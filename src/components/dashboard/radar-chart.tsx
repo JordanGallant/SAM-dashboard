@@ -40,7 +40,7 @@ export function DomainRadarChart({ scorecard }: { scorecard: ScorecardRow[] }) {
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[200px] w-full">
+        <ChartContainer config={chartConfig} className="!aspect-auto h-[200px] w-full">
           <BarChart data={data} layout="vertical" margin={{ left: 0, right: 15, top: 5, bottom: 5 }}>
             <CartesianGrid horizontal={false} strokeDasharray="3 3" opacity={0.3} />
             <XAxis type="number" domain={[0, 100]} tickCount={6} tick={{ fontSize: 10 }} />

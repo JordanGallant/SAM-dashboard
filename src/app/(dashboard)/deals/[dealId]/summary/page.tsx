@@ -47,13 +47,13 @@ export default function SummaryPage() {
       </Card>
 
       {/* Radar + Scorecard */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 items-start">
         <DomainRadarChart scorecard={es.scorecard} />
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Investment Scorecard</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-4">
             <ScorecardTable scorecard={es.scorecard} />
           </CardContent>
         </Card>
