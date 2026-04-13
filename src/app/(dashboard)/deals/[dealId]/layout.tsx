@@ -5,7 +5,8 @@ import { usePathname, useParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Play, Loader2, ArrowLeft } from "lucide-react"
+import { Play, Loader2, ArrowLeft, Lock } from "lucide-react"
+import { useTier } from "@/lib/tier-context"
 import { mockDeals } from "@/lib/mock-data/deals"
 import { ANALYSIS_TABS, STAGE_BADGE_COLORS, STATUS_BADGE_COLORS, PIPELINE_STAGES } from "@/lib/constants"
 import { getScoreColor } from "@/lib/constants"
@@ -23,8 +24,13 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
     return <div className="p-6 text-center text-muted-foreground">Deal not found</div>
   }
 
+  const { config: tierConfig } = useTier()
   const analysis = deal.analysis
   const activeTab = pathname.split("/").pop() || "summary"
+
+  const gatedTabs: Record<string, boolean> = {
+    "fund-fit": !tierConfig.fundFit,
+  }
 
   function getTabScore(tabKey: string): number | undefined {
     if (!analysis) return undefined
@@ -80,6 +86,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
           {ANALYSIS_TABS.map(({ key, label }) => {
             const score = getTabScore(key)
             const isActive = activeTab === key
+            const isGated = gatedTabs[key] ?? false
             return (
               <Link
                 key={key}
@@ -88,11 +95,13 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
                   "flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm transition-colors",
                   isActive
                     ? "border-primary font-medium text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
+                  isGated && "opacity-60"
                 )}
               >
+                {isGated && <Lock className="h-3 w-3" />}
                 {label}
-                {score !== undefined && (
+                {score !== undefined && !isGated && (
                   <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${getScoreColor(score).bg} ${getScoreColor(score).text}`}>
                     {score}
                   </Badge>

@@ -16,11 +16,7 @@ import { StrengthsRisks } from "@/components/dashboard/strengths-risks"
 import { DataCompleteness } from "@/components/dashboard/data-completeness"
 import { ScoreBadge } from "@/components/dashboard/score-badge"
 import { mockDeals } from "@/lib/mock-data/deals"
-import { TIER_CONFIG } from "@/lib/tier-config"
-import type { Tier } from "@/lib/types/user"
-
-// For now, mock the user tier. Replace with real Supabase profile later.
-const CURRENT_TIER: Tier = "professional"
+import { useTier } from "@/lib/tier-context"
 
 export default function SummaryPage() {
   const params = useParams()
@@ -35,7 +31,7 @@ export default function SummaryPage() {
   const [emailSent, setEmailSent] = useState(false)
   const [emailError, setEmailError] = useState("")
 
-  const tierConfig = TIER_CONFIG[CURRENT_TIER]
+  const { config: tierConfig } = useTier()
   const canExportWord = tierConfig.wordExport
   const canEmail = tierConfig.emailSummary !== 0
 
@@ -210,7 +206,7 @@ export default function SummaryPage() {
 
         {/* Tier badge */}
         <p className="text-xs text-muted-foreground">
-          Current plan: <Badge variant="outline" className="text-[10px]">{TIER_CONFIG[CURRENT_TIER].label}</Badge>
+          Current plan: <Badge variant="outline" className="text-[10px]">{tierConfig.label}</Badge>
           {!canExportWord && (
             <span className="ml-2">
               <a href="/settings/billing" className="text-primary hover:underline">Upgrade to Professional</a> to unlock Word export and unlimited email.

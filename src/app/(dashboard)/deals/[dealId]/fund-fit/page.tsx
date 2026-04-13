@@ -8,11 +8,20 @@ import { SectionHeader } from "@/components/dashboard/section-header"
 import { ScoreBadge } from "@/components/dashboard/score-badge"
 import { mockDeals } from "@/lib/mock-data/deals"
 import { CheckCircle2, XCircle } from "lucide-react"
+import { TierGate } from "@/components/dashboard/tier-gate"
+import { useTier } from "@/lib/tier-context"
 
 export default function FundFitPage() {
   const params = useParams()
+  const { config } = useTier()
   const deal = mockDeals.find((d) => d.id === params.dealId)
   const fit = deal?.analysis?.fundFit
+
+  if (!config.fundFit) {
+    return <TierGate feature="Fund Fit Scoring" requiredTier="professional">
+      <div />
+    </TierGate>
+  }
 
   if (!fit) return <p className="text-sm text-muted-foreground">No fund fit analysis available.</p>
 
