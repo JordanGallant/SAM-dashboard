@@ -1,77 +1,90 @@
 "use client"
 
-import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Cell, ReferenceLine } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
+import { Badge } from "@/components/ui/badge"
+import { getScoreColor, DOMAIN_VERDICT_COLORS } from "@/lib/constants"
 import type { ScorecardRow } from "@/lib/types/analysis"
-
-const chartConfig = {
-  score: {
-    label: "Score",
-    color: "hsl(221, 83%, 53%)",
-  },
-  completeness: {
-    label: "Data Available",
-    color: "hsl(160, 60%, 45%)",
-  },
-} satisfies ChartConfig
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 function getBarColor(score: number) {
-  if (score >= 70) return "hsl(152, 69%, 40%)"
-  if (score >= 40) return "hsl(38, 92%, 50%)"
-  return "hsl(0, 72%, 51%)"
+  if (score >= 70) return "bg-emerald-500"
+  if (score >= 40) return "bg-amber-500"
+  return "bg-red-500"
+}
+
+function getBarBg(score: number) {
+  if (score >= 70) return "bg-emerald-100"
+  if (score >= 40) return "bg-amber-100"
+  return "bg-red-100"
 }
 
 export function DomainRadarChart({ scorecard }: { scorecard: ScorecardRow[] }) {
-  const data = scorecard.map((row) => ({
-    domain: row.domain,
-    score: row.score,
-    completeness: row.dataCompleteness,
-  }))
-
   const avgScore = Math.round(scorecard.reduce((a, b) => a + b.score, 0) / scorecard.length)
 
   return (
     <Card>
-      <CardHeader className="pb-1">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-medium">Domain Scores</CardTitle>
-          <span className="text-xs text-muted-foreground">avg {avgScore}/100</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Avg</span>
+            <Badge variant="outline" className={`font-mono text-xs ${getScoreColor(avgScore).bg} ${getScoreColor(avgScore).text}`}>
+              {avgScore}
+            </Badge>
+          </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="!aspect-auto h-[200px] w-full">
-          <BarChart data={data} layout="vertical" margin={{ left: 0, right: 15, top: 5, bottom: 5 }}>
-            <CartesianGrid horizontal={false} strokeDasharray="3 3" opacity={0.3} />
-            <XAxis type="number" domain={[0, 100]} tickCount={6} tick={{ fontSize: 10 }} />
-            <YAxis type="category" dataKey="domain" width={60} tick={{ fontSize: 11, fontWeight: 500 }} />
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <ReferenceLine x={avgScore} stroke="hsl(0, 0%, 60%)" strokeDasharray="3 3" strokeWidth={1} />
-            <Bar dataKey="score" radius={[0, 6, 6, 0]} barSize={18} name="Score">
-              {data.map((entry, i) => (
-                <Cell key={i} fill={getBarColor(entry.score)} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ChartContainer>
+      <CardContent className="space-y-4">
+        {/* Horizontal bar chart */}
+        {scorecard.map((row) => {
+          const verdictColor = DOMAIN_VERDICT_COLORS[row.verdict]
+          return (
+            <div key={row.domain} className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium w-16">{row.domain}</span>
+                  <Badge variant="outline" className={`${verdictColor.bg} ${verdictColor.text} text-[10px] px-1.5 py-0`}>
+                    {row.verdict}
+                  </Badge>
+                </div>
+                <span className={`font-mono text-sm font-semibold ${getScoreColor(row.score).text}`}>
+                  {row.score}
+                </span>
+              </div>
 
-        {/* Data completeness mini-bars */}
-        <div className="mt-3 border-t pt-3">
-          <p className="text-[10px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">Data Completeness</p>
-          <div className="flex gap-2">
-            {scorecard.map((row) => (
-              <div key={row.domain} className="flex-1 text-center">
-                <div className="mx-auto h-12 w-full max-w-[32px] rounded-t-sm bg-muted relative overflow-hidden">
+              {/* Score bar */}
+              <div className={`h-3 w-full rounded-full ${getBarBg(row.score)} overflow-hidden`}>
+                <div
+                  className={`h-full rounded-full ${getBarColor(row.score)} transition-all duration-500`}
+                  style={{ width: `${row.score}%` }}
+                />
+              </div>
+
+              {/* Data completeness indicator */}
+              <div className="flex items-center gap-2">
+                <div className="h-1 flex-1 rounded-full bg-muted overflow-hidden">
                   <div
-                    className="absolute bottom-0 w-full rounded-t-sm bg-emerald-400/70 transition-all"
-                    style={{ height: `${row.dataCompleteness}%` }}
+                    className="h-full rounded-full bg-emerald-400 transition-all duration-500"
+                    style={{ width: `${row.dataCompleteness}%` }}
                   />
                 </div>
-                <p className="mt-1 text-[9px] font-medium text-muted-foreground leading-tight">{row.domain.slice(0, 4)}</p>
-                <p className="text-[9px] tabular-nums text-muted-foreground">{row.dataCompleteness}%</p>
+                <span className="text-[10px] tabular-nums text-muted-foreground w-20 text-right">
+                  {row.dataCompleteness}% data
+                  {row.dataCompleteness < 40 && <span className="text-amber-600"> !</span>}
+                </span>
               </div>
-            ))}
-          </div>
+            </div>
+          )
+        })}
+
+        {/* Legend */}
+        <div className="flex gap-4 pt-1 border-t text-[10px] text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-2 w-4 rounded-full bg-red-500" /> Score
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-1 w-4 rounded-full bg-emerald-400" /> Data available
+          </span>
         </div>
       </CardContent>
     </Card>
