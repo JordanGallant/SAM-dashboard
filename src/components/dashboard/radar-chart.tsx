@@ -1,16 +1,8 @@
 "use client"
 
-import {
-  Radar,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-} from "recharts"
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Cell, ReferenceLine } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
-import { Badge } from "@/components/ui/badge"
-import { getScoreColor, DOMAIN_VERDICT_COLORS } from "@/lib/constants"
 import type { ScorecardRow } from "@/lib/types/analysis"
 
 const chartConfig = {
@@ -19,10 +11,16 @@ const chartConfig = {
     color: "hsl(221, 83%, 53%)",
   },
   completeness: {
-    label: "Data Completeness",
+    label: "Data Available",
     color: "hsl(160, 60%, 45%)",
   },
 } satisfies ChartConfig
+
+function getBarColor(score: number) {
+  if (score >= 70) return "hsl(152, 69%, 40%)"
+  if (score >= 40) return "hsl(38, 92%, 50%)"
+  return "hsl(0, 72%, 51%)"
+}
 
 export function DomainRadarChart({ scorecard }: { scorecard: ScorecardRow[] }) {
   const data = scorecard.map((row) => ({
@@ -31,84 +29,49 @@ export function DomainRadarChart({ scorecard }: { scorecard: ScorecardRow[] }) {
     completeness: row.dataCompleteness,
   }))
 
+  const avgScore = Math.round(scorecard.reduce((a, b) => a + b.score, 0) / scorecard.length)
+
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">Domain Scores</CardTitle>
-        <div className="flex gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-[hsl(221,83%,53%)]" />
-            Score
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-[hsl(160,60%,45%)]" />
-            Data Available
-          </span>
+      <CardHeader className="pb-1">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-medium">Domain Scores</CardTitle>
+          <span className="text-xs text-muted-foreground">avg {avgScore}/100</span>
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[280px]">
-          <RadarChart data={data}>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <PolarGrid strokeDasharray="3 3" />
-            <PolarAngleAxis dataKey="domain" tick={{ fontSize: 11 }} />
-            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9 }} tickCount={6} />
-            <Radar
-              name="Data Completeness"
-              dataKey="completeness"
-              stroke="hsl(160, 60%, 45%)"
-              fill="hsl(160, 60%, 45%)"
-              fillOpacity={0.15}
-              strokeWidth={1.5}
-              strokeDasharray="4 4"
-            />
-            <Radar
-              name="Score"
-              dataKey="score"
-              stroke="hsl(221, 83%, 53%)"
-              fill="hsl(221, 83%, 53%)"
-              fillOpacity={0.25}
-              strokeWidth={2}
-            />
-          </RadarChart>
+        <ChartContainer config={chartConfig} className="h-[200px] w-full">
+          <BarChart data={data} layout="vertical" margin={{ left: 0, right: 15, top: 5, bottom: 5 }}>
+            <CartesianGrid horizontal={false} strokeDasharray="3 3" opacity={0.3} />
+            <XAxis type="number" domain={[0, 100]} tickCount={6} tick={{ fontSize: 10 }} />
+            <YAxis type="category" dataKey="domain" width={60} tick={{ fontSize: 11, fontWeight: 500 }} />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <ReferenceLine x={avgScore} stroke="hsl(0, 0%, 60%)" strokeDasharray="3 3" strokeWidth={1} />
+            <Bar dataKey="score" radius={[0, 6, 6, 0]} barSize={18} name="Score">
+              {data.map((entry, i) => (
+                <Cell key={i} fill={getBarColor(entry.score)} />
+              ))}
+            </Bar>
+          </BarChart>
         </ChartContainer>
 
-        {/* Domain breakdown bars */}
-        <div className="mt-4 space-y-2">
-          {scorecard.map((row) => {
-            const scoreColor = getScoreColor(row.score)
-            const verdictColor = DOMAIN_VERDICT_COLORS[row.verdict]
-            return (
-              <div key={row.domain} className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium">{row.domain}</span>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className={`${verdictColor.bg} ${verdictColor.text} text-[10px] px-1.5 py-0`}>
-                      {row.verdict}
-                    </Badge>
-                    <span className={`font-mono text-[11px] font-semibold ${scoreColor.text}`}>{row.score}</span>
-                  </div>
-                </div>
-                <div className="flex gap-0.5 h-1.5">
+        {/* Data completeness mini-bars */}
+        <div className="mt-3 border-t pt-3">
+          <p className="text-[10px] font-medium text-muted-foreground mb-2 uppercase tracking-wider">Data Completeness</p>
+          <div className="flex gap-2">
+            {scorecard.map((row) => (
+              <div key={row.domain} className="flex-1 text-center">
+                <div className="mx-auto h-12 w-full max-w-[32px] rounded-t-sm bg-muted relative overflow-hidden">
                   <div
-                    className={`rounded-l-full ${scoreColor.bg.replace('100', '400')}`}
-                    style={{ width: `${row.score}%` }}
-                    title={`Score: ${row.score}%`}
-                  />
-                  <div
-                    className="rounded-r-full bg-muted"
-                    style={{ width: `${100 - row.score}%` }}
+                    className="absolute bottom-0 w-full rounded-t-sm bg-emerald-400/70 transition-all"
+                    style={{ height: `${row.dataCompleteness}%` }}
                   />
                 </div>
-                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                  <span>{row.dataCompleteness}% data available</span>
-                  {row.dataCompleteness < 40 && (
-                    <span className="text-amber-600">— low confidence</span>
-                  )}
-                </div>
+                <p className="mt-1 text-[9px] font-medium text-muted-foreground leading-tight">{row.domain.slice(0, 4)}</p>
+                <p className="text-[9px] tabular-nums text-muted-foreground">{row.dataCompleteness}%</p>
               </div>
-            )
-          })}
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>
