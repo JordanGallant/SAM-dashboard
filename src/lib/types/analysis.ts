@@ -1,4 +1,4 @@
-export type Verdict = "Strong Buy" | "Explore" | "Conditional Pass" | "Pass"
+export type Verdict = "Strong Buy" | "Explore" | "Conditional Pass" | "Deny"
 export type Confidence = "High" | "Medium" | "Low"
 export type DomainVerdict = "Strong" | "Moderate" | "Weak" | "Insufficient Data"
 export type Severity = "Critical" | "Warning" | "Info"

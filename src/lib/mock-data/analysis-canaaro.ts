@@ -12,8 +12,8 @@ export const canaароAnalysis: DealAnalysis = {
     raising: "Not disclosed",
     geography: "Netherlands",
     mrr: "Not disclosed",
-    verdict: "Pass",
-    confidence: "High",
+    verdict: "Deny",
+    confidence: "Low",
     overallScore: 24,
     scorecard: [
       { domain: "Team", score: 28, verdict: "Weak", keyFinding: "Complete absence of verifiable founder backgrounds — no LinkedIn profiles, no digital footprint, no career history, no domain expertise evidence.", dataCompleteness: 15 },

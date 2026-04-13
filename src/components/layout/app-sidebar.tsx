@@ -23,7 +23,7 @@ const verdictDotColors: Record<string, string> = {
   "Strong Buy": "bg-emerald-500",
   Explore: "bg-amber-500",
   "Conditional Pass": "bg-orange-500",
-  Pass: "bg-red-500",
+  Deny: "bg-red-500",
 }
 
 export function AppSidebar() {

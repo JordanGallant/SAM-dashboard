@@ -2,7 +2,7 @@ export const VERDICT_COLORS = {
   "Strong Buy": { bg: "bg-emerald-100", text: "text-emerald-800", border: "border-emerald-300" },
   Explore: { bg: "bg-amber-100", text: "text-amber-800", border: "border-amber-300" },
   "Conditional Pass": { bg: "bg-orange-100", text: "text-orange-800", border: "border-orange-300" },
-  Pass: { bg: "bg-red-100", text: "text-red-800", border: "border-red-300" },
+  Deny: { bg: "bg-red-100", text: "text-red-800", border: "border-red-300" },
 } as const
 
 export const DOMAIN_VERDICT_COLORS = {
