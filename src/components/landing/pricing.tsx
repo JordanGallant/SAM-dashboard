@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
-import { Check, X } from "lucide-react"
+import { Check, X, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const tiers = [
@@ -72,7 +72,7 @@ export function Pricing() {
   const [annual, setAnnual] = useState(false)
 
   return (
-    <section id="pricing" className="py-24">
+    <section id="pricing" className="py-24 bg-muted/30">
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold font-heading tracking-tight md:text-4xl">
@@ -83,12 +83,12 @@ export function Pricing() {
           </p>
 
           {/* Annual toggle */}
-          <div className="mt-6 inline-flex items-center gap-3 rounded-full border bg-muted/50 p-1">
+          <div className="mt-6 inline-flex items-center rounded-full border bg-background p-1 shadow-sm">
             <button
               onClick={() => setAnnual(false)}
               className={cn(
                 "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-                !annual ? "bg-background shadow-sm" : "text-muted-foreground"
+                !annual ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
               )}
             >
               Monthly
@@ -96,64 +96,80 @@ export function Pricing() {
             <button
               onClick={() => setAnnual(true)}
               className={cn(
-                "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-                annual ? "bg-background shadow-sm" : "text-muted-foreground"
+                "rounded-full px-4 py-1.5 text-sm font-medium transition-colors flex items-center gap-1.5",
+                annual ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
               )}
             >
               Annual
-              <Badge className="ml-2 bg-emerald-100 text-emerald-700 border-0 text-[10px]">2 months free</Badge>
+              <Badge className="bg-emerald-100 text-emerald-700 border-0 text-[10px] px-1.5 py-0">Save 17%</Badge>
             </button>
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3 items-start">
           {tiers.map((tier) => (
             <Card
               key={tier.name}
               className={cn(
-                "relative",
-                tier.popular && "border-primary shadow-lg shadow-primary/10"
+                "relative flex flex-col",
+                tier.popular
+                  ? "border-2 border-primary shadow-xl shadow-primary/5 scale-[1.02] md:scale-105"
+                  : "border"
               )}
             >
               {tier.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-primary text-primary-foreground">Most Popular</Badge>
+                <div className="bg-primary text-primary-foreground text-center py-1.5 text-xs font-medium flex items-center justify-center gap-1 rounded-t-lg -mt-px -mx-px">
+                  <Sparkles className="h-3 w-3" />
+                  Most Popular
                 </div>
               )}
-              <CardHeader>
+              <CardHeader className={cn(tier.popular ? "pt-4" : "")}>
                 <CardTitle className="text-lg">{tier.name}</CardTitle>
                 <CardDescription>{tier.description}</CardDescription>
-                <div className="mt-3">
-                  <span className="text-4xl font-bold font-heading tracking-tight">
-                    EUR {annual ? Math.round(tier.annual / 12) : tier.price}
-                  </span>
-                  <span className="text-muted-foreground"> / month</span>
+                <div className="mt-4">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-sm text-muted-foreground">EUR</span>
+                    <span className="text-5xl font-bold font-heading tracking-tight">
+                      {annual ? Math.round(tier.annual / 12) : tier.price}
+                    </span>
+                    <span className="text-muted-foreground">/ mo</span>
+                  </div>
                   {annual && (
                     <p className="text-xs text-muted-foreground mt-1">
                       EUR {tier.annual} billed annually
                     </p>
                   )}
+                  {!annual && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Billed monthly
+                    </p>
+                  )}
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="flex flex-col flex-1 space-y-5">
                 <Link
                   href="/register"
                   className={buttonVariants({
                     variant: tier.popular ? "default" : "outline",
+                    size: "lg",
                     className: "w-full",
                   })}
                 >
                   {tier.cta}
                 </Link>
-                <ul className="space-y-2.5">
+                <ul className="space-y-3 flex-1">
                   {tier.features.map((feature) => (
-                    <li key={feature.text} className="flex items-start gap-2 text-sm">
+                    <li key={feature.text} className="flex items-start gap-2.5 text-sm">
                       {feature.included ? (
-                        <Check className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+                        <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                          <Check className="h-2.5 w-2.5 text-emerald-700" />
+                        </div>
                       ) : (
-                        <X className="h-4 w-4 text-muted-foreground/40 mt-0.5 shrink-0" />
+                        <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-muted">
+                          <X className="h-2.5 w-2.5 text-muted-foreground/50" />
+                        </div>
                       )}
-                      <span className={feature.included ? "" : "text-muted-foreground/60"}>
+                      <span className={feature.included ? "" : "text-muted-foreground/50"}>
                         {feature.text}
                       </span>
                     </li>
