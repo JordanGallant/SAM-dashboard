@@ -34,7 +34,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b px-4 py-3">
         <Link href="/deals" className="flex items-center gap-2">
           <BarChart3 className="h-6 w-6" />
-          <span className="text-lg font-bold tracking-tight">SAM</span>
+          <span className="text-lg font-bold tracking-tight font-heading">SAM</span>
         </Link>
       </SidebarHeader>
       <SidebarContent>
