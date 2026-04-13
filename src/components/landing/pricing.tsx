@@ -113,17 +113,17 @@ export function Pricing() {
               className={cn(
                 "relative flex flex-col",
                 tier.popular
-                  ? "border-2 border-primary shadow-xl shadow-primary/5 scale-[1.02] md:scale-105"
+                  ? "border-2 border-primary shadow-xl shadow-primary/5 scale-[1.02] md:scale-105 !pt-0"
                   : "border"
               )}
             >
               {tier.popular && (
-                <div className="bg-primary text-primary-foreground text-center py-1.5 text-xs font-medium flex items-center justify-center gap-1 rounded-t-lg -mt-px -mx-px">
+                <div className="bg-primary text-primary-foreground text-center py-2 text-xs font-medium flex items-center justify-center gap-1">
                   <Sparkles className="h-3 w-3" />
                   Most Popular
                 </div>
               )}
-              <CardHeader className={cn(tier.popular ? "pt-4" : "")}>
+              <CardHeader>
                 <CardTitle className="text-lg">{tier.name}</CardTitle>
                 <CardDescription>{tier.description}</CardDescription>
                 <div className="mt-4">
