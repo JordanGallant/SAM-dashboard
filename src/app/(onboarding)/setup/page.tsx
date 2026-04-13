@@ -18,7 +18,7 @@ export default function SetupPage() {
   return (
     <div className="space-y-4">
       {/* Step indicator */}
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         {steps.map((s, i) => (
           <div key={s} className="flex items-center gap-2">
             <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
@@ -90,7 +90,7 @@ export default function SetupPage() {
                   ))}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="ticket-min">Min Ticket (EUR)</Label>
                   <Input id="ticket-min" type="number" placeholder="250,000" />

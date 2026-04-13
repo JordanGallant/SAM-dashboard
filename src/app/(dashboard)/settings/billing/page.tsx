@@ -17,7 +17,7 @@ export default function BillingPage() {
           <CardDescription>EUR 149/month</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-muted-foreground">Deals this month</p>
               <p className="font-medium">3 / 25</p>
