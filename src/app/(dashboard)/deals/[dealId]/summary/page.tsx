@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge"
 import { FileDown, Mail } from "lucide-react"
 import { VerdictBadge } from "@/components/dashboard/verdict-badge"
 import { ConfidenceBadge } from "@/components/dashboard/confidence-badge"
-import { DomainRadarChart } from "@/components/dashboard/radar-chart"
 import { ScorecardTable } from "@/components/dashboard/scorecard-table"
 import { StrengthsRisks } from "@/components/dashboard/strengths-risks"
 import { DataCompleteness } from "@/components/dashboard/data-completeness"
@@ -46,18 +45,15 @@ export default function SummaryPage() {
         </CardContent>
       </Card>
 
-      {/* Radar + Scorecard */}
-      <div className="grid gap-4 lg:grid-cols-2 items-start">
-        <DomainRadarChart scorecard={es.scorecard} />
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Investment Scorecard</CardTitle>
-          </CardHeader>
-          <CardContent className="pb-4">
-            <ScorecardTable scorecard={es.scorecard} />
-          </CardContent>
-        </Card>
-      </div>
+      {/* Investment Scorecard: chart + table */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Investment Scorecard</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScorecardTable scorecard={es.scorecard} />
+        </CardContent>
+      </Card>
 
       {/* Thesis */}
       <Card>
