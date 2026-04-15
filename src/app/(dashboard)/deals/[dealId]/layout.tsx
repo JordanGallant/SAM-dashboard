@@ -7,24 +7,35 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Play, Loader2, ArrowLeft, Lock } from "lucide-react"
 import { useTier } from "@/lib/tier-context"
-import { mockDeals } from "@/lib/mock-data/deals"
+import { useDeal } from "@/hooks/use-deal"
 import { ANALYSIS_TABS, STAGE_BADGE_COLORS, STATUS_BADGE_COLORS, PIPELINE_STAGES } from "@/lib/constants"
 import { getScoreColor } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
+import { updateDealStatus } from "@/app/actions/deals"
+import type { PipelineStatus } from "@/lib/types/deal"
 
 export default function DealDetailLayout({ children }: { children: React.ReactNode }) {
   const params = useParams()
   const pathname = usePathname()
   const dealId = params.dealId as string
-  const deal = mockDeals.find((d) => d.id === dealId)
+  const { deal, loading } = useDeal(dealId)
+  const { config: tierConfig } = useTier()
   const [analyzing, setAnalyzing] = useState(false)
 
-  if (!deal) {
-    return <div className="p-6 text-center text-muted-foreground">Deal not found</div>
+  if (loading) {
+    return <p className="text-sm text-muted-foreground">Loading deal...</p>
   }
 
-  const { config: tierConfig } = useTier()
+  if (!deal) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-sm text-muted-foreground">Deal not found.</p>
+        <Link href="/deals" className="text-sm text-primary hover:underline mt-2 inline-block">Back to Dealroom</Link>
+      </div>
+    )
+  }
+
   const analysis = deal.analysis
   const activeTab = pathname.split("/").pop() || "summary"
 
@@ -47,6 +58,11 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
     return map[tabKey]
   }
 
+  async function handleStatusChange(status: string | null) {
+    if (!status) return
+    await updateDealStatus(dealId, status as PipelineStatus)
+  }
+
   return (
     <div className="space-y-4">
       {/* Deal header */}
@@ -56,7 +72,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
         </Link>
         <h1 className="text-xl font-bold">{deal.companyName}</h1>
         <Badge className={STAGE_BADGE_COLORS[deal.stage]}>{deal.stage}</Badge>
-        <Select defaultValue={deal.status}>
+        <Select defaultValue={deal.status} onValueChange={handleStatusChange}>
           <SelectTrigger className="h-7 w-auto gap-1 text-xs">
             <SelectValue />
           </SelectTrigger>
@@ -80,7 +96,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
         )}
       </div>
 
-      {/* Tab navigation */}
+      {/* Tab navigation (only when analysis exists) */}
       {analysis && (
         <nav className="flex gap-1 overflow-x-auto border-b pb-px">
           {ANALYSIS_TABS.map(({ key, label }) => {

@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
-import { mockDeals } from "@/lib/mock-data/deals"
+import { useDeal } from "@/hooks/use-deal"
 import { ExternalLink } from "lucide-react"
 
 export default function TeamPage() {
   const params = useParams()
-  const deal = mockDeals.find((d) => d.id === params.dealId)
+  const { deal } = useDeal(params.dealId as string)
   const team = deal?.analysis?.team
 
   if (!team) return <p className="text-sm text-muted-foreground">No team analysis available.</p>

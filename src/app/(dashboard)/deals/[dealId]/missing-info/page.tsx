@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { DataCompleteness } from "@/components/dashboard/data-completeness"
-import { mockDeals } from "@/lib/mock-data/deals"
+import { useDeal } from "@/hooks/use-deal"
 import { CircleDot, MessageSquareText } from "lucide-react"
 
 export default function MissingInfoPage() {
   const params = useParams()
-  const deal = mockDeals.find((d) => d.id === params.dealId)
+  const { deal } = useDeal(params.dealId as string)
   const missing = deal?.analysis?.missingInfo
 
   if (!missing) return <p className="text-sm text-muted-foreground">No missing info analysis available.</p>

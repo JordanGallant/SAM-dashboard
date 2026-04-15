@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { MetricTable } from "@/components/dashboard/metric-table"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
-import { mockDeals } from "@/lib/mock-data/deals"
+import { useDeal } from "@/hooks/use-deal"
 
 export default function ExitPage() {
   const params = useParams()
-  const deal = mockDeals.find((d) => d.id === params.dealId)
+  const { deal } = useDeal(params.dealId as string)
   const exit = deal?.analysis?.exitPotential
 
   if (!exit) return <p className="text-sm text-muted-foreground">No exit analysis available.</p>

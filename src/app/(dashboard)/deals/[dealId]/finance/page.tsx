@@ -6,11 +6,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { MetricTable } from "@/components/dashboard/metric-table"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
-import { mockDeals } from "@/lib/mock-data/deals"
+import { useDeal } from "@/hooks/use-deal"
 
 export default function FinancePage() {
   const params = useParams()
-  const deal = mockDeals.find((d) => d.id === params.dealId)
+  const { deal } = useDeal(params.dealId as string)
   const finance = deal?.analysis?.finance
 
   if (!finance) return <p className="text-sm text-muted-foreground">No financial analysis available.</p>

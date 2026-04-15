@@ -6,12 +6,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
-import { mockDeals } from "@/lib/mock-data/deals"
+import { useDeal } from "@/hooks/use-deal"
 import { THREAT_COLORS, DOMAIN_VERDICT_COLORS } from "@/lib/constants"
 
 export default function MarketPage() {
   const params = useParams()
-  const deal = mockDeals.find((d) => d.id === params.dealId)
+  const { deal } = useDeal(params.dealId as string)
   const market = deal?.analysis?.market
 
   if (!market) return <p className="text-sm text-muted-foreground">No market analysis available.</p>

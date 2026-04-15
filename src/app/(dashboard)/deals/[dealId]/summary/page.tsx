@@ -8,20 +8,22 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { FileDown, Mail, Loader2, CheckCircle2, Lock } from "lucide-react"
+import { FileDown, Mail, Loader2, CheckCircle2, Lock, Sparkles } from "lucide-react"
 import { VerdictBadge } from "@/components/dashboard/verdict-badge"
 import { ConfidenceBadge } from "@/components/dashboard/confidence-badge"
 import { ScorecardTable } from "@/components/dashboard/scorecard-table"
 import { StrengthsRisks } from "@/components/dashboard/strengths-risks"
 import { DataCompleteness } from "@/components/dashboard/data-completeness"
 import { ScoreBadge } from "@/components/dashboard/score-badge"
-import { mockDeals } from "@/lib/mock-data/deals"
+import { DealUpload } from "@/components/deals/deal-upload"
+import { useDeal } from "@/hooks/use-deal"
 import { useTier } from "@/lib/tier-context"
 
 export default function SummaryPage() {
   const params = useParams()
-  const deal = mockDeals.find((d) => d.id === params.dealId)
-  const analysis = deal?.analysis
+  const dealId = params.dealId as string
+  const { deal, loading, refetch } = useDeal(dealId)
+  const { config: tierConfig } = useTier()
 
   const [downloading, setDownloading] = useState(false)
   const [downloadDone, setDownloadDone] = useState(false)
@@ -31,7 +33,6 @@ export default function SummaryPage() {
   const [emailSent, setEmailSent] = useState(false)
   const [emailError, setEmailError] = useState("")
 
-  const { config: tierConfig } = useTier()
   const canExportWord = tierConfig.wordExport
   const canEmail = tierConfig.emailSummary !== 0
 
@@ -84,7 +85,6 @@ export default function SummaryPage() {
       const data = await res.json()
 
       if (data.fallbackDownload) {
-        // Email not configured, download instead
         setEmailError("Email service not configured yet. Use the download button instead.")
         setEmailing(false)
         return
@@ -100,16 +100,31 @@ export default function SummaryPage() {
     }
   }
 
-  if (!analysis) {
+  if (loading) return <p className="text-sm text-muted-foreground">Loading...</p>
+  if (!deal) return null
+
+  // No analysis yet — show upload + run analysis state
+  if (!deal.analysis) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <h2 className="text-lg font-semibold">No Analysis Yet</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Upload documents and run analysis to see results here.</p>
+      <div className="space-y-6">
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+              <Sparkles className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="font-semibold">Awaiting analysis</h3>
+            <p className="mt-1 text-sm text-muted-foreground max-w-md">
+              Upload your pitch deck and any supporting documents below, then click &quot;Run Analysis&quot; to generate your executive summary.
+            </p>
+          </CardContent>
+        </Card>
+
+        <DealUpload dealId={deal.id} documents={deal.documents} onChange={refetch} />
       </div>
     )
   }
 
-  const es = analysis.executiveSummary
+  const es = deal.analysis.executiveSummary
 
   return (
     <div className="space-y-6">
@@ -169,7 +184,6 @@ export default function SummaryPage() {
         <DataCompleteness percentage={es.dataCompleteness} />
 
         <div className="flex flex-col sm:flex-row gap-2">
-          {/* Word Doc Export */}
           {canExportWord ? (
             <Button onClick={handleDownloadWord} disabled={downloading}>
               {downloading ? (
@@ -189,7 +203,6 @@ export default function SummaryPage() {
             </Button>
           )}
 
-          {/* Email Summary */}
           {canEmail ? (
             <Button variant="outline" onClick={() => { setEmailOpen(true); setEmailSent(false); setEmailError("") }}>
               <Mail className="mr-2 h-4 w-4" />
@@ -204,7 +217,6 @@ export default function SummaryPage() {
           )}
         </div>
 
-        {/* Tier badge */}
         <p className="text-xs text-muted-foreground">
           Current plan: <Badge variant="outline" className="text-[10px]">{tierConfig.label}</Badge>
           {!canExportWord && (
@@ -230,19 +242,10 @@ export default function SummaryPage() {
             </div>
           ) : (
             <form onSubmit={handleSendEmail} className="space-y-4">
-              {emailError && (
-                <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{emailError}</div>
-              )}
+              {emailError && <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{emailError}</div>}
               <div className="space-y-2">
                 <Label htmlFor="email">Recipient Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="partner@fund.com"
-                  value={emailTo}
-                  onChange={(e) => setEmailTo(e.target.value)}
-                  required
-                />
+                <Input id="email" type="email" placeholder="partner@fund.com" value={emailTo} onChange={(e) => setEmailTo(e.target.value)} required />
               </div>
               <p className="text-xs text-muted-foreground">
                 Sends the {es.companyName} Executive Summary as a formatted Word doc attachment.

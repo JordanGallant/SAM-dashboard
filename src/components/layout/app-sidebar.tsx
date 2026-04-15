@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar"
 import { buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { mockDeals } from "@/lib/mock-data/deals"
+import { useDeals } from "@/hooks/use-deals"
 import { STAGE_BADGE_COLORS } from "@/lib/constants"
 
 const verdictDotColors: Record<string, string> = {
@@ -28,6 +28,7 @@ const verdictDotColors: Record<string, string> = {
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { deals, loading } = useDeals()
 
   return (
     <Sidebar>
@@ -46,34 +47,40 @@ export function AppSidebar() {
             </Link>
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {mockDeals.map((deal) => {
-                const isActive = pathname.startsWith(`/deals/${deal.id}`)
-                const verdict = deal.analysis?.executiveSummary.verdict
-                return (
-                  <SidebarMenuItem key={deal.id}>
-                    <SidebarMenuButton render={<Link href={`/deals/${deal.id}/summary`} />} isActive={isActive} className="h-auto py-2.5">
-                      <div className="flex w-full items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${verdict ? verdictDotColors[verdict] ?? "bg-gray-300" : "bg-gray-300"}`} />
-                            <span className="truncate font-medium text-sm">{deal.companyName}</span>
-                          </div>
-                          <div className="mt-1 flex items-center gap-2">
-                            <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${STAGE_BADGE_COLORS[deal.stage] ?? ""}`}>
-                              {deal.stage}
-                            </Badge>
-                            <span className="text-[10px] text-muted-foreground">
-                              {new Date(deal.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
-                            </span>
+            {loading ? (
+              <p className="px-2 text-xs text-muted-foreground">Loading...</p>
+            ) : deals.length === 0 ? (
+              <p className="px-2 text-xs text-muted-foreground">No deals yet</p>
+            ) : (
+              <SidebarMenu>
+                {deals.map((deal) => {
+                  const isActive = pathname.startsWith(`/deals/${deal.id}`)
+                  const verdict = deal.analysis?.executiveSummary.verdict
+                  return (
+                    <SidebarMenuItem key={deal.id}>
+                      <SidebarMenuButton render={<Link href={`/deals/${deal.id}/summary`} />} isActive={isActive} className="h-auto py-2.5">
+                        <div className="flex w-full items-start justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${verdict ? verdictDotColors[verdict] ?? "bg-gray-300" : "bg-gray-300"}`} />
+                              <span className="truncate font-medium text-sm">{deal.companyName}</span>
+                            </div>
+                            <div className="mt-1 flex items-center gap-2">
+                              <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${STAGE_BADGE_COLORS[deal.stage] ?? ""}`}>
+                                {deal.stage}
+                              </Badge>
+                              <span className="text-[10px] text-muted-foreground">
+                                {new Date(deal.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            )}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

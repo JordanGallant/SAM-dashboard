@@ -7,11 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { MetricTable } from "@/components/dashboard/metric-table"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
-import { mockDeals } from "@/lib/mock-data/deals"
+import { useDeal } from "@/hooks/use-deal"
 
 export default function ProductPage() {
   const params = useParams()
-  const deal = mockDeals.find((d) => d.id === params.dealId)
+  const { deal } = useDeal(params.dealId as string)
   const product = deal?.analysis?.product
 
   if (!product) return <p className="text-sm text-muted-foreground">No product analysis available.</p>
