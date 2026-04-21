@@ -27,9 +27,10 @@ function DealsContent() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Dealroom</h1>
-          <p className="text-sm text-muted-foreground">
-            {loading ? "Loading..." : `${deals.length} deal${deals.length === 1 ? "" : "s"}`}
+          <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Your deals</p>
+          <h1 className="mt-1 text-2xl font-bold font-heading">Dealroom</h1>
+          <p className="text-sm text-muted-foreground font-mono">
+            {loading ? "loading..." : `${deals.length} deal${deals.length === 1 ? "" : "s"} tracked`}
           </p>
         </div>
         <Button onClick={() => setDialogOpen(true)}>
@@ -81,16 +82,19 @@ function DealsContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-1 text-muted-foreground">
                         <FileText className="h-3.5 w-3.5" />
-                        <span>{deal.documents.length} doc{deal.documents.length !== 1 ? "s" : ""}</span>
+                        <span className="font-mono text-xs">{deal.documents.length} doc{deal.documents.length !== 1 ? "s" : ""}</span>
                       </div>
                       {score !== undefined && (
-                        <span className="font-medium tabular-nums">{score}/100</span>
+                        <div className="flex items-baseline gap-0.5">
+                          <span className="text-lg font-mono font-bold text-amber-600 leading-none">{score}</span>
+                          <span className="text-xs font-mono text-muted-foreground">/100</span>
+                        </div>
                       )}
                       {!deal.analysis && (
-                        <span className="flex items-center gap-1 text-muted-foreground">
+                        <span className="flex items-center gap-1 text-muted-foreground font-mono text-xs uppercase tracking-wider">
                           <Upload className="h-3.5 w-3.5" />
                           Awaiting analysis
                         </span>

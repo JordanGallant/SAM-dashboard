@@ -73,7 +73,10 @@ function BillingContent() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-xl font-bold">Billing & Subscription</h1>
+      <div>
+        <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Account</p>
+        <h1 className="mt-1 text-xl font-bold font-heading">Billing &amp; Subscription</h1>
+      </div>
 
       {showExpired && (
         <div className="rounded-md bg-amber-50 border border-amber-200 p-4 flex gap-3">
@@ -109,12 +112,12 @@ function BillingContent() {
       {!isInactive && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              Current Plan
-              <Badge className="bg-primary/10 text-primary border-0">{config.label}</Badge>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Current plan</p>
+            <CardTitle className="flex items-center gap-2 text-sm font-medium mt-1">
+              <Badge className="bg-primary/10 text-primary border-0 font-mono">{config.label}</Badge>
               {isTrialing && (
-                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                  Trial: {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"} left
+                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 font-mono">
+                  Trial · {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} left
                 </Badge>
               )}
               {isActive && (

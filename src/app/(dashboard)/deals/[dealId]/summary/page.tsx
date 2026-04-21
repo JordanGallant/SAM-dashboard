@@ -14,7 +14,7 @@ import { ConfidenceBadge } from "@/components/dashboard/confidence-badge"
 import { ScorecardTable } from "@/components/dashboard/scorecard-table"
 import { StrengthsRisks } from "@/components/dashboard/strengths-risks"
 import { DataCompleteness } from "@/components/dashboard/data-completeness"
-import { ScoreBadge } from "@/components/dashboard/score-badge"
+import { SectionLabel } from "@/components/dashboard/section-label"
 import { DealUpload } from "@/components/deals/deal-upload"
 import { useDeal } from "@/hooks/use-deal"
 import { useTier } from "@/lib/tier-context"
@@ -175,11 +175,21 @@ export default function SummaryPage() {
     <div className="space-y-6">
       {/* Verdict + Score row */}
       <Card>
-        <CardContent className="flex flex-wrap items-center gap-4 pt-6">
-          <VerdictBadge verdict={es.verdict} />
-          <ConfidenceBadge confidence={es.confidence} />
-          <ScoreBadge score={es.overallScore} label="Overall" />
-          <div className="ml-auto flex flex-wrap gap-2 text-sm text-muted-foreground">
+        <CardContent className="pt-6">
+          <SectionLabel className="mb-3">Executive Summary</SectionLabel>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <VerdictBadge verdict={es.verdict} />
+              <ConfidenceBadge confidence={es.confidence} />
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-4xl font-mono font-bold text-amber-600 leading-none">
+                {es.overallScore}
+              </span>
+              <span className="text-sm font-mono text-muted-foreground">/100</span>
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2 text-sm text-muted-foreground">
             <Badge variant="outline">{es.stage}</Badge>
             <Badge variant="outline">{es.geography}</Badge>
             <Badge variant="outline">Raising: {es.raising}</Badge>
@@ -190,7 +200,8 @@ export default function SummaryPage() {
       {/* Investment Scorecard: chart + table */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Investment Scorecard</CardTitle>
+          <SectionLabel>Investment Scorecard</SectionLabel>
+          <CardTitle className="text-sm font-medium mt-1">Domain scores, verdicts, and key findings</CardTitle>
         </CardHeader>
         <CardContent>
           <ScorecardTable scorecard={es.scorecard} />
@@ -200,7 +211,7 @@ export default function SummaryPage() {
       {/* Thesis */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Investment Thesis</CardTitle>
+          <SectionLabel>Investment Thesis</SectionLabel>
         </CardHeader>
         <CardContent>
           <p className="text-sm leading-relaxed text-muted-foreground">{es.thesis}</p>
@@ -213,7 +224,7 @@ export default function SummaryPage() {
       {/* Next Steps */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Recommended Next Steps</CardTitle>
+          <SectionLabel>Recommended Next Steps</SectionLabel>
         </CardHeader>
         <CardContent>
           <ol className="list-decimal list-inside space-y-2">
