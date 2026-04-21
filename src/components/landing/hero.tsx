@@ -5,15 +5,15 @@ import { ArrowRight, Shield, FileCheck } from "lucide-react"
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-50 via-indigo-50 to-violet-50" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(99,102,241,0.15),transparent)]" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-slate-50 to-white" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(37,99,235,0.08),transparent)]" />
 
       <div className="mx-auto max-w-6xl px-4 py-24 md:py-32">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold tracking-tight md:text-6xl font-heading">
             From pitch deck
             <br />
-            <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
+            <span className="text-primary">
               to investment decision.
             </span>
           </h1>

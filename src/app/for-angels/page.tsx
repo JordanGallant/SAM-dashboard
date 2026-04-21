@@ -68,7 +68,7 @@ export default function ForAnglesPage() {
         </section>
 
         {/* CTA */}
-        <section className="py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-violet-50">
+        <section className="py-20 bg-gradient-to-b from-slate-50 to-white border-t">
           <div className="mx-auto max-w-3xl px-4 text-center">
             <h2 className="text-2xl md:text-3xl font-bold font-heading tracking-tight">
               Angel plan — €49 per month.
