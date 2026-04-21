@@ -23,6 +23,20 @@ function RedirectContent() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tier }),
         })
+
+        if (res.status === 401) {
+          setErrorMessage("Your session expired. Please sign in again.")
+          setStatus("error")
+          return
+        }
+
+        const contentType = res.headers.get("content-type") || ""
+        if (!contentType.includes("application/json")) {
+          setErrorMessage(`Unexpected response (${res.status}). Please try again.`)
+          setStatus("error")
+          return
+        }
+
         const data = await res.json()
         if (data.url) {
           window.location.href = data.url

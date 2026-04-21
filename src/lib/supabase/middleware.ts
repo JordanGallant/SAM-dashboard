@@ -31,6 +31,10 @@ export async function updateSession(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     const { pathname } = request.nextUrl
+
+    // API routes handle their own auth — never redirect them
+    if (pathname.startsWith("/api/")) return supabaseResponse
+
     const publicRoutes = ["/", "/login", "/register", "/reset-password"]
     const isPublic =
       publicRoutes.some((route) => pathname === route) ||
@@ -52,13 +56,14 @@ export async function updateSession(request: NextRequest) {
 
     if (isPublic) return supabaseResponse
 
-    // API routes handle their own auth — don't subscription-gate them
-    if (pathname.startsWith("/api/")) return supabaseResponse
+    const paymentFlowAllowed =
+      pathname === "/settings/billing" ||
+      pathname.startsWith("/settings/billing/") ||
+      pathname === "/setup" ||
+      pathname === "/checkout-redirect" ||
+      pathname.startsWith("/checkout/")
 
-    const billingAllowed =
-      pathname === "/settings/billing" || pathname.startsWith("/settings/billing/") || pathname === "/setup"
-
-    if (billingAllowed) return supabaseResponse
+    if (paymentFlowAllowed) return supabaseResponse
 
     const { data: profile } = await supabase
       .from("profiles")
