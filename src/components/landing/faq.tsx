@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils"
 
 const questions = [
   {
-    q: "How is Sam different from using ChatGPT to analyse a pitch deck?",
-    a: "Sam is not a chatbot. It applies a fixed five-domain evaluation framework to every deck, produces scored verdicts, and maintains consistency across memos. ChatGPT reshuffles the words in your deck and tells you they look good. The two are not substitutes.",
+    q: "How is Sam different from using generic AI to analyse a pitch deck?",
+    a: "Sam applies a fixed five-domain evaluation framework to every deck — the same structure, scoring rubric, and severity classifications every time. Generic AI returns whatever comes out of a prompt, so the output varies, can't be compared across deals, and lacks a defensible methodology. Sam's framework is the product; the model is just the engine behind it.",
   },
   {
     q: "Is my pitch deck data secure and confidential?",

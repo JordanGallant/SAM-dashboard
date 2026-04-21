@@ -40,12 +40,12 @@ export function Comparison() {
         <div className="max-w-3xl mx-auto text-center mb-12">
           <p className="text-xs font-mono uppercase tracking-widest text-amber-600">Where Sam sits</p>
           <h2 className="mt-3 text-3xl md:text-4xl font-bold font-heading tracking-tight">
-            Sam is not a chatbot,
+            Structured analysis,
             <br />
-            <span className="text-muted-foreground">and it is not a database.</span>
+            <span className="text-muted-foreground">not freeform summaries.</span>
           </h2>
           <p className="mt-4 text-muted-foreground">
-            It is the evaluation layer that sits between the deck and the decision.
+            Sam is the evaluation layer that sits between the deck and the decision. Other tools help you find deals or store them — Sam is what tells you whether to invest.
           </p>
         </div>
 
@@ -83,7 +83,7 @@ export function Comparison() {
         </div>
 
         <p className="mt-6 text-xs text-center text-muted-foreground font-mono">
-          Sam is not a startup database (that's Dealroom). Not a CRM (Affinity). Not a data platform (PitchBook). Not a pitch deck summariser (ChatGPT).
+          Sam is not a startup database (that's Dealroom). Not a CRM (Affinity). Not a data platform (PitchBook). Sam is the evaluation layer on top of the deck.
         </p>
       </div>
     </section>

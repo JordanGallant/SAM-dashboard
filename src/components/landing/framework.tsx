@@ -1,11 +1,11 @@
 import { Users, Globe2, Package, TrendingUp, Landmark } from "lucide-react"
 
 const domains = [
-  { icon: Users, name: "Team", sample: 88, focus: "Founder-market fit, backgrounds, red flags" },
-  { icon: Globe2, name: "Market", sample: 76, focus: "TAM / SAM / SOM validation, competitors, why now" },
-  { icon: Package, name: "Product", sample: 84, focus: "10x test, PMF signals, moat" },
-  { icon: TrendingUp, name: "Traction", sample: 72, focus: "Revenue, retention, capital efficiency" },
-  { icon: Landmark, name: "Financials", sample: 90, focus: "Valuation, deal terms, investor signals" },
+  { icon: Users, name: "Team", focus: "Founder-market fit, backgrounds, red flags" },
+  { icon: Globe2, name: "Market", focus: "TAM / SAM / SOM validation, competitors, why now" },
+  { icon: Package, name: "Product", focus: "10x test, PMF signals, moat" },
+  { icon: TrendingUp, name: "Traction", focus: "Revenue, retention, capital efficiency" },
+  { icon: Landmark, name: "Financials", focus: "Valuation, deal terms, investor signals" },
 ]
 
 export function Framework() {
@@ -22,9 +22,7 @@ export function Framework() {
           </p>
         </div>
 
-        {/* Domain cards connected by a line */}
         <div className="relative">
-          {/* Horizontal connecting line (desktop only) */}
           <div className="hidden md:block absolute top-6 left-[10%] right-[10%] h-px bg-border -z-10" />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -44,8 +42,8 @@ export function Framework() {
                       {d.focus}
                     </p>
                     <div className="pt-2 border-t w-full">
-                      <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">Sample</p>
-                      <p className="text-xl font-mono font-bold text-amber-600 mt-0.5">{d.sample}</p>
+                      <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">Scored</p>
+                      <p className="text-base font-mono font-semibold text-amber-600 mt-0.5">0 — 100</p>
                     </div>
                   </div>
                 </div>
