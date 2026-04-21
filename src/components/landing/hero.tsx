@@ -25,7 +25,7 @@ export function Hero() {
               Start with a deck
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
-            <Link href="#sample-memo" className={buttonVariants({ variant: "outline", size: "lg", className: "text-base px-8" })}>
+            <Link href="/sample" className={buttonVariants({ variant: "outline", size: "lg", className: "text-base px-8" })}>
               See a sample memo
             </Link>
           </div>
