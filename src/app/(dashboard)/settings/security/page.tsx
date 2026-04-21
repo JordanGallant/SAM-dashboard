@@ -72,11 +72,6 @@ export default function SecurityPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div>
-        <SectionLabel>Account</SectionLabel>
-        <h1 className="mt-1 text-xl font-bold font-heading">Security</h1>
-      </div>
-
       {/* 2FA */}
       <Card>
         <CardHeader>

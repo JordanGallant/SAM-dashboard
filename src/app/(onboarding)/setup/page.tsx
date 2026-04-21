@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,14 +12,17 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2 } from "lucide-react"
 import { DEAL_STAGES, SECTORS, GEOS } from "@/lib/constants"
 import { upsertFund } from "@/app/actions/funds"
+import { useFundProfile } from "@/hooks/use-fund-profile"
 
 const steps = ["Fund Details", "Investment Focus", "Portfolio"]
 
 export default function SetupPage() {
   const router = useRouter()
+  const { fund, loading: fundLoading } = useFundProfile()
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
+  const [prefilled, setPrefilled] = useState(false)
 
   // Form state
   const [name, setName] = useState("")
@@ -31,6 +34,23 @@ export default function SetupPage() {
   const [ticketMin, setTicketMin] = useState("")
   const [ticketMax, setTicketMax] = useState("")
   const [portfolio, setPortfolio] = useState<string[]>(["", "", ""])
+
+  // Pre-fill from existing fund profile if present (user returning to wizard)
+  useEffect(() => {
+    if (fundLoading || !fund || prefilled) return
+    setName(fund.name ?? "")
+    setWebsite(fund.website ?? "")
+    setThesis(fund.thesis ?? "")
+    setStageFocus(fund.stageFocus ?? [])
+    setSectorFocus(fund.sectorFocus ?? [])
+    setGeoFocus(fund.geoFocus ?? [])
+    setTicketMin(fund.ticketSizeMin ? String(fund.ticketSizeMin) : "")
+    setTicketMax(fund.ticketSizeMax ? String(fund.ticketSizeMax) : "")
+    if (fund.portfolioCompanies && fund.portfolioCompanies.length > 0) {
+      setPortfolio(fund.portfolioCompanies.concat(["", "", ""]).slice(0, Math.max(3, fund.portfolioCompanies.length)))
+    }
+    setPrefilled(true)
+  }, [fund, fundLoading, prefilled])
 
   function toggle(arr: string[], value: string, setter: (v: string[]) => void) {
     setter(arr.includes(value) ? arr.filter((x) => x !== value) : [...arr, value])

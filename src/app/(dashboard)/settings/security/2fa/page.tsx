@@ -141,33 +141,59 @@ function TwoFactorSetup() {
       {step === "enroll" && enrollment && (
         <Card>
           <CardHeader>
-            <SectionLabel>Step 1 · Scan</SectionLabel>
+            <SectionLabel>Step 1 · Install an authenticator app</SectionLabel>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Open your authenticator app and scan the QR code below. Or enter the secret manually.
+              If you don&apos;t already have one, install Google Authenticator on your phone. Authy and 1Password also work.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <a
+                href="https://apps.apple.com/app/google-authenticator/id388497605"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between rounded-md border p-3 text-sm hover:bg-muted/50 transition-colors"
+              >
+                <span className="font-medium">Google Authenticator · iOS</span>
+                <span className="text-[11px] font-mono text-muted-foreground">App Store ↗</span>
+              </a>
+              <a
+                href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between rounded-md border p-3 text-sm hover:bg-muted/50 transition-colors"
+              >
+                <span className="font-medium">Google Authenticator · Android</span>
+                <span className="text-[11px] font-mono text-muted-foreground">Play Store ↗</span>
+              </a>
+            </div>
+
+            <hr />
+
+            <SectionLabel>Step 2 · Scan this QR code</SectionLabel>
+            <p className="text-sm text-muted-foreground">
+              In Google Authenticator, tap <span className="font-medium">+</span> → <span className="font-medium">Scan a QR code</span>, then point your camera at the image below.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 items-center">
               <div className="bg-white p-3 rounded-lg border">
-                {/* Supabase returns an SVG data URL */}
                 <Image src={enrollment.qrCode} alt="2FA QR code" width={180} height={180} unoptimized />
               </div>
               <div className="flex-1 w-full">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Secret key</p>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Or enter this secret manually</p>
                 <div className="rounded-md bg-muted/50 border p-3 font-mono text-xs break-all select-all">
                   {enrollment.secret}
                 </div>
                 <p className="mt-2 text-[11px] text-muted-foreground">
-                  Can&apos;t scan? Copy this secret into your app manually.
+                  In the app, tap <span className="font-medium">+</span> → <span className="font-medium">Enter a setup key</span> and paste this.
                 </p>
               </div>
             </div>
 
             <hr />
             <div>
-              <SectionLabel>Step 2 · Verify</SectionLabel>
+              <SectionLabel>Step 3 · Enter the 6-digit code</SectionLabel>
               <form onSubmit={verifyCode} className="mt-3 space-y-3">
-                <Label htmlFor="code" className="text-sm">Enter the 6-digit code from your app</Label>
+                <Label htmlFor="code" className="text-sm">Type the code currently shown in your authenticator app</Label>
                 <Input
                   id="code"
                   placeholder="000000"

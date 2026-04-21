@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Loader2, CheckCircle2 } from "lucide-react"
+import { Loader2, CheckCircle2, Sparkles } from "lucide-react"
 import { useFundProfile } from "@/hooks/use-fund-profile"
 import { upsertFund } from "@/app/actions/funds"
 import { DEAL_STAGES, SECTORS, GEOS } from "@/lib/constants"
@@ -73,7 +74,20 @@ export default function FundProfilePage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-xl font-bold">Fund Profile</h1>
+      <Card className="border-dashed">
+        <CardContent className="pt-5 flex items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <Sparkles className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium">Prefer the guided setup?</p>
+              <p className="text-xs text-muted-foreground">Walk through the 3-step wizard instead of editing fields directly.</p>
+            </div>
+          </div>
+          <Link href="/setup" className={buttonVariants({ variant: "outline", size: "sm", className: "shrink-0" })}>
+            Use guided setup
+          </Link>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader><CardTitle className="text-sm font-medium">Fund Details</CardTitle></CardHeader>

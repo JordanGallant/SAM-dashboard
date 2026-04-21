@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DealCreateDialog } from "@/components/deals/deal-create-dialog"
+import { FundProfileBanner } from "@/components/dashboard/fund-profile-banner"
 import { useDeals } from "@/hooks/use-deals"
 import { STAGE_BADGE_COLORS, STATUS_BADGE_COLORS, VERDICT_COLORS } from "@/lib/constants"
 
@@ -24,7 +25,8 @@ function DealsContent() {
   }
 
   return (
-    <div>
+    <div className="space-y-6">
+      <FundProfileBanner />
       <div className="mb-6 flex items-center justify-between">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Your deals</p>

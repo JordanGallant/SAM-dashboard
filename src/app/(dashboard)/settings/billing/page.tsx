@@ -74,11 +74,6 @@ function BillingContent() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div>
-        <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Account</p>
-        <h1 className="mt-1 text-xl font-bold font-heading">Billing &amp; Subscription</h1>
-      </div>
-
       {showExpired && (
         <div className="rounded-md bg-amber-50 border border-amber-200 p-4 flex gap-3">
           <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
