@@ -1,4 +1,4 @@
-import type { DealAnalysis } from "../types/analysis"
+import type { DealAnalysis } from "../../src/lib/types/analysis"
 
 export const canaароAnalysis: DealAnalysis = {
   id: "analysis-1",

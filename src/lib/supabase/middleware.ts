@@ -4,7 +4,6 @@ import { NextResponse, type NextRequest } from "next/server"
 export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL
 
   if (!supabaseUrl || !supabaseKey) {
     console.warn("Supabase env vars missing — skipping auth middleware")
@@ -38,7 +37,6 @@ export async function updateSession(request: NextRequest) {
       pathname.startsWith("/auth/") ||
       pathname.startsWith("/checkout/")
 
-    // Not logged in: only allow public routes
     if (!user) {
       if (isPublic) return supabaseResponse
       const url = request.nextUrl.clone()
@@ -46,27 +44,19 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    // Logged in + on auth pages = redirect to dashboard
     if (user && (pathname === "/login" || pathname === "/register")) {
       const url = request.nextUrl.clone()
       url.pathname = "/deals"
       return NextResponse.redirect(url)
     }
 
-    // Admin bypasses everything
-    if (user.email === adminEmail) return supabaseResponse
-
-    // Public routes always accessible
     if (isPublic) return supabaseResponse
 
-    // Subscription gating: check profile status
-    // Always allow /settings/billing and /setup so they can pay or onboard
     const billingAllowed =
       pathname === "/settings/billing" || pathname.startsWith("/settings/billing/") || pathname === "/setup"
 
     if (billingAllowed) return supabaseResponse
 
-    // Fetch profile for subscription check
     const { data: profile } = await supabase
       .from("profiles")
       .select("subscription_status, trial_ends_at, tier")

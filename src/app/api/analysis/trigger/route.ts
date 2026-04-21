@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { mockDeals } from "@/lib/mock-data/deals"
 
 export async function POST(request: Request) {
   try {
@@ -16,20 +15,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Admin demo account — short-circuit (mock analysis already exists in the mock data)
-    if (user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-      const deal = mockDeals.find((d) => d.id === dealId)
-      if (!deal) {
-        return NextResponse.json({ error: "Deal not found" }, { status: 404 })
-      }
-      return NextResponse.json({
-        status: "queued",
-        analysisId: `mock-${dealId}`,
-        message: "Admin demo — analysis already exists in mock data",
-      })
-    }
-
-    // Real user flow
     const { data: deal, error: dealErr } = await supabase
       .from("deals")
       .select("id, company_name, stage, user_id")
@@ -50,7 +35,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No documents to analyze" }, { status: 400 })
     }
 
-    // Generate signed URLs (1 hour expiry) for n8n to download
     const signedDocs = await Promise.all(
       documents.map(async (doc) => {
         const { data: signed, error: signErr } = await supabase.storage
@@ -69,7 +53,6 @@ export async function POST(request: Request) {
       })
     )
 
-    // Create analyses row (pending)
     const { data: analysis, error: analysisErr } = await supabase
       .from("analyses")
       .insert({
@@ -89,7 +72,6 @@ export async function POST(request: Request) {
     const callbackToken = process.env.ANALYSIS_CALLBACK_TOKEN
 
     if (!n8nWebhookUrl || !n8nToken || !callbackToken) {
-      // Mark analysis as failed so user sees it
       await supabase
         .from("analyses")
         .update({ status: "failed", error: "n8n not configured" })
@@ -97,7 +79,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "n8n not configured" }, { status: 500 })
     }
 
-    // Fire-and-forget POST to n8n
     const n8nPayload = {
       job_id: analysis.id,
       deal_id: dealId,
@@ -105,7 +86,6 @@ export async function POST(request: Request) {
       company_stage: deal.stage,
       sender: user.email,
       documents: signedDocs,
-      // Primary doc for single-file processing paths
       pdf_url: signedDocs[0]?.url,
       filename: signedDocs[0]?.filename,
       callback_url: `${appUrl}/api/analysis/callback`,
@@ -134,7 +114,6 @@ export async function POST(request: Request) {
       )
     }
 
-    // Mark as processing
     await supabase
       .from("analyses")
       .update({ status: "processing" })

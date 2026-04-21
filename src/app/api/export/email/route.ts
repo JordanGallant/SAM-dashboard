@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server"
 import { generateExecutiveSummaryDocx } from "@/lib/generate-docx"
 import { createClient } from "@/lib/supabase/server"
-import { mockDeals } from "@/lib/mock-data/deals"
-import type { DealAnalysis, ExecutiveSummary } from "@/lib/types/analysis"
+import type { DealAnalysis } from "@/lib/types/analysis"
 
 export async function POST(request: Request) {
   try {
@@ -10,38 +9,31 @@ export async function POST(request: Request) {
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-
-    let es: ExecutiveSummary | null = null
-    let companyName = ""
-
-    if (user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-      const deal = mockDeals.find((d) => d.id === dealId)
-      if (deal?.analysis) {
-        es = deal.analysis.executiveSummary
-        companyName = deal.companyName
-      }
-    } else {
-      const { data: deal } = await supabase.from("deals").select("company_name").eq("id", dealId).single()
-      const { data: analysis } = await supabase
-        .from("analyses")
-        .select("result")
-        .eq("deal_id", dealId)
-        .eq("status", "completed")
-        .maybeSingle()
-
-      if (deal && analysis?.result) {
-        const result = analysis.result as DealAnalysis
-        es = result.executiveSummary
-        companyName = deal.company_name
-      }
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    if (!es) {
+    const { data: deal } = await supabase
+      .from("deals")
+      .select("company_name")
+      .eq("id", dealId)
+      .eq("user_id", user.id)
+      .single()
+
+    const { data: analysis } = await supabase
+      .from("analyses")
+      .select("result")
+      .eq("deal_id", dealId)
+      .eq("status", "completed")
+      .maybeSingle()
+
+    if (!deal || !analysis?.result) {
       return NextResponse.json({ error: "Deal or analysis not found" }, { status: 404 })
     }
 
+    const es = (analysis.result as DealAnalysis).executiveSummary
     const buffer = await generateExecutiveSummaryDocx(es)
-    const filename = `SAM_${companyName.replace(/\s+/g, "_")}_Executive_Summary.docx`
+    const filename = `SAM_${deal.company_name.replace(/\s+/g, "_")}_Executive_Summary.docx`
 
     const resendKey = process.env.RESEND_API_KEY
     if (!resendKey) {

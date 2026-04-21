@@ -1,4 +1,4 @@
-import type { Deal } from "../types/deal"
+import type { Deal } from "../../src/lib/types/deal"
 import { canaароAnalysis } from "./analysis-canaaro"
 import { vreyAnalysis } from "./analysis-vrey"
 

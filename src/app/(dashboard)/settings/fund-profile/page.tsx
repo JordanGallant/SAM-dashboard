@@ -9,13 +9,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2, CheckCircle2 } from "lucide-react"
 import { useFundProfile } from "@/hooks/use-fund-profile"
-import { useIsAdmin } from "@/hooks/use-is-admin"
 import { upsertFund } from "@/app/actions/funds"
 import { DEAL_STAGES, SECTORS, GEOS } from "@/lib/constants"
 
 export default function FundProfilePage() {
   const { fund, loading, refetch } = useFundProfile()
-  const { isAdmin } = useIsAdmin()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState("")
@@ -76,12 +74,6 @@ export default function FundProfilePage() {
   return (
     <div className="max-w-2xl space-y-6">
       <h1 className="text-xl font-bold">Fund Profile</h1>
-
-      {isAdmin && (
-        <div className="rounded-md bg-blue-50 border border-blue-200 p-3 text-sm text-blue-700">
-          Admin account uses demo data. Changes save but won&apos;t be visible on the admin view.
-        </div>
-      )}
 
       <Card>
         <CardHeader><CardTitle className="text-sm font-medium">Fund Details</CardTitle></CardHeader>

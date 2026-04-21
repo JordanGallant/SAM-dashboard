@@ -1,4 +1,4 @@
-import type { FundProfile } from "../types/fund"
+import type { FundProfile } from "../../src/lib/types/fund"
 
 export const mockFundProfile: FundProfile = {
   id: "fund-1",
