@@ -42,7 +42,7 @@ export default function ForAnglesPage() {
             <div>
               <h2 className="text-xs uppercase tracking-widest text-primary font-semibold">How Sam helps</h2>
               <p className="mt-3 text-base md:text-lg text-muted-foreground">
-                Sam writes the memo you would have written if you had time. Every deck you upload comes back with a scored verdict, red flags, and a structured thesis — in under five minutes. Months later, you can pull up deal nineteen and know exactly why you walked away.
+                Sam writes the memo you would have written if you had time. Every deck you upload comes back with a scored verdict, red flags, and a structured thesis. Months later, you can pull up deal nineteen and know exactly why you walked away.
               </p>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default function ForAnglesPage() {
         <section className="py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-violet-50">
           <div className="mx-auto max-w-3xl px-4 text-center">
             <h2 className="text-2xl md:text-3xl font-bold font-heading tracking-tight">
-              €49 per month. Fifteen memos.
+              Angel plan — €49 per month.
             </h2>
             <p className="mt-3 text-muted-foreground">
               Cancel anytime. Servers in the EU. No model training on your data.

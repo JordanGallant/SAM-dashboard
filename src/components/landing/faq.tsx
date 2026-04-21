@@ -19,7 +19,7 @@ const questions = [
   },
   {
     q: "How long does it take to generate a memo?",
-    a: "Most memos are completed in under five minutes. Decks with heavy financial models or extensive appendices may take up to ten. You can close the browser — results arrive in your account when ready.",
+    a: "Analysis runs in the background. You can close the browser — the memo appears in your account when ready, and you'll get an email notification.",
   },
   {
     q: "Can Sam replace a human analyst or associate?",

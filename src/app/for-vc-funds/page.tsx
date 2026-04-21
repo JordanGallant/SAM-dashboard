@@ -36,7 +36,7 @@ export default function ForVCFundsPage() {
             <div>
               <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">The problem</h2>
               <p className="mt-3 text-base md:text-lg text-muted-foreground">
-                Analyst time goes to the wrong layer. Eighty percent of decks get passed on. The ten minutes spent screening each one, multiplied by hundreds per month, is first-year associate time redirected to the repetitive task no one wanted. Worse: every analyst screens slightly differently, so the memos your partners read are not comparable.
+                Analyst time goes to the wrong layer. Most of the decks your team receives get passed on, and the screening time is first-year associate capacity redirected to repetitive work. Worse: every analyst screens slightly differently, so the memos your partners read are not comparable.
               </p>
             </div>
             <div>

@@ -83,7 +83,7 @@ export function Hero() {
               </div>
             </div>
           </div>
-          <p className="mt-3 text-center text-xs text-muted-foreground font-mono">22 slides in. IC-ready memo out. Five minutes.</p>
+          <p className="mt-3 text-center text-xs text-muted-foreground font-mono">Executive summary — domain scores, strengths, risks, thesis.</p>
         </div>
       </div>
     </section>
