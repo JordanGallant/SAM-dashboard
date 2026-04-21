@@ -1,21 +1,24 @@
 -- Option C — Email-verified signup + scheduled cleanup of inactive accounts.
 -- Run this in Supabase SQL Editor once.
 
--- 1. Add last_active_at and warning_sent_at columns to profiles
+-- 1. Add last_active_at column to profiles (used to spare users who
+--    haven't paid yet but are actively exploring)
 alter table public.profiles
-  add column if not exists last_active_at timestamptz,
-  add column if not exists warning_sent_at timestamptz;
+  add column if not exists last_active_at timestamptz;
 
 -- 2. Ensure pg_cron extension is enabled
 create extension if not exists pg_cron;
 
 -- 3. Drop any previous versions of these jobs (idempotent)
-select cron.unschedule('cleanup-unverified') where exists (
-  select 1 from cron.job where jobname = 'cleanup-unverified'
-);
-select cron.unschedule('cleanup-inactive') where exists (
-  select 1 from cron.job where jobname = 'cleanup-inactive'
-);
+do $$
+begin
+  if exists (select 1 from cron.job where jobname = 'cleanup-unverified') then
+    perform cron.unschedule('cleanup-unverified');
+  end if;
+  if exists (select 1 from cron.job where jobname = 'cleanup-inactive') then
+    perform cron.unschedule('cleanup-inactive');
+  end if;
+end $$;
 
 -- 4. Schedule: delete unverified accounts after 7 days
 -- Runs daily at 03:00 UTC
@@ -48,4 +51,4 @@ select cron.schedule(
 );
 
 -- 6. Verify the jobs are scheduled
--- Run this query to check: select * from cron.job;
+-- Run this query to check: select jobname, schedule, active from cron.job;
