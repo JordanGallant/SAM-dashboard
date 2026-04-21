@@ -1,8 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import { ChevronDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal"
 
 const questions = [
   {
@@ -40,44 +38,47 @@ const questions = [
 ]
 
 export function FAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0)
-
   return (
     <section className="py-24 border-t">
-      <div className="mx-auto max-w-3xl px-4">
-        <div className="text-center mb-10">
-          <p className="text-xs font-mono uppercase tracking-widest text-amber-600">FAQ</p>
-          <h2 className="mt-3 text-3xl md:text-4xl font-bold font-heading tracking-tight">
-            Frequently asked questions
-          </h2>
-        </div>
-        <div className="space-y-2">
-          {questions.map((item, i) => {
-            const isOpen = openIndex === i
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "rounded-lg border bg-card overflow-hidden transition-colors",
-                  isOpen && "border-l-4 border-l-amber-500"
-                )}
-              >
-                <button
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-                  onClick={() => setOpenIndex(isOpen ? null : i)}
-                  aria-expanded={isOpen}
-                >
-                  <span className="font-heading font-medium text-sm md:text-base">{item.q}</span>
-                  <ChevronDown className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", isOpen && "rotate-180")} />
-                </button>
-                {isOpen && (
-                  <div className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed">
-                    {item.a}
+      <div className="mx-auto max-w-6xl px-4">
+        <div className="grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-16">
+          {/* Left: sticky heading */}
+          <Reveal direction="left" className="lg:sticky lg:top-24 lg:self-start">
+            <p className="text-xs font-mono uppercase tracking-widest text-amber-600">Reference</p>
+            <h2 className="mt-3 text-3xl md:text-4xl font-bold font-heading tracking-tight">
+              Questions, answered.
+            </h2>
+            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+              Everything investors have asked us during pilots and preview calls. If your question isn&apos;t here, email{" "}
+              <a href="mailto:hello@sam.ai" className="underline hover:text-foreground">hello@sam.ai</a>.
+            </p>
+            <div className="mt-6 flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              <span>{questions.length.toString().padStart(2, "0")} items</span>
+              <span className="text-border">·</span>
+              <span>April 2026</span>
+            </div>
+          </Reveal>
+
+          {/* Right: numbered Q&A */}
+          <RevealGroup className="space-y-0" stagger={0.05}>
+            {questions.map((item, i) => (
+              <RevealItem key={i}>
+                <div className="group grid grid-cols-[3rem_1fr] gap-4 md:gap-6 py-7 border-b last:border-b-0 border-border transition-colors hover:bg-slate-50/50 -mx-4 px-4 rounded-md">
+                  <span className="text-xs font-mono text-muted-foreground pt-1 transition-colors group-hover:text-amber-600">
+                    {(i + 1).toString().padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3 className="font-heading text-base md:text-lg font-semibold leading-snug">
+                      {item.q}
+                    </h3>
+                    <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                      {item.a}
+                    </p>
                   </div>
-                )}
-              </div>
-            )
-          })}
+                </div>
+              </RevealItem>
+            ))}
+          </RevealGroup>
         </div>
       </div>
     </section>
