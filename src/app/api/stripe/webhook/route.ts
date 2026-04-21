@@ -40,7 +40,10 @@ export async function POST(request: Request) {
           .from("profiles")
           .update({
             tier,
+            subscription_status: "active",
             stripe_customer_id: session.customer as string,
+            trial_ends_at: null,
+            pending_tier: null,
           })
           .eq("id", userId)
       }
@@ -52,11 +55,20 @@ export async function POST(request: Request) {
       const userId = subscription.metadata?.supabase_user_id
       const tier = subscription.metadata?.tier
 
-      if (userId && subscription.status === "active" && tier) {
-        await supabaseAdmin
-          .from("profiles")
-          .update({ tier })
-          .eq("id", userId)
+      if (userId) {
+        const status =
+          subscription.status === "active" || subscription.status === "trialing"
+            ? "active"
+            : subscription.status === "past_due"
+              ? "past_due"
+              : subscription.status === "canceled"
+                ? "canceled"
+                : "inactive"
+
+        const update: Record<string, unknown> = { subscription_status: status }
+        if (tier && status === "active") update.tier = tier
+
+        await supabaseAdmin.from("profiles").update(update).eq("id", userId)
       }
       break
     }
@@ -68,7 +80,9 @@ export async function POST(request: Request) {
       if (userId) {
         await supabaseAdmin
           .from("profiles")
-          .update({ tier: "starter" })
+          .update({
+            subscription_status: "canceled",
+          })
           .eq("id", userId)
       }
       break

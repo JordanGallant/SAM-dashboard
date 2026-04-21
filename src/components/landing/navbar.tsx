@@ -17,8 +17,8 @@ export function Navbar() {
           <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
             Log In
           </Link>
-          <Link href="/register" className={buttonVariants({ size: "sm" })}>
-            Start Free Trial
+          <Link href="/register?tier=professional" className={buttonVariants({ size: "sm" })}>
+            Get Started
           </Link>
         </div>
       </div>

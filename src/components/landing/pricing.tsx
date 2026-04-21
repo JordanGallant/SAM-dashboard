@@ -10,11 +10,12 @@ import { cn } from "@/lib/utils"
 
 const tiers = [
   {
+    key: "starter" as const,
     name: "Starter",
     price: 49,
     annual: 490,
     description: "For angels and scouts",
-    cta: "Start Free Trial",
+    cta: "Subscribe",
     popular: false,
     features: [
       { text: "5 deals / month", included: true },
@@ -29,11 +30,12 @@ const tiers = [
     ],
   },
   {
+    key: "professional" as const,
     name: "Professional",
     price: 149,
     annual: 1490,
     description: "For individual VCs and small funds",
-    cta: "Start Free Trial",
+    cta: "Subscribe",
     popular: true,
     features: [
       { text: "25 deals / month", included: true },
@@ -48,11 +50,12 @@ const tiers = [
     ],
   },
   {
+    key: "fund" as const,
     name: "Fund",
     price: 399,
     annual: 3990,
     description: "For VC funds and CVCs",
-    cta: "Start Free Trial",
+    cta: "Subscribe",
     popular: false,
     features: [
       { text: "Unlimited deals", included: true },
@@ -148,7 +151,7 @@ export function Pricing() {
               </CardHeader>
               <CardContent className="flex flex-col flex-1 space-y-5">
                 <Link
-                  href="/register"
+                  href={`/register?tier=${tier.key}`}
                   className={buttonVariants({
                     variant: tier.popular ? "default" : "outline",
                     size: "lg",
@@ -157,6 +160,9 @@ export function Pricing() {
                 >
                   {tier.cta}
                 </Link>
+                <p className="text-center text-[11px] text-muted-foreground -mt-2">
+                  Have a <Link href={`/register?tier=${tier.key}`} className="underline hover:text-foreground">promo code</Link>? Free trial available.
+                </p>
                 <ul className="space-y-3 flex-1">
                   {tier.features.map((feature) => (
                     <li key={feature.text} className="flex items-start gap-2.5 text-sm">

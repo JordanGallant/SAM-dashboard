@@ -20,7 +20,6 @@ export async function POST(request: Request) {
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -31,15 +30,15 @@ export async function POST(request: Request) {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${appUrl}/settings/billing?success=true`,
+      success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/settings/billing?canceled=true`,
       customer_email: user.email,
+      allow_promotion_codes: true,
       metadata: {
         supabase_user_id: user.id,
         tier,
       },
       subscription_data: {
-        trial_period_days: 14,
         metadata: {
           supabase_user_id: user.id,
           tier,

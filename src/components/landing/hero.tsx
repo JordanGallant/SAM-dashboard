@@ -29,8 +29,8 @@ export function Hero() {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/register" className={buttonVariants({ size: "lg", className: "text-base px-8" })}>
-              Start Free Trial
+            <Link href="/register?tier=professional" className={buttonVariants({ size: "lg", className: "text-base px-8" })}>
+              Get Started
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
             <Link href="#pricing" className={buttonVariants({ variant: "outline", size: "lg", className: "text-base px-8" })}>
@@ -38,7 +38,7 @@ export function Hero() {
             </Link>
           </div>
 
-          <p className="mt-3 text-xs text-muted-foreground">14 days free. No credit card required.</p>
+          <p className="mt-3 text-xs text-muted-foreground">Free trial available with promo code.</p>
         </div>
 
         {/* Header image placeholder */}

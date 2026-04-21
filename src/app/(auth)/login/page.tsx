@@ -1,17 +1,21 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { buttonVariants, Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { BarChart3, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import type { Tier } from "@/lib/types/user"
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const tierParam = searchParams.get("tier") as Tier | null
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -29,6 +33,20 @@ export default function LoginPage() {
       setError(error.message)
       setLoading(false)
       return
+    }
+
+    // If user came from pricing with a tier selected, send them to Stripe
+    if (tierParam) {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier: tierParam }),
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+        return
+      }
     }
 
     router.push("/deals")
@@ -66,9 +84,17 @@ export default function LoginPage() {
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          No account? <Link href="/register" className="font-medium text-foreground hover:underline">Start free trial</Link>
+          No account? <Link href={tierParam ? `/register?tier=${tierParam}` : "/register"} className="font-medium text-foreground hover:underline">Create one</Link>
         </p>
       </CardContent>
     </Card>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   )
 }

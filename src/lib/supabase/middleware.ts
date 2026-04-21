@@ -4,8 +4,8 @@ import { NextResponse, type NextRequest } from "next/server"
 export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL
 
-  // If Supabase not configured, skip auth (lets landing page work)
   if (!supabaseUrl || !supabaseKey) {
     console.warn("Supabase env vars missing — skipping auth middleware")
     return NextResponse.next({ request })
@@ -32,25 +32,66 @@ export async function updateSession(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     const { pathname } = request.nextUrl
-    const publicRoutes = ["/", "/login", "/register", "/reset-password", "/auth/callback"]
-    const isPublic = publicRoutes.some((route) => pathname === route || pathname.startsWith("/auth/"))
+    const publicRoutes = ["/", "/login", "/register", "/reset-password"]
+    const isPublic =
+      publicRoutes.some((route) => pathname === route) ||
+      pathname.startsWith("/auth/") ||
+      pathname.startsWith("/checkout/")
 
-    if (!user && !isPublic) {
+    // Not logged in: only allow public routes
+    if (!user) {
+      if (isPublic) return supabaseResponse
       const url = request.nextUrl.clone()
       url.pathname = "/login"
       return NextResponse.redirect(url)
     }
 
+    // Logged in + on auth pages = redirect to dashboard
     if (user && (pathname === "/login" || pathname === "/register")) {
       const url = request.nextUrl.clone()
       url.pathname = "/deals"
       return NextResponse.redirect(url)
     }
 
+    // Admin bypasses everything
+    if (user.email === adminEmail) return supabaseResponse
+
+    // Public routes always accessible
+    if (isPublic) return supabaseResponse
+
+    // Subscription gating: check profile status
+    // Always allow /settings/billing and /setup so they can pay or onboard
+    const billingAllowed =
+      pathname === "/settings/billing" || pathname.startsWith("/settings/billing/") || pathname === "/setup"
+
+    if (billingAllowed) return supabaseResponse
+
+    // Fetch profile for subscription check
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("subscription_status, trial_ends_at, tier")
+      .eq("id", user.id)
+      .maybeSingle()
+
+    const now = new Date()
+    const trialEnd = profile?.trial_ends_at ? new Date(profile.trial_ends_at) : null
+    const trialValid = profile?.subscription_status === "trial" && trialEnd && trialEnd > now
+    const active = profile?.subscription_status === "active"
+
+    if (!active && !trialValid) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/settings/billing"
+      if (profile?.subscription_status === "trial" && trialEnd && trialEnd <= now) {
+        url.searchParams.set("expired", "true")
+      } else {
+        url.searchParams.set("subscribe", "true")
+      }
+      return NextResponse.redirect(url)
+    }
+
     return supabaseResponse
   } catch (err) {
     console.error("Middleware error:", err)
-    // Don't 500 the entire site — let the page load
     return NextResponse.next({ request })
   }
 }
