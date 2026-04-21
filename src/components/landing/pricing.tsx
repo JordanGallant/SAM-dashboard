@@ -172,7 +172,7 @@ export function Pricing() {
                             transition={{ duration: 0.25, ease: "easeOut" }}
                             className="text-5xl font-mono font-bold tracking-tight inline-block"
                           >
-                            <CountUp to={displayPrice} duration={0.8} />
+                            {displayPrice}
                           </motion.span>
                         </AnimatePresence>
                         <span className="text-sm font-mono text-muted-foreground">/mo</span>
