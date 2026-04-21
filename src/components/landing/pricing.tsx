@@ -69,7 +69,8 @@ export function Pricing() {
     <section id="pricing" className="py-24 bg-muted/30">
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold font-heading tracking-tight md:text-4xl">
+          <p className="text-xs font-mono uppercase tracking-widest text-amber-600">Pricing</p>
+          <h2 className="mt-3 text-3xl font-bold font-heading tracking-tight md:text-4xl">
             Priced against the value of a decision.
           </h2>
           <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
@@ -112,7 +113,7 @@ export function Pricing() {
               )}
             >
               {tier.popular && (
-                <div className="bg-primary text-primary-foreground text-center py-2 text-xs font-medium flex items-center justify-center gap-1">
+                <div className="bg-amber-500 text-white text-center py-2 text-[11px] font-mono font-semibold uppercase tracking-widest flex items-center justify-center gap-1.5">
                   <Sparkles className="h-3 w-3" />
                   Most Popular
                 </div>
@@ -122,19 +123,18 @@ export function Pricing() {
                 <CardDescription>{tier.description}</CardDescription>
                 <div className="mt-4">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-sm text-muted-foreground">EUR</span>
-                    <span className="text-5xl font-bold font-heading tracking-tight">
+                    <span className="text-sm font-mono text-muted-foreground">EUR</span>
+                    <span className="text-5xl font-mono font-bold tracking-tight">
                       {annual ? Math.round(tier.annual / 12) : tier.price}
                     </span>
-                    <span className="text-muted-foreground">/ mo</span>
+                    <span className="text-sm font-mono text-muted-foreground">/mo</span>
                   </div>
-                  {annual && (
-                    <p className="text-xs text-muted-foreground mt-1">
+                  {annual ? (
+                    <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mt-1">
                       EUR {tier.annual} billed annually
                     </p>
-                  )}
-                  {!annual && (
-                    <p className="text-xs text-muted-foreground mt-1">
+                  ) : (
+                    <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mt-1">
                       Billed monthly
                     </p>
                   )}

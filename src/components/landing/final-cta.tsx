@@ -6,7 +6,8 @@ export function FinalCTA() {
   return (
     <section className="py-24 border-t bg-gradient-to-b from-slate-50 to-white">
       <div className="mx-auto max-w-3xl px-4 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight">
+        <p className="text-xs font-mono uppercase tracking-widest text-amber-600">Start today</p>
+        <h2 className="mt-3 text-3xl md:text-4xl font-bold font-heading tracking-tight">
           Your next deck is on its way.
         </h2>
         <p className="mt-3 text-muted-foreground">

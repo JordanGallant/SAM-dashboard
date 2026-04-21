@@ -45,14 +45,23 @@ export function FAQ() {
   return (
     <section className="py-24 border-t">
       <div className="mx-auto max-w-3xl px-4">
-        <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight text-center">
-          Frequently asked questions
-        </h2>
-        <div className="mt-10 space-y-2">
+        <div className="text-center mb-10">
+          <p className="text-xs font-mono uppercase tracking-widest text-amber-600">FAQ</p>
+          <h2 className="mt-3 text-3xl md:text-4xl font-bold font-heading tracking-tight">
+            Frequently asked questions
+          </h2>
+        </div>
+        <div className="space-y-2">
           {questions.map((item, i) => {
             const isOpen = openIndex === i
             return (
-              <div key={i} className="rounded-lg border bg-card">
+              <div
+                key={i}
+                className={cn(
+                  "rounded-lg border bg-card overflow-hidden transition-colors",
+                  isOpen && "border-l-4 border-l-amber-500"
+                )}
+              >
                 <button
                   className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
                   onClick={() => setOpenIndex(isOpen ? null : i)}
@@ -62,7 +71,7 @@ export function FAQ() {
                   <ChevronDown className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", isOpen && "rotate-180")} />
                 </button>
                 {isOpen && (
-                  <div className="px-5 pb-4 text-sm text-muted-foreground">
+                  <div className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed">
                     {item.a}
                   </div>
                 )}

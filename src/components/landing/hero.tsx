@@ -8,14 +8,12 @@ export function Hero() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-slate-50 to-white" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(37,99,235,0.08),transparent)]" />
 
-      <div className="mx-auto max-w-6xl px-4 py-24 md:py-32">
+      <div className="mx-auto max-w-6xl px-4 py-20 md:py-28">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold tracking-tight md:text-6xl font-heading">
             From pitch deck
             <br />
-            <span className="text-primary">
-              to investment decision.
-            </span>
+            <span className="text-primary">to investment decision.</span>
           </h1>
 
           <p className="mt-6 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto">
@@ -27,63 +25,76 @@ export function Hero() {
               Start with a deck
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
-            <Link href="#output-preview" className={buttonVariants({ variant: "outline", size: "lg", className: "text-base px-8" })}>
+            <Link href="#sample-memo" className={buttonVariants({ variant: "outline", size: "lg", className: "text-base px-8" })}>
               See a sample memo
             </Link>
           </div>
 
-          <p className="mt-3 text-xs text-muted-foreground">GDPR-compliant. Servers in the European Union.</p>
+          {/* Mono stat strip */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
+            <span>5 domains</span>
+            <span className="text-border">·</span>
+            <span>scored 0 — 100</span>
+            <span className="text-border">·</span>
+            <span>EU-hosted</span>
+            <span className="text-border">·</span>
+            <span>GDPR by design</span>
+          </div>
         </div>
 
         {/* Sample memo preview */}
-        <div className="mt-16 mx-auto max-w-4xl">
-          <div className="rounded-xl border bg-gradient-to-br from-slate-100 to-slate-50 shadow-2xl shadow-blue-500/10 overflow-hidden">
-            <div className="flex items-center gap-1.5 border-b bg-slate-100/80 px-4 py-2">
+        <div id="sample-memo" className="mt-16 mx-auto max-w-4xl scroll-mt-20">
+          <div className="rounded-xl border bg-white shadow-xl shadow-slate-900/5 overflow-hidden">
+            <div className="flex items-center gap-1.5 border-b bg-slate-50 px-4 py-2">
               <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
               <div className="h-2.5 w-2.5 rounded-full bg-amber-400" />
               <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
-              <span className="ml-3 text-[10px] text-muted-foreground">sam.ai · Executive Summary</span>
+              <span className="ml-3 text-[10px] font-mono text-muted-foreground">sam · executive summary</span>
             </div>
-            <div className="p-6 md:p-8 min-h-[320px] space-y-4">
+            <div className="p-6 md:p-8 space-y-5">
               <div className="flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-center rounded-lg bg-emerald-100 border border-emerald-200 px-4 py-2">
-                  <span className="text-xl font-bold font-heading text-emerald-800">STRONG BUY</span>
+                <div className="inline-flex items-center rounded-md bg-emerald-50 border border-emerald-200 px-3 py-1.5">
+                  <span className="text-lg font-bold font-heading text-emerald-800">STRONG BUY</span>
                 </div>
-                <span className="inline-flex items-center rounded-md bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-medium text-emerald-700">Confidence: High</span>
-                <span className="inline-flex items-center rounded-md bg-blue-50 border border-blue-200 px-2.5 py-0.5 text-xs font-mono font-semibold text-blue-700">82/100</span>
+                <span className="inline-flex items-center rounded-md bg-white border px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                  Confidence: High
+                </span>
+                <div className="ml-auto flex items-baseline gap-1">
+                  <span className="text-3xl font-mono font-bold text-amber-600">82</span>
+                  <span className="text-sm font-mono text-muted-foreground">/100</span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                 {[
                   { domain: "Team", score: 88 },
                   { domain: "Market", score: 76 },
                   { domain: "Product", score: 84 },
                   { domain: "Traction", score: 72 },
-                  { domain: "Finance", score: 90 },
+                  { domain: "Financials", score: 90 },
                 ].map((d) => (
-                  <div key={d.domain} className="flex items-center gap-2">
-                    <span className="text-xs font-medium w-14 text-muted-foreground">{d.domain}</span>
-                    <div className="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden">
-                      <div className="h-full rounded-full bg-emerald-500" style={{ width: `${d.score}%` }} />
+                  <div key={d.domain} className="flex items-center gap-3">
+                    <span className="text-xs font-medium w-16 text-muted-foreground uppercase tracking-wider">{d.domain}</span>
+                    <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                      <div className="h-full rounded-full bg-primary" style={{ width: `${d.score}%` }} />
                     </div>
-                    <span className="text-xs font-mono font-semibold text-emerald-700 w-6 text-right">{d.score}</span>
+                    <span className="text-xs font-mono font-semibold text-primary w-7 text-right">{d.score}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div className="rounded-lg bg-white/80 border p-3 space-y-1.5">
-                  <p className="text-xs font-medium text-emerald-700 flex items-center gap-1"><Shield className="h-3 w-3" /> Key Strengths</p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">Experienced founding team with 15+ years domain expertise. Strong regulatory tailwinds.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div className="rounded-md border bg-slate-50/60 p-3 space-y-1">
+                  <p className="text-[10px] font-medium text-emerald-700 flex items-center gap-1 uppercase tracking-wider"><Shield className="h-3 w-3" /> Key Strengths</p>
+                  <p className="text-xs text-foreground/80 leading-relaxed">Experienced founding team with 15+ years domain expertise. Strong regulatory tailwinds.</p>
                 </div>
-                <div className="rounded-lg bg-white/80 border p-3 space-y-1.5">
-                  <p className="text-xs font-medium text-amber-700 flex items-center gap-1"><FileCheck className="h-3 w-3" /> Key Risks</p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">Capital-intensive model requires follow-on funding. Hardware margins thin at 15-25%.</p>
+                <div className="rounded-md border bg-slate-50/60 p-3 space-y-1">
+                  <p className="text-[10px] font-medium text-amber-700 flex items-center gap-1 uppercase tracking-wider"><FileCheck className="h-3 w-3" /> Key Risks</p>
+                  <p className="text-xs text-foreground/80 leading-relaxed">Capital-intensive model requires follow-on funding. Hardware margins thin at 15-25%.</p>
                 </div>
               </div>
             </div>
           </div>
-          <p className="mt-3 text-center text-xs text-muted-foreground font-mono">Executive summary — domain scores, strengths, risks, thesis.</p>
         </div>
       </div>
     </section>
