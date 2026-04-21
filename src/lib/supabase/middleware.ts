@@ -35,7 +35,16 @@ export async function updateSession(request: NextRequest) {
     // API routes handle their own auth — never redirect them
     if (pathname.startsWith("/api/")) return supabaseResponse
 
-    const publicRoutes = ["/", "/login", "/register", "/reset-password"]
+    const publicRoutes = [
+      "/",
+      "/login",
+      "/register",
+      "/reset-password",
+      "/how-it-works",
+      "/for-angels",
+      "/for-vc-funds",
+      "/privacy",
+    ]
     const isPublic =
       publicRoutes.some((route) => pathname === route) ||
       pathname.startsWith("/auth/") ||
