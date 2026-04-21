@@ -11,62 +11,62 @@ import { cn } from "@/lib/utils"
 const tiers = [
   {
     key: "starter" as const,
-    name: "Starter",
+    name: "Angel",
     price: 49,
     annual: 490,
-    description: "For angels and scouts",
+    description: "For individual investors handling their own deal flow.",
     cta: "Subscribe",
     popular: false,
     features: [
-      { text: "5 deals / month", included: true },
+      { text: "15 memos per month", included: true },
       { text: "1 user", included: true },
-      { text: "Quick Scan analysis", included: true },
+      { text: "All five investment domains", included: true },
+      { text: "PDF export", included: true },
       { text: "Deck upload only", included: true },
-      { text: "3 email summaries / month", included: true },
-      { text: "Full Report", included: false },
-      { text: "Fund Fit scoring", included: false },
-      { text: "Word doc export", included: false },
+      { text: "Supporting docs (transcripts, DD)", included: false },
       { text: "Priority processing", included: false },
+      { text: "Shared memo library", included: false },
+      { text: "Team seats", included: false },
     ],
   },
   {
     key: "professional" as const,
-    name: "Professional",
+    name: "Pro",
     price: 149,
     annual: 1490,
-    description: "For individual VCs and small funds",
+    description: "For syndicates, scouts, and solo GPs.",
     cta: "Subscribe",
     popular: true,
     features: [
-      { text: "25 deals / month", included: true },
+      { text: "50 memos per month", included: true },
       { text: "1 user", included: true },
-      { text: "Quick Scan + Full Report", included: true },
+      { text: "All five investment domains", included: true },
+      { text: "PDF export + shareable links", included: true },
+      { text: "Supporting docs (transcripts, DD)", included: true },
       { text: "Deck + 5 docs per deal", included: true },
-      { text: "Unlimited email summaries", included: true },
-      { text: "Fund Fit scoring", included: true },
-      { text: "Word doc export", included: true },
       { text: "Priority processing", included: false },
-      { text: "Dedicated schema", included: false },
+      { text: "Team seats", included: false },
+      { text: "Shared memo library", included: false },
     ],
   },
   {
     key: "fund" as const,
-    name: "Fund",
+    name: "VC Fund",
     price: 399,
     annual: 3990,
-    description: "For VC funds and CVCs",
-    cta: "Subscribe",
+    description: "For fund teams running first-screening at scale.",
+    cta: "Book a walkthrough",
     popular: false,
     features: [
-      { text: "Unlimited deals", included: true },
-      { text: "5 users (+EUR 49/seat)", included: true },
-      { text: "Quick Scan + Full Report", included: true },
-      { text: "Unlimited doc uploads", included: true },
-      { text: "Unlimited email summaries", included: true },
-      { text: "Fund Fit scoring", included: true },
-      { text: "Word doc export", included: true },
+      { text: "Unlimited memos", included: true },
+      { text: "5 seats (+EUR 49/seat)", included: true },
+      { text: "All five investment domains", included: true },
+      { text: "PDF export + shareable links", included: true },
+      { text: "Unlimited supporting docs", included: true },
+      { text: "Shared memo library", included: true },
       { text: "Priority processing", included: true },
-      { text: "Dedicated schema + 2FA required", included: true },
+      { text: "Team annotations", included: true },
+      { text: "SSO available", included: true },
     ],
   },
 ]
@@ -79,10 +79,10 @@ export function Pricing() {
       <div className="mx-auto max-w-6xl px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold font-heading tracking-tight md:text-4xl">
-            Simple, transparent pricing
+            Priced against the value of a decision.
           </h2>
-          <p className="mt-3 text-muted-foreground">
-            14 days free on all plans. No credit card required.
+          <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
+            One memo can validate or prevent a €250k check. Choose the tier that matches your deal flow.
           </p>
 
           {/* Annual toggle */}
