@@ -97,6 +97,14 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
+    // Ping last_active_at so cleanup jobs don't delete accounts whose
+    // owner is actively using the product (even briefly). Fire-and-forget.
+    supabase
+      .from("profiles")
+      .update({ last_active_at: new Date().toISOString() })
+      .eq("id", user.id)
+      .then(() => {})
+
     // Fund tier requires 2FA. Check Assurance Level — aal2 means MFA verified.
     if (profile?.tier === "fund") {
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
