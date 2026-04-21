@@ -38,7 +38,8 @@ export default function SecurityPage() {
     setDisabling(true)
     const supabase = createClient()
     const { data } = await supabase.auth.mfa.listFactors()
-    for (const f of data?.totp ?? []) {
+    const allTotp = (data?.all ?? []).filter((f) => f.factor_type === "totp")
+    for (const f of allTotp) {
       await supabase.auth.mfa.unenroll({ factorId: f.id })
     }
     await refreshMfaState()

@@ -37,7 +37,11 @@ function TwoFactorSetup() {
   async function startEnrollment() {
     const supabase = createClient()
 
-    // Check if user already has a verified factor
+    // `listFactors()` only returns verified factors in `totp`. Unverified
+    // (pending) factors from abandoned attempts are in `all` — we must
+    // read from there and unenroll them before enrolling a fresh factor,
+    // otherwise Supabase rejects the new enrollment with a duplicate
+    // friendly-name error.
     const { data: factors } = await supabase.auth.mfa.listFactors()
     const verified = factors?.totp?.find((f) => f.status === "verified")
     if (verified) {
@@ -45,16 +49,16 @@ function TwoFactorSetup() {
       return
     }
 
-    // Remove any non-verified (pending) factors from previous attempts
-    const pending = factors?.totp?.filter((f) => f.status !== "verified") ?? []
-    for (const f of pending) {
+    const stale = (factors?.all ?? []).filter(
+      (f) => f.factor_type === "totp" && f.status !== "verified",
+    )
+    for (const f of stale) {
       await supabase.auth.mfa.unenroll({ factorId: f.id })
     }
 
-    // Enroll a fresh TOTP factor
     const { data, error } = await supabase.auth.mfa.enroll({
       factorType: "totp",
-      friendlyName: `Sam · ${new Date().toISOString().slice(0, 10)}`,
+      friendlyName: `Sam · ${Date.now()}`,
     })
 
     if (error || !data) {
