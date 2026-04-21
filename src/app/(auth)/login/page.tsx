@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { BarChart3, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import type { Tier } from "@/lib/types/user"
+import { GoogleButton } from "@/components/auth/google-button"
 
 function LoginContent() {
   const router = useRouter()
@@ -62,7 +63,18 @@ function LoginContent() {
         <CardTitle>Welcome back</CardTitle>
         <CardDescription>Sign in to your SAM account</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <GoogleButton label="Sign in with Google" tier={tierParam} />
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-[10px] font-mono uppercase tracking-widest">
+            <span className="bg-card px-3 text-muted-foreground">or continue with email</span>
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
@@ -83,7 +95,7 @@ function LoginContent() {
             Sign In
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-muted-foreground">
+        <p className="text-center text-sm text-muted-foreground">
           No account? <Link href={tierParam ? `/register?tier=${tierParam}` : "/register"} className="font-medium text-foreground hover:underline">Create one</Link>
         </p>
       </CardContent>
