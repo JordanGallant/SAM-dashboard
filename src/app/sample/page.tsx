@@ -4,11 +4,13 @@ import { Footer } from "@/components/landing/footer"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
-import { Shield, AlertTriangle, ArrowRight, CheckCircle2, XCircle } from "lucide-react"
+import { Shield, AlertTriangle, ArrowRight } from "lucide-react"
 import { sampleAnalysis } from "@/lib/sample-analysis"
+import { VERDICT_COLORS, DOMAIN_VERDICT_COLORS } from "@/lib/constants"
 
 export default function SamplePage() {
   const es = sampleAnalysis.executiveSummary
+  const verdictColor = VERDICT_COLORS[es.verdict]
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -22,7 +24,7 @@ export default function SamplePage() {
               What a Sam analysis looks like.
             </h1>
             <p className="mt-3 text-muted-foreground max-w-2xl">
-              Below is an actual Sam memo — produced from a 2-slide pitch deck submitted with no supporting information. The framework applied the same structure it would to any deck, and Sam scored and flagged accordingly.
+              Below is an illustrative Sam memo for a fictional Seed-stage SaaS company. Every section follows the same structure Sam produces for any deck — executive summary, scored domain breakdown, thesis, strengths, risks, and recommended next steps.
             </p>
           </div>
         </section>
@@ -63,8 +65,8 @@ export default function SamplePage() {
                 <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600 mb-3">Verdict</p>
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="inline-flex items-center rounded-md bg-red-50 border border-red-200 px-3 py-1.5">
-                      <span className="text-lg font-bold font-heading text-red-800">{es.verdict.toUpperCase()}</span>
+                    <div className={`inline-flex items-center rounded-md ${verdictColor.bg} ${verdictColor.border} border px-3 py-1.5`}>
+                      <span className={`text-lg font-bold font-heading ${verdictColor.text}`}>{es.verdict.toUpperCase()}</span>
                     </div>
                     <span className="inline-flex items-center rounded-md bg-white border px-2.5 py-1 text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider">
                       Confidence · {es.confidence}
@@ -85,16 +87,19 @@ export default function SamplePage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 font-mono text-xs">
-                  {es.scorecard.map((row) => (
-                    <div key={row.domain} className="grid grid-cols-[6rem_1fr_2.5rem_5rem] items-center gap-4">
-                      <span className="text-muted-foreground tracking-wider uppercase">{row.domain}</span>
-                      <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                        <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${row.score}%` }} />
+                  {es.scorecard.map((row) => {
+                    const dv = DOMAIN_VERDICT_COLORS[row.verdict]
+                    return (
+                      <div key={row.domain} className="grid grid-cols-[6rem_1fr_2.5rem_5rem] items-center gap-4">
+                        <span className="text-muted-foreground tracking-wider uppercase">{row.domain}</span>
+                        <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                          <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${row.score}%` }} />
+                        </div>
+                        <span className="font-semibold text-primary text-right tabular-nums">{row.score}</span>
+                        <span className={`${dv.text} uppercase tracking-wider text-[10px]`}>{row.verdict}</span>
                       </div>
-                      <span className="font-semibold text-primary text-right tabular-nums">{row.score}</span>
-                      <span className="text-red-600 uppercase tracking-wider text-[10px]">{row.verdict}</span>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 <div className="mt-6 space-y-3 border-t pt-5">
                   {es.scorecard.map((row) => (
