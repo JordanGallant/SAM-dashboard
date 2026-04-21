@@ -55,7 +55,10 @@ export function DealCreateDialog({ open, onOpenChange, onCreated }: DealCreateDi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Deal</DialogTitle>
+          <DialogTitle>New Deal</DialogTitle>
+          <p className="text-sm text-muted-foreground">
+            After creating, you&apos;ll upload the pitch deck and run analysis.
+          </p>
         </DialogHeader>
         <form className="space-y-4" onSubmit={handleSubmit}>
           {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>}

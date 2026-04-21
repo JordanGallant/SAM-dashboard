@@ -46,7 +46,7 @@ function DealsContent() {
             </div>
             <h3 className="font-semibold">No deals yet</h3>
             <p className="mt-1 text-sm text-muted-foreground max-w-sm">
-              Create your first deal to start tracking investment opportunities and running AI-powered analysis.
+              Create a deal for each startup, then upload their pitch deck to get an AI-generated investment analysis.
             </p>
             <Button onClick={() => setDialogOpen(true)} className="mt-4">
               <Plus className="mr-2 h-4 w-4" />

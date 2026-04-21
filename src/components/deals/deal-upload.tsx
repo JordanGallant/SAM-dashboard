@@ -61,7 +61,10 @@ export function DealUpload({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">Documents</CardTitle>
+        <CardTitle className="text-sm font-medium">Pitch Deck & Supporting Documents</CardTitle>
+        <p className="text-xs text-muted-foreground">
+          Upload the pitch deck first. Transcripts and DD docs are optional but improve analysis quality.
+        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>}
@@ -120,7 +123,7 @@ export function DealUpload({
             ))}
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground text-center py-4">No documents uploaded yet</p>
+          <p className="text-xs text-muted-foreground text-center py-4">No pitch deck uploaded yet</p>
         )}
       </CardContent>
     </Card>
