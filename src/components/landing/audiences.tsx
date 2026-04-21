@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, User, Network, Building2 } from "lucide-react"
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal"
 
 const audiences = [
   {
@@ -30,35 +31,37 @@ export function Audiences() {
   return (
     <section className="py-24 border-t">
       <div className="mx-auto max-w-6xl px-4">
-        <div className="text-center mb-14">
-          <p className="text-xs font-mono uppercase tracking-widest text-amber-600">Who it's for</p>
+        <Reveal className="text-center mb-14">
+          <p className="text-xs font-mono uppercase tracking-widest text-amber-600">Who it&apos;s for</p>
           <h2 className="mt-3 text-3xl md:text-4xl font-bold font-heading tracking-tight">
             Different roles. Same framework.
           </h2>
-        </div>
+        </Reveal>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <RevealGroup className="grid gap-6 md:grid-cols-3" stagger={0.1}>
           {audiences.map((a) => {
             const Icon = a.icon
             return (
-              <Card key={a.label}>
-                <CardContent className="pt-6 space-y-4 h-full flex flex-col">
-                  <div className="flex items-center justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <Icon className="h-5 w-5 text-primary" />
+              <RevealItem key={a.label}>
+                <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg h-full">
+                  <CardContent className="pt-6 space-y-4 h-full flex flex-col">
+                    <div className="flex items-center justify-between">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                        <Icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{a.stat}</p>
                     </div>
-                    <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{a.stat}</p>
-                  </div>
-                  <p className="text-[11px] font-mono font-semibold uppercase tracking-widest text-amber-600">{a.label}</p>
-                  <p className="text-sm text-muted-foreground flex-1 leading-relaxed">{a.body}</p>
-                  <Link href={a.href} className="text-sm font-medium text-primary hover:underline flex items-center gap-1 pt-2 border-t">
-                    Learn more <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </CardContent>
-              </Card>
+                    <p className="text-[11px] font-mono font-semibold uppercase tracking-widest text-amber-600">{a.label}</p>
+                    <p className="text-sm text-muted-foreground flex-1 leading-relaxed">{a.body}</p>
+                    <Link href={a.href} className="text-sm font-medium text-primary hover:underline flex items-center gap-1 pt-2 border-t group">
+                      Learn more <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                  </CardContent>
+                </Card>
+              </RevealItem>
             )
           })}
-        </div>
+        </RevealGroup>
       </div>
     </section>
   )

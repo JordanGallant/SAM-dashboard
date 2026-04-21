@@ -1,4 +1,5 @@
 import { Shield, MapPin, Lock, UserCheck } from "lucide-react"
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal"
 
 const pillars = [
   { icon: MapPin, label: "EU servers only", desc: "Processing and storage within the European Union." },
@@ -12,8 +13,7 @@ export function Trust() {
     <section className="py-24 border-t bg-slate-50/50">
       <div className="mx-auto max-w-6xl px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          {/* Left: text + EU badge */}
-          <div>
+          <Reveal direction="left">
             <div className="inline-flex items-center gap-2 rounded-md bg-amber-100 border border-amber-200 px-2.5 py-1 mb-6">
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-amber-700">EU</span>
               <span className="text-[10px] font-mono uppercase tracking-wider text-amber-700">data sovereignty</span>
@@ -30,23 +30,24 @@ export function Trust() {
             <p className="mt-3 text-muted-foreground leading-relaxed">
               The framework was designed by people who have evaluated early-stage companies for a living — not by people who studied the problem from a distance.
             </p>
-          </div>
+          </Reveal>
 
-          {/* Right: pillar grid */}
-          <div className="grid grid-cols-2 gap-3">
+          <RevealGroup className="grid grid-cols-2 gap-3" stagger={0.06}>
             {pillars.map((p) => {
               const Icon = p.icon
               return (
-                <div key={p.label} className="rounded-lg border bg-white p-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 mb-3">
-                    <Icon className="h-4 w-4 text-primary" />
+                <RevealItem key={p.label}>
+                  <div className="rounded-lg border bg-white p-4 h-full transition-shadow hover:shadow-md">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 mb-3">
+                      <Icon className="h-4 w-4 text-primary" />
+                    </div>
+                    <p className="font-heading font-semibold text-xs">{p.label}</p>
+                    <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">{p.desc}</p>
                   </div>
-                  <p className="font-heading font-semibold text-xs">{p.label}</p>
-                  <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">{p.desc}</p>
-                </div>
+                </RevealItem>
               )
             })}
-          </div>
+          </RevealGroup>
         </div>
       </div>
     </section>

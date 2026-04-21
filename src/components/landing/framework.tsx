@@ -1,4 +1,5 @@
 import { Users, Globe2, Package, TrendingUp, Landmark } from "lucide-react"
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal"
 
 const domains = [
   { icon: Users, name: "Team", focus: "Founder-market fit, backgrounds, red flags" },
@@ -12,7 +13,7 @@ export function Framework() {
   return (
     <section className="py-24 border-t">
       <div className="mx-auto max-w-6xl px-4">
-        <div className="max-w-3xl mx-auto text-center mb-14">
+        <Reveal className="max-w-3xl mx-auto text-center mb-14">
           <p className="text-xs font-mono uppercase tracking-widest text-amber-600">The framework</p>
           <h2 className="mt-3 text-3xl md:text-4xl font-bold font-heading tracking-tight">
             Five domains. One framework.
@@ -20,17 +21,17 @@ export function Framework() {
           <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
             Every memo covers the same five domains, scored the same way. Stage-aware weights ensure a pre-seed deck is judged on pre-seed criteria — not Series A benchmarks.
           </p>
-        </div>
+        </Reveal>
 
         <div className="relative">
           <div className="hidden md:block absolute top-6 left-[10%] right-[10%] h-px bg-border -z-10" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <RevealGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" stagger={0.08}>
             {domains.map((d, i) => {
               const Icon = d.icon
               return (
-                <div key={d.name} className="relative">
-                  <div className="rounded-xl border bg-white p-5 h-full flex flex-col items-center text-center space-y-3">
+                <RevealItem key={d.name} className="relative">
+                  <div className="rounded-xl border bg-white p-5 h-full flex flex-col items-center text-center space-y-3 transition-shadow hover:shadow-md">
                     <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
                       0{i + 1}
                     </span>
@@ -46,19 +47,19 @@ export function Framework() {
                       <p className="text-base font-mono font-semibold text-amber-600 mt-0.5">0 — 100</p>
                     </div>
                   </div>
-                </div>
+                </RevealItem>
               )
             })}
-          </div>
+          </RevealGroup>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
+        <Reveal className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
           <span>weighted by stage</span>
           <span className="text-border">·</span>
           <span>validated against benchmarks</span>
           <span className="text-border">·</span>
           <span>flagged by severity</span>
-        </div>
+        </Reveal>
       </div>
     </section>
   )

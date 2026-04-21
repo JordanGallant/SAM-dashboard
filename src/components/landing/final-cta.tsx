@@ -1,11 +1,12 @@
 import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
+import { Reveal } from "@/components/motion/reveal"
 
 export function FinalCTA() {
   return (
     <section className="py-24 border-t bg-gradient-to-b from-slate-50 to-white">
-      <div className="mx-auto max-w-3xl px-4 text-center">
+      <Reveal className="mx-auto max-w-3xl px-4 text-center">
         <p className="text-xs font-mono uppercase tracking-widest text-amber-600">Start today</p>
         <h2 className="mt-3 text-3xl md:text-4xl font-bold font-heading tracking-tight">
           Your next deck is on its way.
@@ -14,12 +15,12 @@ export function FinalCTA() {
           No integrations, no onboarding call. Upload a deck, get a memo.
         </p>
         <div className="mt-8">
-          <Link href="/register?tier=professional" className={buttonVariants({ size: "lg", className: "text-base px-8" })}>
+          <Link href="/register?tier=professional" className={`${buttonVariants({ size: "lg", className: "text-base px-8" })} group`}>
             Analyse a deck
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

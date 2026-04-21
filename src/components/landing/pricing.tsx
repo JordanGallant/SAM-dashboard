@@ -106,10 +106,10 @@ export function Pricing() {
             <Card
               key={tier.name}
               className={cn(
-                "relative flex flex-col",
+                "relative flex flex-col transition-all duration-300 hover:-translate-y-1",
                 tier.popular
-                  ? "border-2 border-primary shadow-xl shadow-primary/5 scale-[1.02] md:scale-105 !pt-0"
-                  : "border"
+                  ? "border-2 border-primary shadow-xl shadow-primary/5 scale-[1.02] md:scale-105 !pt-0 hover:shadow-2xl hover:shadow-primary/10"
+                  : "border hover:shadow-lg"
               )}
             >
               {tier.popular && (
