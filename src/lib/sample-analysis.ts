@@ -54,7 +54,7 @@ export const sampleAnalysis: DealAnalysis = {
         dataCompleteness: 58,
       },
       {
-        domain: "Financials",
+        domain: "Finance",
         score: 62,
         verdict: "Moderate",
         keyFinding:
