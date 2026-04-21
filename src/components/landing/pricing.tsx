@@ -141,7 +141,7 @@ export function Pricing() {
                   className={cn(
                     "relative flex flex-col transition-all duration-300 hover:-translate-y-1 overflow-hidden",
                     tier.popular
-                      ? "border-2 border-primary shadow-xl shadow-primary/5 scale-[1.02] md:scale-105 !pt-0 hover:shadow-2xl hover:shadow-amber-500/20"
+                      ? "border bg-gradient-to-b from-primary/[0.03] via-primary/[0.015] to-transparent shadow-xl shadow-primary/10 scale-[1.02] md:scale-105 !pt-0 hover:shadow-2xl hover:shadow-amber-500/20"
                       : "border hover:shadow-lg"
                   )}
                 >
