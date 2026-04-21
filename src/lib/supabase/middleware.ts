@@ -52,6 +52,9 @@ export async function updateSession(request: NextRequest) {
 
     if (isPublic) return supabaseResponse
 
+    // API routes handle their own auth — don't subscription-gate them
+    if (pathname.startsWith("/api/")) return supabaseResponse
+
     const billingAllowed =
       pathname === "/settings/billing" || pathname.startsWith("/settings/billing/") || pathname === "/setup"
 
