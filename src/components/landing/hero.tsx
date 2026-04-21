@@ -45,53 +45,67 @@ export function Hero() {
         {/* Sample memo preview */}
         <div id="sample-memo" className="mt-16 mx-auto max-w-4xl scroll-mt-20">
           <div className="rounded-xl border bg-white shadow-xl shadow-slate-900/5 overflow-hidden">
+            {/* Window chrome */}
             <div className="flex items-center gap-1.5 border-b bg-slate-50 px-4 py-2">
               <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
               <div className="h-2.5 w-2.5 rounded-full bg-amber-400" />
               <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
-              <span className="ml-3 text-[10px] font-mono text-muted-foreground">sam · executive summary</span>
+              <span className="ml-3 text-[10px] font-mono text-muted-foreground uppercase tracking-wider">sam · executive summary</span>
             </div>
-            <div className="p-6 md:p-8 space-y-5">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-center rounded-md bg-emerald-50 border border-emerald-200 px-3 py-1.5">
-                  <span className="text-lg font-bold font-heading text-emerald-800">STRONG BUY</span>
+
+            {/* Header row */}
+            <div className="p-6 md:p-8 border-b">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="inline-flex items-center rounded-md bg-emerald-50 border border-emerald-200 px-3 py-1.5">
+                    <span className="text-lg font-bold font-heading text-emerald-800">STRONG BUY</span>
+                  </div>
+                  <span className="inline-flex items-center rounded-md bg-white border px-2.5 py-1 text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider">
+                    Confidence · High
+                  </span>
                 </div>
-                <span className="inline-flex items-center rounded-md bg-white border px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                  Confidence: High
-                </span>
-                <div className="ml-auto flex items-baseline gap-1">
-                  <span className="text-3xl font-mono font-bold text-amber-600">82</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-mono font-bold text-amber-600 leading-none">82</span>
                   <span className="text-sm font-mono text-muted-foreground">/100</span>
                 </div>
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+            {/* Domain scores — table-aligned rows */}
+            <div className="p-6 md:p-8 border-b">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600 mb-4">Domain Scores</p>
+              <div className="space-y-2.5 font-mono text-xs">
                 {[
-                  { domain: "Team", score: 88 },
-                  { domain: "Market", score: 76 },
-                  { domain: "Product", score: 84 },
-                  { domain: "Traction", score: 72 },
-                  { domain: "Financials", score: 90 },
+                  { domain: "TEAM", score: 88 },
+                  { domain: "MARKET", score: 76 },
+                  { domain: "PRODUCT", score: 84 },
+                  { domain: "TRACTION", score: 72 },
+                  { domain: "FINANCIALS", score: 90 },
                 ].map((d) => (
-                  <div key={d.domain} className="flex items-center gap-3">
-                    <span className="text-xs font-medium w-16 text-muted-foreground uppercase tracking-wider">{d.domain}</span>
-                    <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${d.score}%` }} />
+                  <div key={d.domain} className="grid grid-cols-[6rem_1fr_2.5rem] items-center gap-4">
+                    <span className="text-muted-foreground tracking-wider">{d.domain}</span>
+                    <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                      <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${d.score}%` }} />
                     </div>
-                    <span className="text-xs font-mono font-semibold text-primary w-7 text-right">{d.score}</span>
+                    <span className="font-semibold text-primary text-right tabular-nums">{d.score}</span>
                   </div>
                 ))}
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <div className="rounded-md border bg-slate-50/60 p-3 space-y-1">
-                  <p className="text-[10px] font-medium text-emerald-700 flex items-center gap-1 uppercase tracking-wider"><Shield className="h-3 w-3" /> Key Strengths</p>
-                  <p className="text-xs text-foreground/80 leading-relaxed">Experienced founding team with 15+ years domain expertise. Strong regulatory tailwinds.</p>
-                </div>
-                <div className="rounded-md border bg-slate-50/60 p-3 space-y-1">
-                  <p className="text-[10px] font-medium text-amber-700 flex items-center gap-1 uppercase tracking-wider"><FileCheck className="h-3 w-3" /> Key Risks</p>
-                  <p className="text-xs text-foreground/80 leading-relaxed">Capital-intensive model requires follow-on funding. Hardware margins thin at 15-25%.</p>
-                </div>
+            {/* Strengths + Risks */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x">
+              <div className="p-6 md:p-8 space-y-2">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-emerald-700 flex items-center gap-1.5">
+                  <Shield className="h-3 w-3" /> Key Strengths
+                </p>
+                <p className="text-sm text-foreground/80 leading-relaxed">Experienced founding team with 15+ years domain expertise. Strong regulatory tailwinds.</p>
+              </div>
+              <div className="p-6 md:p-8 space-y-2">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-amber-700 flex items-center gap-1.5">
+                  <FileCheck className="h-3 w-3" /> Key Risks
+                </p>
+                <p className="text-sm text-foreground/80 leading-relaxed">Capital-intensive model requires follow-on funding. Hardware margins thin at 15-25%.</p>
               </div>
             </div>
           </div>
