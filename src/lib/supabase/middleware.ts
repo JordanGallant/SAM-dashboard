@@ -97,6 +97,23 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
+    // Fund tier requires 2FA. Check Assurance Level — aal2 means MFA verified.
+    if (profile?.tier === "fund") {
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+      const mfaRequired = aal?.nextLevel === "aal2"
+      const twoFactorPath =
+        pathname === "/settings/security" ||
+        pathname === "/settings/security/2fa" ||
+        pathname.startsWith("/settings/security/")
+
+      if (mfaRequired && !twoFactorPath) {
+        const url = request.nextUrl.clone()
+        url.pathname = "/settings/security/2fa"
+        url.searchParams.set("required", "true")
+        return NextResponse.redirect(url)
+      }
+    }
+
     return supabaseResponse
   } catch (err) {
     console.error("Middleware error:", err)

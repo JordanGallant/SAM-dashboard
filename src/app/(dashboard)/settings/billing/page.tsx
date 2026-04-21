@@ -10,6 +10,7 @@ import { useTier } from "@/lib/tier-context"
 import { TIER_CONFIG } from "@/lib/tier-config"
 import type { Tier } from "@/lib/types/user"
 import { createClient } from "@/lib/supabase/client"
+import { PromoCodeInput } from "@/components/dashboard/promo-code-input"
 
 const TIER_ORDER: Tier[] = ["starter", "professional", "fund"]
 
@@ -96,11 +97,14 @@ function BillingContent() {
           <div>
             <p className="font-medium text-blue-900">Subscription required</p>
             <p className="text-sm text-blue-800 mt-0.5">
-              Pick a plan below to get access. Have a promo code? Contact support to apply it.
+              Pick a plan below to get access, or redeem a promo code for a free trial.
             </p>
           </div>
         </div>
       )}
+
+      {/* Promo code redemption for inactive / expired users */}
+      {(isInactive || isExpiredTrial) && <PromoCodeInput />}
 
       {showCanceled && (
         <div className="rounded-md bg-gray-50 border border-gray-200 p-4">
