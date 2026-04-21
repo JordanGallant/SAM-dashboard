@@ -1,8 +1,9 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { SectionHeader } from "@/components/dashboard/section-header"
+import { SectionLabel } from "@/components/dashboard/section-label"
 import { MetricTable } from "@/components/dashboard/metric-table"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
 import { useDeal } from "@/hooks/use-deal"
@@ -19,23 +20,23 @@ export default function ExitPage() {
       <SectionHeader title="Exit Potential" score={exit.score} verdict={exit.verdict} dataCompleteness={exit.dataCompleteness} />
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Comparable Exits</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><SectionLabel>Comparable exits</SectionLabel></CardHeader>
         <CardContent><MetricTable rows={exit.comparableExits} /></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Realistic Exit Range</CardTitle></CardHeader>
-        <CardContent><p className="text-sm text-muted-foreground">{exit.exitRange}</p></CardContent>
+        <CardHeader className="pb-2"><SectionLabel>Realistic exit range</SectionLabel></CardHeader>
+        <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{exit.exitRange}</p></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Exit Timeline</CardTitle></CardHeader>
-        <CardContent><p className="text-sm text-muted-foreground">{exit.exitTimeline}</p></CardContent>
+        <CardHeader className="pb-2"><SectionLabel>Exit timeline</SectionLabel></CardHeader>
+        <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{exit.exitTimeline}</p></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Acquirer Landscape</CardTitle></CardHeader>
-        <CardContent><p className="text-sm text-muted-foreground">{exit.acquirerLandscape}</p></CardContent>
+        <CardHeader className="pb-2"><SectionLabel>Acquirer landscape</SectionLabel></CardHeader>
+        <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{exit.acquirerLandscape}</p></CardContent>
       </Card>
 
       <RedFlagsList items={exit.redFlags} />

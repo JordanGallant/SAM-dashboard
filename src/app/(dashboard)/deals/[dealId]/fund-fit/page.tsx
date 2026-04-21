@@ -1,11 +1,10 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { SectionHeader } from "@/components/dashboard/section-header"
-import { ScoreBadge } from "@/components/dashboard/score-badge"
+import { SectionLabel } from "@/components/dashboard/section-label"
 import { useDeal } from "@/hooks/use-deal"
 import { CheckCircle2, XCircle } from "lucide-react"
 import { TierGate } from "@/components/dashboard/tier-gate"
@@ -18,9 +17,11 @@ export default function FundFitPage() {
   const fit = deal?.analysis?.fundFit
 
   if (!config.fundFit) {
-    return <TierGate feature="Fund Fit Scoring" requiredTier="professional">
-      <div />
-    </TierGate>
+    return (
+      <TierGate feature="Fund Fit Scoring" requiredTier="professional">
+        <div />
+      </TierGate>
+    )
   }
 
   if (!fit) return <p className="text-sm text-muted-foreground">No fund fit analysis available.</p>
@@ -30,14 +31,14 @@ export default function FundFitPage() {
       <SectionHeader title="Fund Fit" score={fit.score} verdict={fit.verdict} dataCompleteness={fit.dataCompleteness} />
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Criteria Match</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><SectionLabel>Criteria match</SectionLabel></CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Criterion</TableHead>
-                <TableHead>Fund Profile</TableHead>
-                <TableHead>This Deal</TableHead>
+                <TableHead>Fund profile</TableHead>
+                <TableHead>This deal</TableHead>
                 <TableHead className="w-[80px] text-center">Match</TableHead>
               </TableRow>
             </TableHeader>
@@ -45,8 +46,8 @@ export default function FundFitPage() {
               {fit.criteria.map((c) => (
                 <TableRow key={c.criterion}>
                   <TableCell className="font-medium">{c.criterion}</TableCell>
-                  <TableCell>{c.fundProfile}</TableCell>
-                  <TableCell>{c.deal}</TableCell>
+                  <TableCell className="text-muted-foreground">{c.fundProfile}</TableCell>
+                  <TableCell className="text-muted-foreground">{c.deal}</TableCell>
                   <TableCell className="text-center">
                     {c.match
                       ? <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-600" />
@@ -62,26 +63,26 @@ export default function FundFitPage() {
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            Thesis Alignment
-            <ScoreBadge score={fit.thesisAlignment} />
-          </CardTitle>
+          <SectionLabel>Thesis alignment</SectionLabel>
+          <div className="mt-2 flex items-baseline gap-1">
+            <span className="text-3xl font-mono font-bold text-amber-600 leading-none">{fit.thesisAlignment}</span>
+            <span className="text-xs font-mono text-muted-foreground">/100</span>
+          </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             {fit.thesisAlignment >= 70
               ? "Strong alignment with fund thesis."
               : fit.thesisAlignment >= 40
                 ? "Partial alignment with fund thesis. Some criteria do not match."
-                : "Weak alignment with fund thesis."
-            }
+                : "Weak alignment with fund thesis."}
           </p>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Portfolio Conflict Check</CardTitle></CardHeader>
-        <CardContent><p className="text-sm text-muted-foreground">{fit.portfolioConflict}</p></CardContent>
+        <CardHeader className="pb-2"><SectionLabel>Portfolio conflict check</SectionLabel></CardHeader>
+        <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{fit.portfolioConflict}</p></CardContent>
       </Card>
     </div>
   )
