@@ -72,6 +72,7 @@ function RegisterContent() {
       password,
       options: {
         data: { full_name: name, pending_tier: tierParam },
+        // After email confirmation, route through callback which checks pending_tier
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
@@ -82,6 +83,14 @@ function RegisterContent() {
       return
     }
 
+    // If Supabase email confirmation is ON, there's no session yet.
+    // Supabase returns user but no session → show check-email page.
+    if (!data.session) {
+      router.push(`/auth/check-email?email=${encodeURIComponent(email)}`)
+      return
+    }
+
+    // Session exists (email confirmation is off) → proceed
     // If we have a valid promo code, apply it
     if (codeValid && promoCode) {
       // Wait a moment for the profile trigger to fire
@@ -94,7 +103,6 @@ function RegisterContent() {
       })
 
       if (applyRes.ok) {
-        // Trial granted — go to setup wizard
         router.push("/setup")
         router.refresh()
         return
@@ -102,25 +110,8 @@ function RegisterContent() {
       // If apply fails, fall through to paid flow
     }
 
-    // No code (or code failed) — send to Stripe Checkout
-    await new Promise((r) => setTimeout(r, 500))
-    try {
-      const checkoutRes = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier: tierParam }),
-      })
-      const checkoutData = await checkoutRes.json()
-      if (checkoutData.url) {
-        window.location.href = checkoutData.url
-        return
-      }
-      setError(checkoutData.error || "Failed to start checkout")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Network error")
-    }
-
-    setLoading(false)
+    // No code (or code failed) — route through checkout-redirect page
+    router.push(`/checkout-redirect?tier=${tierParam}`)
   }
 
   return (
