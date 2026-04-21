@@ -19,9 +19,10 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   const params = useParams()
   const pathname = usePathname()
   const dealId = params.dealId as string
-  const { deal, loading } = useDeal(dealId)
+  const { deal, loading, refetch } = useDeal(dealId)
   const { config: tierConfig } = useTier()
   const [analyzing, setAnalyzing] = useState(false)
+  const [analyzeError, setAnalyzeError] = useState("")
 
   if (loading) {
     return <p className="text-sm text-muted-foreground">Loading deal...</p>
@@ -63,6 +64,28 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
     await updateDealStatus(dealId, status as PipelineStatus)
   }
 
+  async function handleRunAnalysis() {
+    setAnalyzing(true)
+    setAnalyzeError("")
+    try {
+      const res = await fetch("/api/analysis/trigger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dealId }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setAnalyzeError(data.error || "Failed to start analysis")
+      } else {
+        refetch()
+      }
+    } catch (err) {
+      setAnalyzeError(err instanceof Error ? err.message : "Network error")
+    } finally {
+      setAnalyzing(false)
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* Deal header */}
@@ -87,14 +110,21 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
         {!analysis && (
           <Button
             size="sm"
-            onClick={() => { setAnalyzing(true); setTimeout(() => setAnalyzing(false), 3000) }}
-            disabled={analyzing}
+            onClick={handleRunAnalysis}
+            disabled={analyzing || deal.documents.length === 0}
+            title={deal.documents.length === 0 ? "Upload a pitch deck first" : undefined}
           >
             {analyzing ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-2 h-3.5 w-3.5" />}
-            {analyzing ? "Analyzing..." : "Run Analysis"}
+            {analyzing ? "Starting..." : "Analyze Pitch Deck"}
           </Button>
         )}
       </div>
+
+      {analyzeError && (
+        <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+          {analyzeError}
+        </div>
+      )}
 
       {/* Tab navigation (only when analysis exists) */}
       {analysis && (

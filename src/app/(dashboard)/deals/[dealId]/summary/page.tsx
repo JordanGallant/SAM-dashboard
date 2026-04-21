@@ -22,7 +22,7 @@ import { useTier } from "@/lib/tier-context"
 export default function SummaryPage() {
   const params = useParams()
   const dealId = params.dealId as string
-  const { deal, loading, refetch } = useDeal(dealId)
+  const { deal, loading, refetch, analysisStatus } = useDeal(dealId)
   const { config: tierConfig } = useTier()
 
   const [downloading, setDownloading] = useState(false)
@@ -103,8 +103,49 @@ export default function SummaryPage() {
   if (loading) return <p className="text-sm text-muted-foreground">Loading...</p>
   if (!deal) return null
 
+  // Processing state
+  if (!deal.analysis && (analysisStatus === "pending" || analysisStatus === "processing")) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+            <h3 className="font-semibold">Analyzing pitch deck</h3>
+            <p className="mt-1 text-sm text-muted-foreground max-w-md">
+              This typically takes 30-45 minutes. You can leave this page — we&apos;ll save the results when done. This page auto-refreshes every 30 seconds.
+            </p>
+          </CardContent>
+        </Card>
+
+        <DealUpload dealId={deal.id} documents={deal.documents} onChange={refetch} />
+      </div>
+    )
+  }
+
+  // Failed state
+  if (!deal.analysis && analysisStatus === "failed") {
+    return (
+      <div className="space-y-6">
+        <Card className="border-red-200">
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+              <Sparkles className="h-6 w-6 text-red-600" />
+            </div>
+            <h3 className="font-semibold">Analysis failed</h3>
+            <p className="mt-1 text-sm text-muted-foreground max-w-md">
+              Something went wrong during analysis. You can click &quot;Analyze Pitch Deck&quot; above to try again.
+            </p>
+          </CardContent>
+        </Card>
+
+        <DealUpload dealId={deal.id} documents={deal.documents} onChange={refetch} />
+      </div>
+    )
+  }
+
   // No analysis yet — show upload + run analysis state
   if (!deal.analysis) {
+    const hasDocs = deal.documents.length > 0
     return (
       <div className="space-y-6">
         <Card className="border-dashed">
@@ -112,9 +153,13 @@ export default function SummaryPage() {
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
               <Sparkles className="h-6 w-6 text-muted-foreground" />
             </div>
-            <h3 className="font-semibold">Awaiting analysis</h3>
+            <h3 className="font-semibold">
+              {hasDocs ? "Ready to analyze" : "Upload a pitch deck"}
+            </h3>
             <p className="mt-1 text-sm text-muted-foreground max-w-md">
-              Upload your pitch deck and any supporting documents below, then click &quot;Run Analysis&quot; to generate your executive summary.
+              {hasDocs
+                ? 'Click "Analyze Pitch Deck" at the top to start. Analysis takes around 30-45 minutes and runs in the background — you can leave this page.'
+                : "Upload your pitch deck below. Once uploaded, click \"Analyze Pitch Deck\" at the top to generate your executive summary."}
             </p>
           </CardContent>
         </Card>
