@@ -49,7 +49,8 @@ export async function updateSession(request: NextRequest) {
     const isPublic =
       publicRoutes.some((route) => pathname === route) ||
       pathname.startsWith("/auth/") ||
-      pathname.startsWith("/checkout/")
+      pathname.startsWith("/checkout/") ||
+      pathname.startsWith("/design/")
 
     if (!user) {
       if (isPublic) return supabaseResponse

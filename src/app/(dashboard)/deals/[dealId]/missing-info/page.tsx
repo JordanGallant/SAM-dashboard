@@ -43,7 +43,7 @@ export default function MissingInfoPage() {
 
       {missing.sections.map((section) => (
         <Card key={section.section}>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <SectionLabel>{section.section}</SectionLabel>
             <p className="mt-1 text-xs text-muted-foreground">{section.impact}</p>
           </CardHeader>

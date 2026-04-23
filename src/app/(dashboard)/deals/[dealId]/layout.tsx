@@ -8,8 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Play, Loader2, ArrowLeft, Lock } from "lucide-react"
 import { useTier } from "@/lib/tier-context"
 import { useDeal } from "@/hooks/use-deal"
-import { ANALYSIS_TABS, STAGE_BADGE_COLORS, STATUS_BADGE_COLORS, PIPELINE_STAGES } from "@/lib/constants"
-import { getScoreColor } from "@/lib/constants"
+import { STATUS_BADGE_COLORS, PIPELINE_STAGES } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { updateDealStatus } from "@/app/actions/deals"
@@ -38,7 +37,8 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   }
 
   const analysis = deal.analysis
-  const activeTab = pathname.split("/").pop() || "summary"
+  const tabKeys = new Set(["summary", "team", "market", "product", "traction", "finance", "exit", "fund-fit", "missing-info"])
+  const activeTab = pathname.split("/").filter(Boolean).reverse().find((s) => tabKeys.has(s)) || "summary"
 
   const gatedTabs: Record<string, boolean> = {
     "fund-fit": !tierConfig.fundFit,
@@ -87,37 +87,43 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <div className="space-y-4">
-      {/* Deal header */}
-      <div className="flex flex-wrap items-center gap-3">
-        <Link href="/deals" className="text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" />
+    <div className="space-y-6">
+      {/* Deal header — editorial, single line */}
+      <div className="space-y-2">
+        <Link href="/deals" className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="h-3 w-3" />
+          Dealroom
         </Link>
-        <h1 className="text-xl font-bold">{deal.companyName}</h1>
-        <Badge className={STAGE_BADGE_COLORS[deal.stage]}>{deal.stage}</Badge>
-        <Select defaultValue={deal.status} onValueChange={handleStatusChange}>
-          <SelectTrigger className="h-7 w-auto gap-1 text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {PIPELINE_STAGES.map((s) => (
-              <SelectItem key={s} value={s}>
-                <Badge variant="outline" className={`${STATUS_BADGE_COLORS[s]} border-0`}>{s}</Badge>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {!analysis && (
-          <Button
-            size="sm"
-            onClick={handleRunAnalysis}
-            disabled={analyzing || deal.documents.length === 0}
-            title={deal.documents.length === 0 ? "Upload a pitch deck first" : undefined}
-          >
-            {analyzing ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-2 h-3.5 w-3.5" />}
-            {analyzing ? "Starting..." : "Analyze Pitch Deck"}
-          </Button>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-heading font-bold leading-none">{deal.companyName}</h1>
+          <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+            {deal.stage}
+          </span>
+          <Select defaultValue={deal.status} onValueChange={handleStatusChange}>
+            <SelectTrigger className="h-7 w-auto gap-1 text-[11px] font-mono uppercase tracking-wider">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PIPELINE_STAGES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  <Badge variant="outline" className={`${STATUS_BADGE_COLORS[s]} border-0`}>{s}</Badge>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {!analysis && (
+            <Button
+              size="sm"
+              onClick={handleRunAnalysis}
+              disabled={analyzing || deal.documents.length === 0}
+              title={deal.documents.length === 0 ? "Upload a pitch deck first" : undefined}
+              className="ml-auto"
+            >
+              {analyzing ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-2 h-3.5 w-3.5" />}
+              {analyzing ? "Starting..." : "Analyze pitch deck"}
+            </Button>
+          )}
+        </div>
       </div>
 
       {analyzeError && (
@@ -126,40 +132,89 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
         </div>
       )}
 
-      {/* Tab navigation (only when analysis exists) */}
-      {analysis && (
-        <nav className="flex gap-1 overflow-x-auto border-b pb-px">
-          {ANALYSIS_TABS.map(({ key, label }) => {
-            const score = getTabScore(key)
-            const isActive = activeTab === key
-            const isGated = gatedTabs[key] ?? false
-            return (
-              <Link
-                key={key}
-                href={`/deals/${dealId}/${key}`}
-                className={cn(
-                  "flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm transition-colors",
-                  isActive
-                    ? "border-primary font-medium text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground",
-                  isGated && "opacity-60"
-                )}
-              >
-                {isGated && <Lock className="h-3 w-3" />}
-                {label}
-                {score !== undefined && !isGated && (
-                  <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${getScoreColor(score).bg} ${getScoreColor(score).text}`}>
-                    {score}
-                  </Badge>
-                )}
-              </Link>
-            )
-          })}
-        </nav>
-      )}
+      {/* Body: content on left · right sub-nav */}
+      <div className="flex items-start gap-6">
+        {/* Content fills available width */}
+        <div className="flex-1 min-w-0">{children}</div>
 
-      {/* Tab content */}
-      <div>{children}</div>
+        {analysis && (
+          <nav className="w-56 shrink-0 hidden md:block sticky top-4 self-start">
+            {NAV_GROUPS.map((group, groupIdx) => (
+              <div key={group.label} className={cn(groupIdx > 0 && "mt-5")}>
+                <p className="mb-1 text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground/80">
+                  {group.label}
+                </p>
+                <ul>
+                  {group.items.map(({ key, label }) => {
+                    const score = getTabScore(key)
+                    const isActive = activeTab === key
+                    const isGated = gatedTabs[key] ?? false
+                    const dotColor =
+                      score === undefined
+                        ? "bg-muted-foreground/25"
+                        : score >= 70
+                        ? "bg-emerald-500"
+                        : score >= 40
+                        ? "bg-amber-500"
+                        : "bg-red-500"
+                    return (
+                      <li key={key}>
+                        <Link
+                          href={`/deals/${dealId}/${key}`}
+                          className={cn(
+                            "group relative flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] font-medium transition-colors",
+                            isActive
+                              ? "text-foreground bg-muted/70"
+                              : "text-foreground/55 hover:text-foreground hover:bg-muted/40",
+                            isGated && "opacity-60"
+                          )}
+                        >
+                          {/* Fixed-size dot wrapper — ring never pushes siblings */}
+                          <span aria-hidden className="relative flex h-3 w-3 shrink-0 items-center justify-center">
+                            <span className={cn("h-1.5 w-1.5 rounded-full", dotColor)} />
+                            {isActive && (
+                              <span className="absolute inset-0 rounded-full ring-2 ring-current opacity-30" />
+                            )}
+                          </span>
+                          {isGated && <Lock className="h-3 w-3 shrink-0 text-muted-foreground" />}
+                          <span className="truncate">{label}</span>
+                          {!isGated && (
+                            <span className="ml-auto font-mono text-[11px] tabular-nums text-muted-foreground group-hover:text-foreground">
+                              {score ?? "—"}
+                            </span>
+                          )}
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))}
+          </nav>
+        )}
+      </div>
     </div>
   )
 }
+
+const NAV_GROUPS: { label: string; items: { key: string; label: string }[] }[] = [
+  { label: "Overview", items: [{ key: "summary", label: "Executive Summary" }] },
+  {
+    label: "Domains",
+    items: [
+      { key: "team", label: "Team" },
+      { key: "market", label: "Market" },
+      { key: "product", label: "Product" },
+      { key: "traction", label: "Traction" },
+      { key: "finance", label: "Finance" },
+      { key: "exit", label: "Exit Potential" },
+    ],
+  },
+  {
+    label: "Review",
+    items: [
+      { key: "fund-fit", label: "Fund Fit" },
+      { key: "missing-info", label: "Missing Info" },
+    ],
+  },
+]

@@ -20,22 +20,22 @@ export default function ExitPage() {
       <SectionHeader title="Exit Potential" score={exit.score} verdict={exit.verdict} dataCompleteness={exit.dataCompleteness} />
 
       <Card>
-        <CardHeader className="pb-2"><SectionLabel>Comparable exits</SectionLabel></CardHeader>
+        <CardHeader><SectionLabel>Comparable exits</SectionLabel></CardHeader>
         <CardContent><MetricTable rows={exit.comparableExits} /></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><SectionLabel>Realistic exit range</SectionLabel></CardHeader>
+        <CardHeader><SectionLabel>Realistic exit range</SectionLabel></CardHeader>
         <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{exit.exitRange}</p></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><SectionLabel>Exit timeline</SectionLabel></CardHeader>
+        <CardHeader><SectionLabel>Exit timeline</SectionLabel></CardHeader>
         <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{exit.exitTimeline}</p></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><SectionLabel>Acquirer landscape</SectionLabel></CardHeader>
+        <CardHeader><SectionLabel>Acquirer landscape</SectionLabel></CardHeader>
         <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{exit.acquirerLandscape}</p></CardContent>
       </Card>
 

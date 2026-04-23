@@ -162,14 +162,20 @@ export default function SetupPage() {
                   ))}
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="ticket-min">Min Ticket (EUR)</Label>
-                  <Input id="ticket-min" type="number" placeholder="250000" value={ticketMin} onChange={(e) => setTicketMin(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ticket-max">Max Ticket (EUR)</Label>
-                  <Input id="ticket-max" type="number" placeholder="2000000" value={ticketMax} onChange={(e) => setTicketMax(e.target.value)} />
+              <div className="space-y-2">
+                <Label>Check size (EUR)</Label>
+                <p className="text-xs text-muted-foreground">
+                  The range you typically invest per deal.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="ticket-min" className="text-xs font-normal text-muted-foreground">Minimum</Label>
+                    <Input id="ticket-min" type="number" placeholder="250000" value={ticketMin} onChange={(e) => setTicketMin(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="ticket-max" className="text-xs font-normal text-muted-foreground">Maximum</Label>
+                    <Input id="ticket-max" type="number" placeholder="2000000" value={ticketMax} onChange={(e) => setTicketMax(e.target.value)} />
+                  </div>
                 </div>
               </div>
             </>

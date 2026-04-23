@@ -75,10 +75,10 @@ export default function FundProfilePage() {
   return (
     <div className="max-w-2xl space-y-6">
       <Card className="border-dashed">
-        <CardContent className="pt-5 flex items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
+        <CardContent className="flex items-center justify-between gap-4">
+          <div className="flex items-start gap-3 min-w-0">
             <Sparkles className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-medium">Prefer the guided setup?</p>
               <p className="text-xs text-muted-foreground">Walk through the 3-step wizard instead of editing fields directly.</p>
             </div>
@@ -141,14 +141,20 @@ export default function FundProfilePage() {
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Min Ticket (EUR)</Label>
-              <Input type="number" value={ticketMin} onChange={(e) => setTicketMin(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Max Ticket (EUR)</Label>
-              <Input type="number" value={ticketMax} onChange={(e) => setTicketMax(e.target.value)} />
+          <div className="space-y-2">
+            <Label>Check size (EUR)</Label>
+            <p className="text-xs text-muted-foreground">
+              The range you typically invest per deal. Used to flag deals where the raise size is a poor fit.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-normal text-muted-foreground">Minimum</Label>
+                <Input type="number" placeholder="250000" value={ticketMin} onChange={(e) => setTicketMin(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-normal text-muted-foreground">Maximum</Label>
+                <Input type="number" placeholder="2000000" value={ticketMax} onChange={(e) => setTicketMax(e.target.value)} />
+              </div>
             </div>
           </div>
         </CardContent>

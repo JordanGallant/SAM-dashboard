@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAM · Design Showcase · Canaaro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --amber-50: #FFFBEB; --amber-100: #FEF3C7; --amber-500: #F59E0B;
+      --amber-600: #D97706; --amber-700: #B45309; --amber-800: #92400E;
+      --emerald-500: #10B981; --emerald-600: #059669; --emerald-700: #047857;
+      --red-500: #EF4444; --red-600: #DC2626; --red-700: #B91C1C;
+      --stone-50: #FAFAF9; --stone-100: #F5F5F4; --stone-200: #E7E5E4;
+      --stone-500: #78716C; --stone-700: #44403C; --stone-900: #1C1917;
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Geist', system-ui, -apple-system, sans-serif;
+      background: var(--stone-50);
+      color: var(--stone-900);
+      margin: 0;
+    }
+    .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em;
+      color: var(--amber-600); font-weight: 500;
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 2px 8px; border-radius: 9999px; font-weight: 500;
+    }
+    .tile {
+      background: #fff; border: 1px solid var(--stone-200);
+      border-radius: 12px; padding: 20px;
+    }
+    body::after {
+      content: ""; position: fixed; inset: 0; pointer-events: none;
+      z-index: 9999; opacity: 0.02;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    }
+    @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    .grow { animation: grow 0.7s cubic-bezier(0.22, 1, 0.36, 1); transform-origin: left; }
+
+    /* ======= Layout ======= */
+    .app { display: grid; grid-template-columns: 240px 1fr 0px; min-height: 100vh; transition: grid-template-columns 0.2s ease; }
+    .app.collapsed { grid-template-columns: 64px 1fr 0px; }
+    .app.chat-open { grid-template-columns: 240px 1fr 360px; }
+    .app.collapsed.chat-open { grid-template-columns: 64px 1fr 360px; }
+    aside {
+      background: #fff; border-right: 1px solid var(--stone-200);
+      display: flex; flex-direction: column;
+      position: sticky; top: 0; height: 100vh; overflow: hidden;
+    }
+    aside .nav-label { transition: opacity 0.15s; white-space: nowrap; }
+    .app.collapsed aside .nav-label,
+    .app.collapsed aside .brand-text,
+    .app.collapsed aside .section-label { opacity: 0; pointer-events: none; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 14px; margin: 1px 8px; border-radius: 8px;
+      font-size: 13.5px; color: var(--stone-700); cursor: pointer;
+      transition: background 0.1s;
+    }
+    .nav-item:hover { background: var(--stone-100); }
+    .nav-item.active {
+      background: var(--amber-50); color: var(--amber-800);
+      box-shadow: inset 2px 0 0 var(--amber-600);
+    }
+    .nav-item .nav-icon { width: 18px; height: 18px; flex-shrink: 0; color: var(--stone-500); }
+    .nav-item.active .nav-icon { color: var(--amber-700); }
+    .nav-item .nav-score { margin-left: auto; font-size: 10.5px; }
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--stone-500); padding: 14px 22px 4px;
+    }
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* ======= Chat panel ======= */
+    .chat-panel {
+      background: #fff; border-left: 1px solid var(--stone-200);
+      display: flex; flex-direction: column;
+      position: sticky; top: 0; height: 100vh; overflow: hidden;
+      transform: translateX(100%); transition: transform 0.2s ease;
+    }
+    .app.chat-open .chat-panel { transform: translateX(0); }
+    .chat-fab {
+      position: fixed; bottom: 24px; right: 24px; z-index: 50;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--amber-700); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 20px rgba(180, 83, 9, 0.25), 0 2px 4px rgba(0,0,0,0.06);
+      cursor: pointer; transition: transform 0.15s, background 0.15s;
+    }
+    .chat-fab:hover { background: var(--amber-800); transform: translateY(-1px); }
+    .app.chat-open .chat-fab { display: none; }
+    .msg {
+      max-width: 85%; padding: 10px 12px; border-radius: 12px;
+      font-size: 13px; line-height: 1.45;
+    }
+    .msg.sam { background: var(--stone-100); color: var(--stone-900); border-bottom-left-radius: 4px; }
+    .msg.user { background: var(--amber-700); color: #fff; margin-left: auto; border-bottom-right-radius: 4px; }
+    .ctx-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      padding: 3px 8px; border-radius: 6px;
+      background: var(--amber-50); color: var(--amber-800);
+      border: 1px solid #FDE68A;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside>
+    <!-- Brand + collapse -->
+    <div class="flex items-center justify-between px-4 py-4 border-b border-stone-200">
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="w-7 h-7 rounded-md flex items-center justify-center shrink-0" style="background: var(--amber-700); color: #fff;">
+          <span class="mono font-bold text-xs">S</span>
+        </div>
+        <div class="brand-text min-w-0">
+          <div class="text-sm font-semibold leading-none">Canaaro</div>
+          <div class="mono text-[10px] text-stone-500 mt-1 uppercase tracking-wider">Seed · GTM SaaS</div>
+        </div>
+      </div>
+      <button id="collapseBtn" class="text-stone-500 hover:text-stone-900 shrink-0" title="Collapse">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+    </div>
+
+    <!-- Verdict block -->
+    <div class="px-4 py-4 border-b border-stone-200">
+      <div class="flex items-baseline gap-2">
+        <span class="mono font-bold text-3xl leading-none" style="color: var(--red-600);">24</span>
+        <span class="mono text-[10px] text-stone-400 uppercase tracking-wider">/ 100</span>
+      </div>
+      <div class="flex items-center gap-1.5 mt-2 nav-label">
+        <span class="chip" style="background: #F4F4F5; color: #3F3F46;">PASS</span>
+        <span class="chip" style="background: #FEF2F2; color: var(--red-700);">HIGH CONF</span>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 overflow-y-auto py-2">
+      <div class="section-label">Analysis</div>
+      <div class="nav-item active" data-target="overview">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="nav-label">Overview</span>
+      </div>
+      <div class="nav-item" data-target="team">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="nav-label">Team</span>
+        <span class="nav-score mono text-red-600 nav-label">28</span>
+      </div>
+      <div class="nav-item" data-target="market">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 18 18"/><path d="M18 12v8"/><path d="M14 15v5"/><path d="M10 10v10"/><path d="M6 13v7"/></svg>
+        <span class="nav-label">Market</span>
+        <span class="nav-score mono text-red-600 nav-label">38</span>
+      </div>
+      <div class="nav-item" data-target="product">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+        <span class="nav-label">Product</span>
+        <span class="nav-score mono text-red-600 nav-label">22</span>
+      </div>
+      <div class="nav-item" data-target="traction">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        <span class="nav-label">Traction</span>
+        <span class="nav-score mono text-red-600 nav-label">12</span>
+      </div>
+      <div class="nav-item" data-target="finance">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span class="nav-label">Finance</span>
+        <span class="nav-score mono text-red-600 nav-label">18</span>
+      </div>
+
+      <div class="section-label">Context</div>
+      <div class="nav-item" data-target="comparables">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-5"/></svg>
+        <span class="nav-label">Comparables</span>
+      </div>
+      <div class="nav-item" data-target="docs">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="nav-label">Documents</span>
+      </div>
+    </nav>
+
+    <!-- Footer meta -->
+    <div class="border-t border-stone-200 px-4 py-3 nav-label">
+      <div class="mono text-[10px] text-stone-500 uppercase tracking-wider">Analyst · SAM v0.9</div>
+      <div class="mono text-[10px] text-stone-400 mt-0.5">2026-04-22 · 14:07</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="min-w-0">
+
+    <!-- Slim top bar -->
+    <div class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-stone-200 px-8 py-3 flex items-center gap-6">
+      <div id="breadcrumb" class="mono text-xs uppercase tracking-wider text-stone-500">OVERVIEW</div>
+      <div class="ml-auto flex items-center gap-4 text-xs">
+        <span class="mono text-stone-500">NL · SEED · GTM SAAS</span>
+        <span class="mono text-stone-400">·</span>
+        <span class="mono text-stone-500">RAISING <span class="text-stone-400">NOT DISCLOSED</span></span>
+      </div>
+    </div>
+
+    <!-- ========== OVERVIEW ========== -->
+    <section id="overview" class="page-section active px-8 py-6">
+      <div class="grid grid-cols-12 gap-5">
+
+        <!-- Score Gauge -->
+        <div class="tile col-span-12 md:col-span-4 flex flex-col items-center justify-center min-h-[260px]">
+          <span class="eyebrow self-start">SCORE</span>
+          <div class="relative my-3" style="width: 170px; height: 170px;">
+            <svg width="170" height="170" class="-rotate-90">
+              <circle cx="85" cy="85" r="72" stroke="#E7E5E4" stroke-width="11" fill="none"/>
+              <circle cx="85" cy="85" r="72" stroke="#DC2626" stroke-width="11" fill="none" stroke-linecap="round"
+                      stroke-dasharray="108.6 452.4" class="grow"/>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center leading-none">
+              <span class="mono font-bold" style="font-size: 52px; color: var(--red-600);">24</span>
+              <span class="mono text-[10px] uppercase tracking-widest text-stone-500 mt-1">/ 100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Domain Radar -->
+        <div class="tile col-span-12 md:col-span-8">
+          <span class="eyebrow">DOMAIN RADAR</span>
+          <div class="flex items-center justify-center mt-1">
+            <svg width="420" height="300" viewBox="0 0 420 300" class="overflow-visible">
+              <g stroke="#E7E5E4" stroke-width="1" fill="none">
+                <polygon points="210,30 371,147 309.8,340 110.2,340 49,147"/>
+                <polygon points="210,75 338.8,168.6 289.8,323 130.2,323 81.2,168.6" stroke-opacity="0.6"/>
+                <polygon points="210,120 306.6,190.2 269.8,306 150.2,306 113.4,190.2" stroke-opacity="0.4"/>
+                <polygon points="210,165 274.4,211.8 249.8,289 170.2,289 145.6,211.8" stroke-opacity="0.3"/>
+              </g>
+              <polygon points="210,160.2 254.18,209.1 232.76,307.76 190.49,338.58 136.38,182.64"
+                      fill="#DC2626" fill-opacity="0.15" stroke="#DC2626" stroke-width="2"/>
+              <g fill="#DC2626">
+                <circle cx="210" cy="160.2" r="4"/>
+                <circle cx="254.18" cy="209.1" r="4"/>
+                <circle cx="232.76" cy="307.76" r="4"/>
+                <circle cx="190.49" cy="338.58" r="4"/>
+                <circle cx="136.38" cy="182.64" r="4"/>
+              </g>
+              <g class="mono" font-size="11" fill="#44403C" text-anchor="middle" font-weight="500">
+                <text x="210" y="18">TEAM · 28</text>
+                <text x="385" y="145">MARKET · 38</text>
+                <text x="320" y="360">PRODUCT · 22</text>
+                <text x="95" y="360">TRACTION · 12</text>
+                <text x="35" y="145">FINANCE · 18</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Decision Matrix -->
+        <div class="tile col-span-12 md:col-span-6">
+          <span class="eyebrow">DECISION MATRIX · SCORE × CONFIDENCE</span>
+          <svg width="100%" viewBox="0 0 420 280" class="block mt-1">
+            <line x1="0" y1="140" x2="420" y2="140" stroke="#E7E5E4"/>
+            <line x1="210" y1="0" x2="210" y2="280" stroke="#E7E5E4"/>
+            <text x="105" y="25" class="mono" font-size="9" fill="#B45309" text-anchor="middle" font-weight="700">DIG DEEPER</text>
+            <text x="105" y="38" class="mono" font-size="8" fill="#78716C" text-anchor="middle">HIGH SCORE · LOW CONF</text>
+            <text x="315" y="25" class="mono" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">CONVICTION BUY</text>
+            <text x="315" y="38" class="mono" font-size="8" fill="#78716C" text-anchor="middle">HIGH SCORE · HIGH CONF</text>
+            <text x="105" y="270" class="mono" font-size="9" fill="#78716C" text-anchor="middle">DEFER</text>
+            <text x="105" y="255" class="mono" font-size="8" fill="#78716C" text-anchor="middle">LOW SCORE · LOW CONF</text>
+            <text x="315" y="270" class="mono" font-size="9" fill="#B91C1C" text-anchor="middle" font-weight="700">PASS / BURY</text>
+            <text x="315" y="255" class="mono" font-size="8" fill="#78716C" text-anchor="middle">LOW SCORE · HIGH CONF</text>
+            <circle cx="350" cy="220" r="9" fill="#DC2626" stroke="#fff" stroke-width="3"/>
+            <text x="340" y="200" class="mono" font-size="11" fill="#1C1917" font-weight="700" text-anchor="end">CANAARO</text>
+            <text x="340" y="213" class="mono" font-size="9" fill="#78716C" text-anchor="end">24 · HIGH CONF</text>
+          </svg>
+        </div>
+
+        <!-- Findings -->
+        <div class="tile col-span-12 md:col-span-6">
+          <span class="eyebrow">FINDINGS · STRENGTHS vs RISKS</span>
+
+          <!-- Weighted bar -->
+          <div class="mt-4">
+            <div class="flex h-7 rounded-md overflow-hidden ring-1 ring-stone-200">
+              <div class="flex items-center justify-center mono text-[10px] font-bold uppercase tracking-wider text-white" style="background: var(--emerald-600); width: 14%;">1.5</div>
+              <div class="flex items-center justify-center mono text-[10px] font-bold uppercase tracking-wider text-white" style="background: var(--red-600); width: 86%;">WEIGHT 9</div>
+            </div>
+            <div class="flex justify-between mono text-[10px] uppercase tracking-wider text-stone-500 mt-1.5">
+              <span>STRENGTHS · 3 INFO</span>
+              <span style="color: var(--red-700); font-weight: 600;">RISKS · 3 CRITICAL</span>
+            </div>
+          </div>
+
+          <!-- Two columns of actual findings -->
+          <div class="grid grid-cols-2 gap-5 mt-5">
+            <div>
+              <ul class="space-y-3">
+                <li class="text-[12.5px] leading-snug">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background: var(--emerald-500);"></span>
+                    <span class="font-semibold text-stone-900">Large addressable market</span>
+                  </div>
+                  <p class="text-stone-600 ml-3.5 mt-0.5">$5–8B SAM · 20–24% CAGR · multiple $1B+ outcomes</p>
+                </li>
+                <li class="text-[12.5px] leading-snug">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background: var(--emerald-500);"></span>
+                    <span class="font-semibold text-stone-900">Validated problem</span>
+                  </div>
+                  <p class="text-stone-600 ml-3.5 mt-0.5">GTM inefficiency — persistent, quantified demand signal</p>
+                </li>
+                <li class="text-[12.5px] leading-snug">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background: var(--emerald-500);"></span>
+                    <span class="font-semibold text-stone-900">EU cost structure</span>
+                  </div>
+                  <p class="text-stone-600 ml-3.5 mt-0.5">NL-based team → lower burn vs US equivalents</p>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <ul class="space-y-3">
+                <li class="text-[12.5px] leading-snug">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background: var(--red-600);"></span>
+                    <span class="font-semibold text-stone-900">Information vacuum</span>
+                  </div>
+                  <p class="text-stone-600 ml-3.5 mt-0.5">2-slide deck · no product, team, traction, financials</p>
+                </li>
+                <li class="text-[12.5px] leading-snug">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background: var(--red-600);"></span>
+                    <span class="font-semibold text-stone-900">Hyper-competitive market</span>
+                  </div>
+                  <p class="text-stone-600 ml-3.5 mt-0.5">Outreach $489M · Gong $584M · no differentiation stated</p>
+                </li>
+                <li class="text-[12.5px] leading-snug">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background: var(--red-600);"></span>
+                    <span class="font-semibold text-stone-900">Unverifiable founders</span>
+                  </div>
+                  <p class="text-stone-600 ml-3.5 mt-0.5">No LinkedIn, zero digital footprint · roles undefined</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score × Completeness -->
+        <div class="tile col-span-12 md:col-span-6">
+          <span class="eyebrow">SCORE × DATA COMPLETENESS</span>
+          <div class="space-y-3 mt-3">
+            <div class="grid grid-cols-[80px_1fr_1fr] gap-3 text-[10px] mono uppercase tracking-wider text-stone-500 pb-2 border-b border-stone-200">
+              <span>Domain</span><span>Score</span><span>Data %</span>
+            </div>
+            <div class="grid grid-cols-[80px_1fr_1fr] gap-3 items-center text-sm">
+              <span class="font-medium">Team</span>
+              <div class="flex items-center gap-2"><div class="grow h-2 rounded bg-red-500" style="width: 28%;"></div><span class="mono text-xs text-stone-500">28</span></div>
+              <div class="flex items-center gap-2"><div class="grow h-2 rounded bg-stone-400" style="width: 10%;"></div><span class="mono text-xs text-red-700 font-bold">10</span></div>
+            </div>
+            <div class="grid grid-cols-[80px_1fr_1fr] gap-3 items-center text-sm">
+              <span class="font-medium">Market</span>
+              <div class="flex items-center gap-2"><div class="grow h-2 rounded bg-red-500" style="width: 38%;"></div><span class="mono text-xs text-stone-500">38</span></div>
+              <div class="flex items-center gap-2"><div class="grow h-2 rounded bg-stone-400" style="width: 25%;"></div><span class="mono text-xs text-stone-500">25</span></div>
+            </div>
+            <div class="grid grid-cols-[80px_1fr_1fr] gap-3 items-center text-sm">
+              <span class="font-medium">Product</span>
+              <div class="flex items-center gap-2"><div class="grow h-2 rounded bg-red-500" style="width: 22%;"></div><span class="mono text-xs text-stone-500">22</span></div>
+              <div class="flex items-center gap-2"><div class="grow h-2 rounded bg-stone-400" style="width: 5%;"></div><span class="mono text-xs text-red-700 font-bold">5</span></div>
+            </div>
+            <div class="grid grid-cols-[80px_1fr_1fr] gap-3 items-center text-sm">
+              <span class="font-medium">Traction</span>
+              <div class="flex items-center gap-2"><div class="grow h-2 rounded bg-red-500" style="width: 12%;"></div><span class="mono text-xs text-stone-500">12</span></div>
+              <div class="flex items-center gap-2"><div class="grow h-2 rounded bg-stone-400" style="width: 0%;"></div><span class="mono text-xs text-red-700 font-bold">0</span></div>
+            </div>
+            <div class="grid grid-cols-[80px_1fr_1fr] gap-3 items-center text-sm">
+              <span class="font-medium">Finance</span>
+              <div class="flex items-center gap-2"><div class="grow h-2 rounded bg-red-500" style="width: 18%;"></div><span class="mono text-xs text-stone-500">18</span></div>
+              <div class="flex items-center gap-2"><div class="grow h-2 rounded bg-stone-400" style="width: 0%;"></div><span class="mono text-xs text-red-700 font-bold">0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Severity Distribution -->
+        <div class="tile col-span-12 md:col-span-6">
+          <span class="eyebrow">SEVERITY DISTRIBUTION</span>
+          <div class="grid grid-cols-2 gap-6 mt-3">
+            <div>
+              <div class="eyebrow mb-3" style="color: var(--emerald-600);">STRENGTHS · 3</div>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2 text-sm"><span class="w-16 mono text-[10px] uppercase text-stone-500">INFO</span><div class="flex-1 h-5 rounded bg-stone-100 overflow-hidden"><div class="h-full bg-emerald-400" style="width: 100%;"></div></div><span class="mono text-sm font-bold text-emerald-700 w-4">3</span></div>
+                <div class="flex items-center gap-2 text-sm opacity-30"><span class="w-16 mono text-[10px] uppercase text-stone-500">MINOR</span><div class="flex-1 h-5 rounded bg-stone-100"></div><span class="mono text-sm w-4 text-stone-400">0</span></div>
+                <div class="flex items-center gap-2 text-sm opacity-30"><span class="w-16 mono text-[10px] uppercase text-stone-500">MAJOR</span><div class="flex-1 h-5 rounded bg-stone-100"></div><span class="mono text-sm w-4 text-stone-400">0</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="eyebrow mb-3" style="color: var(--red-600);">RISKS · 3</div>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2 text-sm"><span class="w-16 mono text-[10px] uppercase text-stone-500">CRITICAL</span><div class="flex-1 h-5 rounded bg-stone-100 overflow-hidden"><div class="h-full bg-red-700" style="width: 100%;"></div></div><span class="mono text-sm font-bold text-red-700 w-4">3</span></div>
+                <div class="flex items-center gap-2 text-sm opacity-30"><span class="w-16 mono text-[10px] uppercase text-stone-500">MAJOR</span><div class="flex-1 h-5 rounded bg-stone-100"></div><span class="mono text-sm w-4 text-stone-400">0</span></div>
+                <div class="flex items-center gap-2 text-sm opacity-30"><span class="w-16 mono text-[10px] uppercase text-stone-500">MINOR</span><div class="flex-1 h-5 rounded bg-stone-100"></div><span class="mono text-sm w-4 text-stone-400">0</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparables strip -->
+        <div class="tile col-span-12">
+          <span class="eyebrow">COMPARABLES · SEED GTM SAAS · NL</span>
+          <div class="mt-4 relative h-14">
+            <div class="absolute inset-x-0 top-6 h-1.5 rounded-full bg-gradient-to-r from-red-200 via-amber-200 to-emerald-200"></div>
+            <div class="absolute top-0 bottom-0" style="left: 20%;">
+              <div class="w-px h-full bg-stone-300 mx-auto"></div>
+              <div class="absolute top-full mt-1 -translate-x-1/2 mono text-[10px] text-stone-500 whitespace-nowrap">P25 · 42</div>
+            </div>
+            <div class="absolute top-0 bottom-0" style="left: 50%;">
+              <div class="w-px h-full bg-stone-300 mx-auto"></div>
+              <div class="absolute top-full mt-1 -translate-x-1/2 mono text-[10px] text-stone-500 whitespace-nowrap">MEDIAN · 56</div>
+            </div>
+            <div class="absolute top-0 bottom-0" style="left: 80%;">
+              <div class="w-px h-full bg-stone-300 mx-auto"></div>
+              <div class="absolute top-full mt-1 -translate-x-1/2 mono text-[10px] text-stone-500 whitespace-nowrap">P75 · 68</div>
+            </div>
+            <div class="absolute" style="left: 10%; top: 2px;">
+              <div class="w-3 h-3 rounded-full bg-red-600 ring-2 ring-white"></div>
+              <div class="absolute top-4 -translate-x-1/2 left-1/2 mono text-[11px] text-red-700 font-bold whitespace-nowrap">CANAARO · 24</div>
+            </div>
+          </div>
+          <p class="mt-8 text-xs mono uppercase tracking-wider text-stone-500">BOTTOM DECILE vs 127 SEED GTM SAAS COMPANIES SCREENED IN NL</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========== DOMAIN STUBS ========== -->
+    <section id="team" class="page-section px-8 py-6">
+      <div class="tile"><span class="eyebrow">TEAM · 28 / 100</span><p class="text-stone-500 mt-3 text-sm">Domain-specific visualizations will live here: founder-team radar, experience stack, skill matrix, linkedin completeness, prior exits, domain depth.</p></div>
+    </section>
+    <section id="market" class="page-section px-8 py-6">
+      <div class="tile"><span class="eyebrow">MARKET · 38 / 100</span><p class="text-stone-500 mt-3 text-sm">TAM / SAM / SOM rings, competitive landscape map, market timing curve, demand signals, macro tailwind score.</p></div>
+    </section>
+    <section id="product" class="page-section px-8 py-6">
+      <div class="tile"><span class="eyebrow">PRODUCT · 22 / 100</span><p class="text-stone-500 mt-3 text-sm">Product maturity gauge, differentiation radar vs competitors, tech stack chips, roadmap timeline, moat sources.</p></div>
+    </section>
+    <section id="traction" class="page-section px-8 py-6">
+      <div class="tile"><span class="eyebrow">TRACTION · 12 / 100</span><p class="text-stone-500 mt-3 text-sm">Customer logo wall, MRR curve, pipeline funnel, NRR/GRR benchmark, LOI density, CAC payback waterfall.</p></div>
+    </section>
+    <section id="finance" class="page-section px-8 py-6">
+      <div class="tile"><span class="eyebrow">FINANCE · 18 / 100</span><p class="text-stone-500 mt-3 text-sm">Runway countdown, burn multiple gauge, cap-table sunburst, round sizing scatter (vs comparables), dilution impact.</p></div>
+    </section>
+    <section id="comparables" class="page-section px-8 py-6">
+      <div class="tile"><span class="eyebrow">COMPARABLES</span><p class="text-stone-500 mt-3 text-sm">Full benchmarking: score distribution, round size, valuation, traction stage — Canaaro vs 127 seed GTM SaaS NL.</p></div>
+    </section>
+    <section id="docs" class="page-section px-8 py-6">
+      <div class="tile"><span class="eyebrow">DOCUMENTS</span><p class="text-stone-500 mt-3 text-sm">Pitch deck thumbnails, extracted insights map, document-coverage heatmap.</p></div>
+    </section>
+
+  </main>
+
+  <!-- ===================== CHAT PANEL ===================== -->
+  <aside class="chat-panel" id="chatPanel">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-4 py-3 border-b border-stone-200">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: var(--stone-900); color: #fff;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <div class="text-sm font-semibold leading-none">Ask SAM</div>
+          <div class="mono text-[10px] text-stone-500 mt-1 uppercase tracking-wider">Context-aware</div>
+        </div>
+      </div>
+      <button id="chatClose" class="text-stone-500 hover:text-stone-900" title="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Context bar -->
+    <div class="px-4 py-3 border-b border-stone-200 bg-stone-50/60">
+      <div class="mono text-[10px] text-stone-500 uppercase tracking-wider mb-2">In context</div>
+      <div class="flex flex-wrap gap-1.5">
+        <span class="ctx-chip">CANAARO · 24</span>
+        <span class="ctx-chip">PASS</span>
+        <span class="ctx-chip">5 DOMAINS</span>
+        <span class="ctx-chip">3 RISKS</span>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="flex-1 overflow-y-auto px-4 py-4 space-y-3" id="chatMessages">
+      <div class="msg sam">Hi Jordan — I have full context on Canaaro and your other deals. Ask me anything.</div>
+      <div class="msg sam">
+        <div class="mono text-[10px] uppercase tracking-wider text-stone-500 mb-1.5">Suggested</div>
+        <div class="space-y-1.5">
+          <button class="suggest-btn block w-full text-left text-[12.5px] text-stone-800 hover:bg-white rounded px-2 py-1.5 border border-stone-200 bg-white/50">Why did Canaaro score so low?</button>
+          <button class="suggest-btn block w-full text-left text-[12.5px] text-stone-800 hover:bg-white rounded px-2 py-1.5 border border-stone-200 bg-white/50">Compare Canaaro to my other seed GTM deals</button>
+          <button class="suggest-btn block w-full text-left text-[12.5px] text-stone-800 hover:bg-white rounded px-2 py-1.5 border border-stone-200 bg-white/50">Draft a pass email to the founder</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="border-t border-stone-200 p-3">
+      <form id="chatForm" class="flex items-end gap-2">
+        <textarea
+          id="chatInput"
+          rows="1"
+          placeholder="Ask about Canaaro or your other deals…"
+          class="flex-1 resize-none rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-600"
+          style="max-height: 120px;"></textarea>
+        <button type="submit" class="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center" style="background: var(--amber-700); color: #fff;" title="Send">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </form>
+      <p class="mono text-[9px] text-stone-400 mt-2 uppercase tracking-wider">Shift+Enter for new line · Answers cite deal memos</p>
+    </div>
+  </aside>
+
+  <!-- Floating chat FAB (shown when chat is closed) -->
+  <button class="chat-fab" id="chatFab" title="Ask SAM">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  </button>
+</div>
+
+<script>
+  const app = document.getElementById('app');
+  const collapseBtn = document.getElementById('collapseBtn');
+  const breadcrumb = document.getElementById('breadcrumb');
+  const navItems = document.querySelectorAll('.nav-item');
+  const sections = document.querySelectorAll('.page-section');
+
+  collapseBtn.addEventListener('click', () => {
+    app.classList.toggle('collapsed');
+    const svg = collapseBtn.querySelector('svg path');
+    svg.setAttribute('d', app.classList.contains('collapsed') ? 'm9 6 6 6-6 6' : 'm15 6-6 6 6 6');
+  });
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const target = item.dataset.target;
+      navItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      sections.forEach(s => s.classList.remove('active'));
+      document.getElementById(target).classList.add('active');
+      breadcrumb.textContent = item.querySelector('.nav-label').textContent.toUpperCase();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // ----- Chat panel -----
+  const chatFab = document.getElementById('chatFab');
+  const chatClose = document.getElementById('chatClose');
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+  const chatMessages = document.getElementById('chatMessages');
+
+  chatFab.addEventListener('click', () => app.classList.add('chat-open'));
+  chatClose.addEventListener('click', () => app.classList.remove('chat-open'));
+
+  function addMsg(text, who) {
+    const el = document.createElement('div');
+    el.className = 'msg ' + who;
+    el.textContent = text;
+    chatMessages.appendChild(el);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function sendMessage(text) {
+    if (!text.trim()) return;
+    addMsg(text, 'user');
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+    setTimeout(() => {
+      addMsg('(stub) I would answer using Canaaro’s memo + your fund thesis. Wire Anthropic + deal-context retrieval to finish this.', 'sam');
+    }, 400);
+  }
+
+  chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    sendMessage(chatInput.value);
+  });
+
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage(chatInput.value);
+    }
+  });
+
+  chatInput.addEventListener('input', () => {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+  });
+
+  document.querySelectorAll('.suggest-btn').forEach(b => {
+    b.addEventListener('click', () => sendMessage(b.textContent.trim()));
+  });
+</script>
+
+</body>
+</html>

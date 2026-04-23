@@ -22,7 +22,7 @@ export default function ProductPage() {
 
       {/* Problem Assessment */}
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Problem Assessment</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Problem Assessment</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-3">
             <Badge variant="outline">Problem Type: {product.problemType}</Badge>
@@ -41,7 +41,7 @@ export default function ProductPage() {
 
       {/* Solution Comparison */}
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Solution & 10x Better Test</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Solution & 10x Better Test</CardTitle></CardHeader>
         <CardContent>
           <MetricTable rows={product.solutionComparison} />
         </CardContent>
@@ -49,7 +49,7 @@ export default function ProductPage() {
 
       {/* PMF */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
             Product-Market Fit
             <Badge variant="outline">{product.pmfStatus}</Badge>
@@ -60,9 +60,10 @@ export default function ProductPage() {
 
       {/* Moat */}
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Moat Assessment</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Moat Assessment</CardTitle></CardHeader>
         <CardContent>
-          <Table>
+          <div className="overflow-x-auto">
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Moat Type</TableHead>
@@ -84,6 +85,7 @@ export default function ProductPage() {
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 

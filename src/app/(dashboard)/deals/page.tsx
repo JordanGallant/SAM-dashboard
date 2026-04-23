@@ -1,16 +1,16 @@
 "use client"
 
-import { useState, Suspense } from "react"
+import { useState, Suspense, useMemo } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
-import { Plus, FileText, Upload, BarChart3 } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Plus, Upload, BarChart3 } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DealCreateDialog } from "@/components/deals/deal-create-dialog"
 import { FundProfileBanner } from "@/components/dashboard/fund-profile-banner"
 import { useDeals } from "@/hooks/use-deals"
-import { STAGE_BADGE_COLORS, STATUS_BADGE_COLORS, VERDICT_COLORS } from "@/lib/constants"
+import { VERDICT_COLORS } from "@/lib/constants"
 
 function DealsContent() {
   const searchParams = useSearchParams()
@@ -24,15 +24,25 @@ function DealsContent() {
     router.push(`/deals/${dealId}/summary`)
   }
 
+  const stats = useMemo(() => {
+    const analyzed = deals.filter((d) => d.analysis).length
+    const awaiting = deals.length - analyzed
+    return { analyzed, awaiting }
+  }, [deals])
+
   return (
     <div className="space-y-6">
       <FundProfileBanner />
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-2 flex items-end justify-between gap-4">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Your deals</p>
           <h1 className="mt-1 text-2xl font-bold font-heading">Dealroom</h1>
-          <p className="text-sm text-muted-foreground font-mono">
-            {loading ? "loading..." : `${deals.length} deal${deals.length === 1 ? "" : "s"} tracked`}
+          <p className="mt-1 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+            {loading
+              ? "loading..."
+              : deals.length === 0
+                ? "no deals tracked"
+                : `${deals.length} deal${deals.length === 1 ? "" : "s"} · ${stats.analyzed} analyzed · ${stats.awaiting} awaiting`}
           </p>
         </div>
         <Button onClick={() => setDialogOpen(true)}>
@@ -60,53 +70,57 @@ function DealsContent() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {deals.map((deal) => {
-            const verdict = deal.analysis?.executiveSummary.verdict
-            const score = deal.analysis?.executiveSummary.overallScore
+            const exec = deal.analysis?.executiveSummary
+            const verdict = exec?.verdict
+            const score = exec?.overallScore
+            const thesis = exec?.thesis
+            const metaBits = [deal.stage, exec?.sector, exec?.geography].filter(Boolean) as string[]
             return (
-              <Link key={deal.id} href={`/deals/${deal.id}/summary`}>
-                <Card className="transition-colors hover:bg-muted/50 cursor-pointer">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-start justify-between">
-                      <CardTitle className="text-base">{deal.companyName}</CardTitle>
+              <Link key={deal.id} href={`/deals/${deal.id}/summary`} className="group">
+                <Card className="h-full transition-all hover:shadow-sm hover:ring-foreground/20 cursor-pointer flex flex-col">
+                  <CardContent className="flex-1 flex flex-col gap-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-heading font-semibold text-base leading-tight truncate">
+                          {deal.companyName}
+                        </h3>
+                        {metaBits.length > 0 && (
+                          <p className="mt-1 text-[10px] font-mono uppercase tracking-wider text-muted-foreground truncate">
+                            {metaBits.join(" · ")}
+                          </p>
+                        )}
+                      </div>
                       {verdict && (
-                        <Badge className={`${VERDICT_COLORS[verdict].bg} ${VERDICT_COLORS[verdict].text} border-0`}>
+                        <Badge className={`${VERDICT_COLORS[verdict].bg} ${VERDICT_COLORS[verdict].text} border-0 font-mono text-[10px] tracking-wider shrink-0`}>
                           {verdict}
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className={STAGE_BADGE_COLORS[deal.stage]}>
-                        {deal.stage}
-                      </Badge>
-                      <Badge variant="outline" className={STATUS_BADGE_COLORS[deal.status]}>
-                        {deal.status}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <FileText className="h-3.5 w-3.5" />
-                        <span className="font-mono text-xs">{deal.documents.length} doc{deal.documents.length !== 1 ? "s" : ""}</span>
-                      </div>
-                      {score !== undefined && (
-                        <div className="flex items-baseline gap-0.5">
-                          <span className="text-lg font-mono font-bold text-amber-600 leading-none">{score}</span>
-                          <span className="text-xs font-mono text-muted-foreground">/100</span>
-                        </div>
-                      )}
-                      {!deal.analysis && (
-                        <span className="flex items-center gap-1 text-muted-foreground font-mono text-xs uppercase tracking-wider">
+
+                    {thesis ? (
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-4">
+                        {thesis}
+                      </p>
+                    ) : (
+                      <div className="flex-1 flex items-center justify-center py-6 rounded-md border border-dashed">
+                        <span className="flex items-center gap-2 text-muted-foreground font-mono text-[11px] uppercase tracking-wider">
                           <Upload className="h-3.5 w-3.5" />
                           Awaiting analysis
                         </span>
-                      )}
-                    </div>
-                    {deal.tags.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {deal.tags.map((tag) => (
-                          <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">{tag}</Badge>
-                        ))}
+                      </div>
+                    )}
+
+                    {score !== undefined && (
+                      <div className="mt-auto pt-3 border-t border-border flex items-baseline justify-between">
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                          Overall score
+                        </span>
+                        <div className="flex items-baseline gap-0.5">
+                          <span className="text-2xl font-mono font-bold text-amber-600 leading-none tabular-nums">
+                            {score}
+                          </span>
+                          <span className="text-xs font-mono text-muted-foreground">/100</span>
+                        </div>
                       </div>
                     )}
                   </CardContent>

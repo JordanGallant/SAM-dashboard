@@ -20,24 +20,25 @@ export default function FinancePage() {
       <SectionHeader title="Financial Analysis" score={finance.score} verdict={finance.verdict} dataCompleteness={finance.dataCompleteness} />
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Financial Health</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Financial Health</CardTitle></CardHeader>
         <CardContent><MetricTable rows={finance.financialHealth} showBenchmark={false} /></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Capital Efficiency</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Capital Efficiency</CardTitle></CardHeader>
         <CardContent><p className="text-sm text-muted-foreground">{finance.capitalEfficiency}</p></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Investor Signals</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Investor Signals</CardTitle></CardHeader>
         <CardContent><p className="text-sm text-muted-foreground">{finance.investorSignals}</p></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Valuation Assessment</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Valuation Assessment</CardTitle></CardHeader>
         <CardContent>
-          <Table>
+          <div className="overflow-x-auto">
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Method</TableHead>
@@ -55,11 +56,12 @@ export default function FinancePage() {
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Deal Terms & Cap Table</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Deal Terms & Cap Table</CardTitle></CardHeader>
         <CardContent><p className="text-sm text-muted-foreground">{finance.dealTerms}</p></CardContent>
       </Card>
 

@@ -31,9 +31,10 @@ export default function FundFitPage() {
       <SectionHeader title="Fund Fit" score={fit.score} verdict={fit.verdict} dataCompleteness={fit.dataCompleteness} />
 
       <Card>
-        <CardHeader className="pb-2"><SectionLabel>Criteria match</SectionLabel></CardHeader>
+        <CardHeader><SectionLabel>Criteria match</SectionLabel></CardHeader>
         <CardContent>
-          <Table>
+          <div className="overflow-x-auto">
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Criterion</TableHead>
@@ -58,11 +59,12 @@ export default function FundFitPage() {
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <SectionLabel>Thesis alignment</SectionLabel>
           <div className="mt-2 flex items-baseline gap-1">
             <span className="text-3xl font-mono font-bold text-amber-600 leading-none">{fit.thesisAlignment}</span>
@@ -81,7 +83,7 @@ export default function FundFitPage() {
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><SectionLabel>Portfolio conflict check</SectionLabel></CardHeader>
+        <CardHeader><SectionLabel>Portfolio conflict check</SectionLabel></CardHeader>
         <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{fit.portfolioConflict}</p></CardContent>
       </Card>
     </div>

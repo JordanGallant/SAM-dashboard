@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useParams } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -11,13 +11,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { FileDown, Mail, Loader2, CheckCircle2, Lock, Sparkles } from "lucide-react"
 import { VerdictBadge } from "@/components/dashboard/verdict-badge"
 import { ConfidenceBadge } from "@/components/dashboard/confidence-badge"
-import { ScorecardTable } from "@/components/dashboard/scorecard-table"
-import { StrengthsRisks } from "@/components/dashboard/strengths-risks"
-import { DataCompleteness } from "@/components/dashboard/data-completeness"
 import { SectionLabel } from "@/components/dashboard/section-label"
+import { ScoreGauge } from "@/components/dashboard/score-gauge"
+import { DomainRadar } from "@/components/dashboard/domain-radar"
 import { DealUpload } from "@/components/deals/deal-upload"
 import { useDeal } from "@/hooks/use-deal"
 import { useTier } from "@/lib/tier-context"
+import { getScoreColor } from "@/lib/constants"
+import type { FindingItem, Confidence } from "@/lib/types/analysis"
+
+const SEVERITY_WEIGHT: Record<string, number> = { Critical: 3, Warning: 2, Info: 1 }
+const CONFIDENCE_PCT: Record<Confidence, number> = { High: 85, Medium: 55, Low: 25 }
+function weightedTotal(items: FindingItem[]) {
+  return items.reduce((s, it) => s + (SEVERITY_WEIGHT[it.severity] ?? 1), 0)
+}
 
 export default function SummaryPage() {
   const params = useParams()
@@ -170,75 +177,287 @@ export default function SummaryPage() {
   }
 
   const es = deal.analysis.executiveSummary
+  const metaBits = [es.stage, es.sector, es.geography, es.raising && `raising ${es.raising}`, es.mrr && `${es.mrr} MRR`].filter(Boolean)
+
+  const sWeight = weightedTotal(es.strengths)
+  const rWeight = weightedTotal(es.risks)
+  const wTotal = sWeight + rWeight || 1
+  const sPct = (sWeight / wTotal) * 100
+  const rPct = (rWeight / wTotal) * 100
+
+  // Decision matrix position: X = confidence (0-100), Y = score (0-100)
+  const confX = CONFIDENCE_PCT[es.confidence]
+  const scoreY = es.overallScore
+
+  const scoreColor = getScoreColor(es.overallScore)
+
+  // Severity counts
+  const sevCounts = (items: FindingItem[]) =>
+    items.reduce<Record<string, number>>((acc, it) => {
+      acc[it.severity] = (acc[it.severity] ?? 0) + 1
+      return acc
+    }, {})
+  const strSev = sevCounts(es.strengths)
+  const riskSev = sevCounts(es.risks)
 
   return (
     <div className="space-y-6">
-      {/* Verdict + Score row */}
-      <Card>
-        <CardContent className="pt-6">
-          <SectionLabel className="mb-3">Executive Summary</SectionLabel>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3">
+      {/* Meta strip */}
+      <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+        {metaBits.join(" · ")}
+      </p>
+
+      {/* Row 1: Score Gauge · Domain Radar · Verdict/Data */}
+      <section className="grid gap-4 md:grid-cols-12">
+        <Card className="md:col-span-3">
+          <CardContent className="flex flex-col items-center justify-center gap-3">
+            <SectionLabel className="self-start">Score</SectionLabel>
+            <ScoreGauge score={es.overallScore} />
+            <div className="flex flex-col items-center gap-1 mt-1">
               <VerdictBadge verdict={es.verdict} />
               <ConfidenceBadge confidence={es.confidence} />
             </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-mono font-bold text-amber-600 leading-none">
-                {es.overallScore}
-              </span>
-              <span className="text-sm font-mono text-muted-foreground">/100</span>
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-6">
+          <CardContent>
+            <SectionLabel>Domain Radar</SectionLabel>
+            <DomainRadar scorecard={es.scorecard} height={260} />
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-3">
+          <CardContent className="space-y-4">
+            <div>
+              <SectionLabel>Data Completeness</SectionLabel>
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className={`font-mono text-3xl font-bold tabular-nums ${scoreColor.text}`}>
+                  {es.dataCompleteness}
+                </span>
+                <span className="text-xs font-mono text-muted-foreground">/ 100</span>
+              </div>
+              <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+                <div className="h-full bg-primary" style={{ width: `${es.dataCompleteness}%` }} />
+              </div>
             </div>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2 text-sm text-muted-foreground">
-            <Badge variant="outline">{es.stage}</Badge>
-            <Badge variant="outline">{es.geography}</Badge>
-            <Badge variant="outline">Raising: {es.raising}</Badge>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="border-t pt-3 space-y-1">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Findings</p>
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-mono text-emerald-600 font-bold tabular-nums">{es.strengths.length}</span>
+                <span className="text-[10px] font-mono text-muted-foreground">STRENGTHS / RISKS</span>
+                <span className="font-mono text-red-600 font-bold tabular-nums">{es.risks.length}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
 
-      {/* Investment Scorecard: chart + table */}
+      {/* Row 2: Decision Matrix · Findings */}
+      <section className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardContent>
+            <SectionLabel>Decision Matrix · Score × Confidence</SectionLabel>
+            <svg width="100%" viewBox="0 0 420 280" className="mt-2">
+              <line x1="0" y1="140" x2="420" y2="140" stroke="#E7E5E4"/>
+              <line x1="210" y1="0" x2="210" y2="280" stroke="#E7E5E4"/>
+              <text x="105" y="20" fontFamily="monospace" fontSize="9" fill="#B45309" textAnchor="middle" fontWeight="700">DIG DEEPER</text>
+              <text x="105" y="32" fontFamily="monospace" fontSize="8" fill="#78716C" textAnchor="middle">HIGH SCORE · LOW CONF</text>
+              <text x="315" y="20" fontFamily="monospace" fontSize="9" fill="#059669" textAnchor="middle" fontWeight="700">CONVICTION BUY</text>
+              <text x="315" y="32" fontFamily="monospace" fontSize="8" fill="#78716C" textAnchor="middle">HIGH SCORE · HIGH CONF</text>
+              <text x="105" y="270" fontFamily="monospace" fontSize="9" fill="#78716C" textAnchor="middle">DEFER</text>
+              <text x="105" y="258" fontFamily="monospace" fontSize="8" fill="#78716C" textAnchor="middle">LOW SCORE · LOW CONF</text>
+              <text x="315" y="270" fontFamily="monospace" fontSize="9" fill="#B91C1C" textAnchor="middle" fontWeight="700">PASS / BURY</text>
+              <text x="315" y="258" fontFamily="monospace" fontSize="8" fill="#78716C" textAnchor="middle">LOW SCORE · HIGH CONF</text>
+              <circle
+                cx={(confX / 100) * 420}
+                cy={280 - (scoreY / 100) * 280}
+                r="9"
+                fill={es.overallScore >= 70 ? "#059669" : es.overallScore >= 40 ? "#D97706" : "#DC2626"}
+                stroke="#fff"
+                strokeWidth="3"
+              />
+            </svg>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="space-y-4">
+            <SectionLabel>Findings · Strengths vs Risks</SectionLabel>
+
+            {/* Weighted bar */}
+            <div>
+              <div className="flex h-6 rounded-md overflow-hidden ring-1 ring-border">
+                <div
+                  className="flex items-center justify-center bg-emerald-600 text-white font-mono text-[10px] font-bold uppercase tracking-wider"
+                  style={{ width: `${sPct}%` }}
+                >
+                  {sPct >= 12 && sWeight}
+                </div>
+                <div
+                  className="flex items-center justify-center bg-red-600 text-white font-mono text-[10px] font-bold uppercase tracking-wider"
+                  style={{ width: `${rPct}%` }}
+                >
+                  {rPct >= 12 && `W ${rWeight}`}
+                </div>
+              </div>
+              <div className="mt-1.5 flex justify-between text-[10px] font-mono uppercase tracking-wider">
+                <span className="text-emerald-700">Strengths · {es.strengths.length}</span>
+                <span className="text-red-700">Risks · {es.risks.length}</span>
+              </div>
+            </div>
+
+            {/* Two-column headline list */}
+            <div className="grid grid-cols-2 gap-4">
+              <ul className="space-y-2.5">
+                {es.strengths.slice(0, 3).map((s) => (
+                  <li key={s.id} className="text-[12.5px] leading-snug">
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="font-semibold text-foreground line-clamp-1">{s.text.split(":")[0] ?? s.text}</span>
+                    </div>
+                    {s.text.includes(":") && (
+                      <p className="ml-3.5 mt-0.5 text-muted-foreground line-clamp-2">
+                        {s.text.split(":").slice(1).join(":").trim()}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <ul className="space-y-2.5">
+                {es.risks.slice(0, 3).map((r) => (
+                  <li key={r.id} className="text-[12.5px] leading-snug">
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-600 shrink-0" />
+                      <span className="font-semibold text-foreground line-clamp-1">{r.text.split(":")[0] ?? r.text}</span>
+                    </div>
+                    {r.text.includes(":") && (
+                      <p className="ml-3.5 mt-0.5 text-muted-foreground line-clamp-2">
+                        {r.text.split(":").slice(1).join(":").trim()}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Row 3: Score × Completeness · Severity */}
+      <section className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardContent>
+            <SectionLabel>Score × Data Completeness</SectionLabel>
+            <div className="mt-3 space-y-2.5">
+              <div className="grid grid-cols-[5rem_1fr_1fr] gap-3 text-[10px] font-mono uppercase tracking-wider text-muted-foreground pb-1.5 border-b">
+                <span>Domain</span><span>Score</span><span>Data %</span>
+              </div>
+              {es.scorecard.map((row) => {
+                const sc = getScoreColor(row.score)
+                const dcLow = row.dataCompleteness < 20
+                const barBg = row.score >= 70 ? "bg-emerald-500" : row.score >= 40 ? "bg-amber-500" : "bg-red-500"
+                return (
+                  <div key={row.domain} className="grid grid-cols-[5rem_1fr_1fr] gap-3 items-center text-sm">
+                    <span className="font-medium text-[13px]">{row.domain}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1.5 rounded bg-muted overflow-hidden">
+                        <div className={`h-full ${barBg}`} style={{ width: `${row.score}%` }} />
+                      </div>
+                      <span className={`font-mono text-xs tabular-nums ${sc.text}`}>{row.score}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1.5 rounded bg-muted overflow-hidden">
+                        <div className="h-full bg-stone-400" style={{ width: `${row.dataCompleteness}%` }} />
+                      </div>
+                      <span className={`font-mono text-xs tabular-nums ${dcLow ? "text-red-700 font-bold" : "text-muted-foreground"}`}>
+                        {row.dataCompleteness}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent>
+            <SectionLabel>Severity Distribution</SectionLabel>
+            <div className="mt-3 grid grid-cols-2 gap-5">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-wider text-emerald-700 mb-2">
+                  Strengths · {es.strengths.length}
+                </p>
+                <div className="space-y-1.5">
+                  {(["Critical", "Warning", "Info"] as const).map((sev) => {
+                    const count = strSev[sev] ?? 0
+                    return (
+                      <div key={sev} className={`flex items-center gap-2 text-xs ${count === 0 ? "opacity-30" : ""}`}>
+                        <span className="w-14 font-mono text-[10px] uppercase text-muted-foreground">{sev}</span>
+                        <div className="flex-1 h-4 rounded bg-muted overflow-hidden">
+                          <div className="h-full bg-emerald-500" style={{ width: `${Math.min(100, count * 33)}%` }} />
+                        </div>
+                        <span className="w-4 font-mono text-xs font-bold text-emerald-700 tabular-nums">{count}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-wider text-red-700 mb-2">
+                  Risks · {es.risks.length}
+                </p>
+                <div className="space-y-1.5">
+                  {(["Critical", "Warning", "Info"] as const).map((sev) => {
+                    const count = riskSev[sev] ?? 0
+                    return (
+                      <div key={sev} className={`flex items-center gap-2 text-xs ${count === 0 ? "opacity-30" : ""}`}>
+                        <span className="w-14 font-mono text-[10px] uppercase text-muted-foreground">{sev}</span>
+                        <div className="flex-1 h-4 rounded bg-muted overflow-hidden">
+                          <div className="h-full bg-red-600" style={{ width: `${Math.min(100, count * 33)}%` }} />
+                        </div>
+                        <span className="w-4 font-mono text-xs font-bold text-red-700 tabular-nums">{count}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Thesis — compact pull quote */}
       <Card>
-        <CardHeader className="pb-2">
-          <SectionLabel>Investment Scorecard</SectionLabel>
-          <CardTitle className="text-sm font-medium mt-1">Domain scores, verdicts, and key findings</CardTitle>
-        </CardHeader>
         <CardContent>
-          <ScorecardTable scorecard={es.scorecard} />
+          <SectionLabel className="mb-2">Investment Thesis</SectionLabel>
+          <p className="text-[15px] leading-[1.65] text-foreground/85 max-w-prose">
+            {es.thesis}
+          </p>
         </CardContent>
       </Card>
-
-      {/* Thesis */}
-      <Card>
-        <CardHeader className="pb-2">
-          <SectionLabel>Investment Thesis</SectionLabel>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm leading-relaxed text-muted-foreground">{es.thesis}</p>
-        </CardContent>
-      </Card>
-
-      {/* Strengths + Risks */}
-      <StrengthsRisks strengths={es.strengths} risks={es.risks} />
 
       {/* Next Steps */}
       <Card>
-        <CardHeader className="pb-2">
-          <SectionLabel>Recommended Next Steps</SectionLabel>
-        </CardHeader>
         <CardContent>
-          <ol className="list-decimal list-inside space-y-2">
+          <SectionLabel className="mb-3">Recommended Next Steps</SectionLabel>
+          <ol className="space-y-2 max-w-prose">
             {es.recommendedNextSteps.map((step, i) => (
-              <li key={i} className="text-sm text-muted-foreground">{step}</li>
+              <li key={i} className="flex gap-3 text-sm leading-relaxed">
+                <span className="font-mono text-[11px] text-amber-600 tabular-nums pt-1 shrink-0 w-5">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="text-foreground/85">{step}</span>
+              </li>
             ))}
           </ol>
         </CardContent>
       </Card>
 
-      {/* Data completeness + Export */}
-      <div className="space-y-4">
-        <DataCompleteness percentage={es.dataCompleteness} />
-
+      {/* Export actions */}
+      <section className="pt-4 border-t">
+        <SectionLabel className="mb-3">Share this memo</SectionLabel>
         <div className="flex flex-col sm:flex-row gap-2">
           {canExportWord ? (
             <Button onClick={handleDownloadWord} disabled={downloading}>
@@ -249,12 +468,12 @@ export default function SummaryPage() {
               ) : (
                 <FileDown className="mr-2 h-4 w-4" />
               )}
-              {downloading ? "Generating..." : downloadDone ? "Downloaded" : "Generate Word Doc"}
+              {downloading ? "Generating..." : downloadDone ? "Downloaded" : "Generate Word doc"}
             </Button>
           ) : (
             <Button variant="outline" disabled className="opacity-60">
               <Lock className="mr-2 h-4 w-4" />
-              Word Export
+              Word export
               <Badge variant="secondary" className="ml-2 text-[10px]">Pro+</Badge>
             </Button>
           )}
@@ -262,26 +481,22 @@ export default function SummaryPage() {
           {canEmail ? (
             <Button variant="outline" onClick={() => { setEmailOpen(true); setEmailSent(false); setEmailError("") }}>
               <Mail className="mr-2 h-4 w-4" />
-              Email Summary
+              Email to a partner
             </Button>
           ) : (
             <Button variant="outline" disabled className="opacity-60">
               <Lock className="mr-2 h-4 w-4" />
-              Email Summary
+              Email summary
               <Badge variant="secondary" className="ml-2 text-[10px]">Pro+</Badge>
             </Button>
           )}
-        </div>
-
-        <p className="text-xs text-muted-foreground">
-          Current plan: <Badge variant="outline" className="text-[10px]">{tierConfig.label}</Badge>
           {!canExportWord && (
-            <span className="ml-2">
-              <a href="/settings/billing" className="text-primary hover:underline">Upgrade to Professional</a> to unlock Word export and unlimited email.
-            </span>
+            <a href="/settings/billing" className="ml-auto inline-flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors self-center">
+              On {tierConfig.label} · upgrade to Professional →
+            </a>
           )}
-        </p>
-      </div>
+        </div>
+      </section>
 
       {/* Email Dialog */}
       <Dialog open={emailOpen} onOpenChange={setEmailOpen}>

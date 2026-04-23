@@ -19,17 +19,17 @@ export default function TractionPage() {
       <SectionHeader title="Traction & Unit Economics" score={traction.score} verdict={traction.verdict} dataCompleteness={traction.dataCompleteness} />
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Revenue & Growth</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Revenue & Growth</CardTitle></CardHeader>
         <CardContent><MetricTable rows={traction.revenueMetrics} /></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Unit Economics</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Unit Economics</CardTitle></CardHeader>
         <CardContent><MetricTable rows={traction.unitEconomics} /></CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Retention & Engagement</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Retention & Engagement</CardTitle></CardHeader>
         <CardContent><MetricTable rows={traction.retention} showBenchmark={false} /></CardContent>
       </Card>
 

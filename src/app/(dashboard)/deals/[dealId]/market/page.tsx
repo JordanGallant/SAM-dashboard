@@ -22,9 +22,10 @@ export default function MarketPage() {
 
       {/* TAM/SAM/SOM */}
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Market Size Validation</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Market Size Validation</CardTitle></CardHeader>
         <CardContent>
-          <Table>
+          <div className="overflow-x-auto">
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Metric</TableHead>
@@ -46,18 +47,19 @@ export default function MarketPage() {
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 
       {/* Market Dynamics */}
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Market Dynamics</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Market Dynamics</CardTitle></CardHeader>
         <CardContent><p className="text-sm leading-relaxed text-muted-foreground">{market.marketDynamics}</p></CardContent>
       </Card>
 
       {/* Why Now */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
             Why Now?
             <Badge variant="outline" className={`${DOMAIN_VERDICT_COLORS[market.whyNowScore].bg} ${DOMAIN_VERDICT_COLORS[market.whyNowScore].text}`}>
@@ -70,9 +72,10 @@ export default function MarketPage() {
 
       {/* Competitive Landscape */}
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Competitive Landscape</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm font-medium">Competitive Landscape</CardTitle></CardHeader>
         <CardContent>
-          <Table>
+          <div className="overflow-x-auto">
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Competitor</TableHead>
@@ -97,6 +100,7 @@ export default function MarketPage() {
               })}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 
