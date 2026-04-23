@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.gstack/
+
+# Design reference screenshots (local-only, regenerated via browse tool)
+/public/design/kuanta/
