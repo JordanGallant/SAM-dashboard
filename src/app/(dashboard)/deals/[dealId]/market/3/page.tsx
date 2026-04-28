@@ -9,7 +9,7 @@ import { ScoreGauge } from "@/components/dashboard/score-gauge"
 const THREAT_WIDTH: Record<string, { pct: number; bg: string; text: string }> = {
   "Very High": { pct: 100, bg: "bg-red-700", text: "text-red-700" },
   High: { pct: 75, bg: "bg-red-500", text: "text-red-700" },
-  Medium: { pct: 50, bg: "bg-amber-500", text: "text-amber-700" },
+  Medium: { pct: 50, bg: "bg-primary/100", text: "text-primary" },
   Low: { pct: 25, bg: "bg-emerald-500", text: "text-emerald-700" },
 }
 
@@ -32,7 +32,7 @@ export default function MarketV3Page() {
           </p>
         </div>
         <div>
-          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-amber-700 mb-3">Market Size</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-primary mb-3">Market Size</p>
           <div className="relative h-[180px] flex items-center justify-center">
             <svg viewBox="0 0 300 180" width="100%" height="180">
               {/* Concentric rings — TAM outermost, SOM innermost */}
@@ -47,7 +47,7 @@ export default function MarketV3Page() {
           <div className="grid grid-cols-3 gap-3 mt-2 text-center">
             {m.marketSize.map((row) => (
               <div key={row.metric}>
-                <p className="text-[10px] font-mono uppercase tracking-widest text-amber-700">{row.metric}</p>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-primary">{row.metric}</p>
                 <p className="text-sm font-semibold mt-0.5 leading-tight">{row.validatedEstimate}</p>
               </div>
             ))}
@@ -57,7 +57,7 @@ export default function MarketV3Page() {
 
       {/* Competitor threat bars */}
       <section className="bg-card rounded-2xl p-6 ring-1 ring-foreground/10">
-        <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-amber-700 mb-4">
+        <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-primary mb-4">
           Competitive threat map · {m.competitors.length}
         </p>
         <div className="space-y-2.5">
@@ -87,11 +87,11 @@ export default function MarketV3Page() {
       {/* Why now / dynamics — side by side text blocks */}
       <section className="grid gap-6 md:grid-cols-2">
         <div className="bg-card rounded-2xl p-6 ring-1 ring-foreground/10">
-          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-amber-700 mb-3">Why Now</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-primary mb-3">Why Now</p>
           <p className="text-[13px] leading-[1.7] text-foreground/80">{m.whyNow}</p>
         </div>
         <div className="bg-card rounded-2xl p-6 ring-1 ring-foreground/10">
-          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-amber-700 mb-3">Market Dynamics</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-primary mb-3">Market Dynamics</p>
           <p className="text-[13px] leading-[1.7] text-foreground/80">{m.marketDynamics}</p>
         </div>
       </section>

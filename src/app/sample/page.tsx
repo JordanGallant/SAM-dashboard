@@ -19,7 +19,7 @@ export default function SamplePage() {
         {/* Page hero */}
         <section className="py-16 border-b bg-slate-50/50">
           <div className="mx-auto max-w-4xl px-4">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Sample memo</p>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Sample memo</p>
             <h1 className="mt-2 text-3xl md:text-4xl font-bold font-heading tracking-tight">
               What a Sam analysis looks like.
             </h1>
@@ -35,7 +35,7 @@ export default function SamplePage() {
             {/* Company header */}
             <Card>
               <CardContent className="pt-6">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Company</p>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Company</p>
                 <h2 className="mt-1 text-2xl font-bold font-heading">{es.companyName}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">{es.sector}</p>
                 <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
@@ -62,7 +62,7 @@ export default function SamplePage() {
             {/* Verdict header */}
             <Card>
               <CardContent className="pt-6">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600 mb-3">Verdict</p>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-primary mb-3">Verdict</p>
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex flex-wrap items-center gap-3">
                     <div className={`inline-flex items-center rounded-md ${verdictColor.bg} ${verdictColor.border} border px-3 py-1.5`}>
@@ -73,7 +73,7 @@ export default function SamplePage() {
                     </span>
                   </div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-mono font-bold text-amber-600 leading-none">{es.overallScore}</span>
+                    <span className="text-4xl font-mono font-bold text-primary leading-none">{es.overallScore}</span>
                     <span className="text-sm font-mono text-muted-foreground">/100</span>
                   </div>
                 </div>
@@ -83,7 +83,7 @@ export default function SamplePage() {
             {/* Domain scores */}
             <Card>
               <CardHeader className="pb-2">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Investment scorecard</p>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Investment scorecard</p>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 font-mono text-xs">
@@ -115,7 +115,7 @@ export default function SamplePage() {
             {/* Thesis */}
             <Card>
               <CardHeader className="pb-2">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Investment thesis</p>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Investment thesis</p>
               </CardHeader>
               <CardContent>
                 <p className="text-sm leading-relaxed text-foreground/80">{es.thesis}</p>
@@ -148,7 +148,7 @@ export default function SamplePage() {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-amber-700 flex items-center gap-1.5">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-primary flex items-center gap-1.5">
                     <AlertTriangle className="h-3 w-3" /> Key risks
                   </p>
                 </CardHeader>
@@ -173,13 +173,13 @@ export default function SamplePage() {
             {/* Next steps */}
             <Card>
               <CardHeader className="pb-2">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Recommended next steps</p>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Recommended next steps</p>
               </CardHeader>
               <CardContent>
                 <ol className="space-y-2 text-sm text-foreground/80">
                   {es.recommendedNextSteps.map((step, i) => (
                     <li key={i} className="flex gap-3">
-                      <span className="font-mono text-amber-600 shrink-0">0{i + 1}</span>
+                      <span className="font-mono text-primary shrink-0">0{i + 1}</span>
                       <span className="leading-relaxed">{step}</span>
                     </li>
                   ))}
@@ -192,7 +192,7 @@ export default function SamplePage() {
         {/* CTA */}
         <section className="py-20 border-t bg-gradient-to-b from-slate-50 to-white">
           <div className="mx-auto max-w-3xl px-4 text-center">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Your memo</p>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Your memo</p>
             <h2 className="mt-3 text-2xl md:text-3xl font-bold font-heading tracking-tight">
               Run the same analysis on your next deck.
             </h2>

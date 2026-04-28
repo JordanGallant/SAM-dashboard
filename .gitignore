@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Design reference screenshots (local-only, regenerated via browse tool)
 /public/design/kuanta/
+
+# Customer pitch decks
+public/canaaro-deck.pdf

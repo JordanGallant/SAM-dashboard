@@ -67,7 +67,7 @@ export default function FundFitPage() {
         <CardHeader>
           <SectionLabel>Thesis alignment</SectionLabel>
           <div className="mt-2 flex items-baseline gap-1">
-            <span className="text-3xl font-mono font-bold text-amber-600 leading-none">{fit.thesisAlignment}</span>
+            <span className="text-3xl font-mono font-bold text-primary leading-none">{fit.thesisAlignment}</span>
             <span className="text-xs font-mono text-muted-foreground">/100</span>
           </div>
         </CardHeader>

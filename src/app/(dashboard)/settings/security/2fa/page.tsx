@@ -117,12 +117,12 @@ function TwoFactorSetup() {
       </div>
 
       {required && step !== "done" && (
-        <Card className="border-amber-200 bg-amber-50/40">
+        <Card className="border-primary/30 bg-primary/10">
           <CardContent className="pt-5 flex gap-3">
-            <AlertTriangle className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+            <AlertTriangle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-amber-900">2FA is required for your plan</p>
-              <p className="mt-1 text-xs text-amber-800 leading-relaxed">
+              <p className="text-sm font-medium text-primary">2FA is required for your plan</p>
+              <p className="mt-1 text-xs text-primary leading-relaxed">
                 Fund tier accounts must have 2FA enabled to access the dashboard. Complete setup below to continue.
               </p>
             </div>

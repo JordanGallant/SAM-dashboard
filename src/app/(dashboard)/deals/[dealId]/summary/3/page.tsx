@@ -158,7 +158,7 @@ export default function SummaryV3Page() {
                 <DomainRing score={row.score} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <Icon className="h-3.5 w-3.5 text-amber-700 shrink-0" />
+                    <Icon className="h-3.5 w-3.5 text-primary shrink-0" />
                     <h3 className="font-heading text-[13.5px] font-bold truncate">{row.domain}</h3>
                   </div>
                   <span
@@ -254,12 +254,12 @@ export default function SummaryV3Page() {
 
       {/* Next Steps — amber callout */}
       {es.recommendedNextSteps.length > 0 && (
-        <section className="rounded-2xl border border-amber-200 bg-amber-50/60 p-6">
+        <section className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="grid place-items-center h-8 w-8 rounded-full bg-amber-100">
-              <ArrowRight className="h-4 w-4 text-amber-900" />
+            <div className="grid place-items-center h-8 w-8 rounded-full bg-primary/15">
+              <ArrowRight className="h-4 w-4 text-primary" />
             </div>
-            <p className="font-heading font-bold text-[15px] text-amber-900">
+            <p className="font-heading font-bold text-[15px] text-primary">
               Recommended Next Steps
             </p>
           </div>
@@ -269,7 +269,7 @@ export default function SummaryV3Page() {
                 key={i}
                 className="grid grid-cols-[2.25rem_1fr] gap-3 items-baseline text-[13.5px] leading-[1.55]"
               >
-                <span className="font-mono text-[11px] uppercase tracking-widest font-bold text-amber-900 tabular-nums">
+                <span className="font-mono text-[11px] uppercase tracking-widest font-bold text-primary tabular-nums">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span className="text-foreground/85">{step}</span>

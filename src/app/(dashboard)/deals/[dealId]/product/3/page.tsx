@@ -32,9 +32,9 @@ export default function ProductV3Page() {
           </div>
         </div>
         <div>
-          <p className="text-[10px] font-mono uppercase tracking-widest text-amber-700 mb-2">Problem</p>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-primary mb-2">Problem</p>
           <p className="text-[15px] leading-[1.6] text-foreground/85 mb-4">{p.problemType}</p>
-          <p className="text-[10px] font-mono uppercase tracking-widest text-amber-700 mb-1">Pain</p>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-primary mb-1">Pain</p>
           <p className="text-[13px] leading-[1.55] text-foreground/75">{p.painScore}</p>
         </div>
       </section>
@@ -42,7 +42,7 @@ export default function ProductV3Page() {
       {/* Moat radar */}
       {p.moat.length > 0 && (
         <section className="bg-card rounded-2xl p-6 ring-1 ring-foreground/10">
-          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-amber-700 mb-2">Moat Profile</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-primary mb-2">Moat Profile</p>
           <div style={{ width: "100%", height: 280 }}>
             <ResponsiveContainer>
               <RadarChart data={moatData} outerRadius="72%">
@@ -68,14 +68,14 @@ export default function ProductV3Page() {
       {/* Solution comparison bars */}
       {p.solutionComparison.length > 0 && (
         <section className="bg-card rounded-2xl p-6 ring-1 ring-foreground/10">
-          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-amber-700 mb-4">Solution Comparison</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-primary mb-4">Solution Comparison</p>
           <div className="space-y-3">
             {p.solutionComparison.map((row, i) => {
               const statusColor =
                 row.status === "check"
                   ? "bg-emerald-500"
                   : row.status === "warning"
-                  ? "bg-amber-500"
+                  ? "bg-primary/100"
                   : row.status === "critical"
                   ? "bg-red-500"
                   : "bg-stone-400"
@@ -97,11 +97,11 @@ export default function ProductV3Page() {
       {/* PMF details + current solutions as side-by-side text */}
       <section className="grid gap-6 md:grid-cols-2">
         <div className="bg-card rounded-2xl p-6 ring-1 ring-foreground/10">
-          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-amber-700 mb-3">PMF Details</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-primary mb-3">PMF Details</p>
           <p className="text-[13px] leading-[1.7] text-foreground/80">{p.pmfDetails}</p>
         </div>
         <div className="bg-card rounded-2xl p-6 ring-1 ring-foreground/10">
-          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-amber-700 mb-3">Current Solutions</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-primary mb-3">Current Solutions</p>
           <p className="text-[13px] leading-[1.7] text-foreground/80">{p.currentSolutions}</p>
         </div>
       </section>

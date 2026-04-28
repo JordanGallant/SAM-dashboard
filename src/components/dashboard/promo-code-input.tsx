@@ -54,8 +54,8 @@ export function PromoCodeInput({ defaultTier = "professional" }: PromoCodeInputP
     <Card>
       <CardContent className="pt-6 space-y-3">
         <div className="flex items-center gap-2">
-          <Tag className="h-4 w-4 text-amber-600" />
-          <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Promo code</p>
+          <Tag className="h-4 w-4 text-primary" />
+          <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Promo code</p>
         </div>
         <p className="text-sm text-muted-foreground">
           Redeem an invitation code to start a free trial instead of paying.
@@ -85,7 +85,7 @@ export function PromoCodeInput({ defaultTier = "professional" }: PromoCodeInputP
               <Button
                 onClick={handleApply}
                 disabled={!code || applying}
-                className="bg-amber-600 hover:bg-amber-700 text-white"
+                className="bg-primary hover:bg-primary text-white"
               >
                 {applying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Apply

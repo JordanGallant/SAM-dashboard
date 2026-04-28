@@ -84,7 +84,7 @@ export default function SecurityPage() {
               <Badge className="bg-emerald-100 text-emerald-700 border-0">Enabled</Badge>
             )}
             {mfaEnrolled === false && (
-              <Badge className="bg-amber-50 text-amber-700 border border-amber-200">Not set up</Badge>
+              <Badge className="bg-primary/10 text-primary border border-primary/30">Not set up</Badge>
             )}
             {config.twoFactorRequired && (
               <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 font-mono text-[10px]">
@@ -95,7 +95,7 @@ export default function SecurityPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           {mfaEnrolled === false && config.twoFactorRequired && (
-            <div className="rounded-md bg-amber-50 border border-amber-200 p-3 flex gap-2 text-sm text-amber-900">
+            <div className="rounded-md bg-primary/10 border border-primary/30 p-3 flex gap-2 text-sm text-primary">
               <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
               <span>Your {config.label} plan requires 2FA. Set it up to keep dashboard access.</span>
             </div>

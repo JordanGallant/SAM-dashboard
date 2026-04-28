@@ -11,7 +11,7 @@ import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 function statusColor(status: MetricRow["status"]) {
   switch (status) {
     case "check": return { dot: "bg-emerald-500", text: "text-emerald-700" }
-    case "warning": return { dot: "bg-amber-500", text: "text-amber-700" }
+    case "warning": return { dot: "bg-primary/100", text: "text-amber-700" }
     case "critical": return { dot: "bg-red-500", text: "text-red-700" }
     case "gap": return { dot: "bg-stone-400", text: "text-muted-foreground" }
   }
@@ -81,7 +81,7 @@ export default function TractionV3Page() {
           <p className="text-[10px] font-mono uppercase tracking-widest text-red-700 font-bold">{t.verdict}</p>
         </div>
         <div>
-          <p className="text-[10px] font-mono uppercase tracking-widest text-amber-700 mb-2">Traction</p>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-primary mb-2">Traction</p>
           <p className="text-[14px] leading-[1.6] text-foreground/80 max-w-prose">
             {t.revenueMetrics.length + t.unitEconomics.length + t.retention.length === 0
               ? "No traction metrics reported."
@@ -98,9 +98,9 @@ export default function TractionV3Page() {
         </div>
       </section>
 
-      <KpiGrid title="Revenue" rows={t.revenueMetrics} accent="text-amber-700" />
-      <KpiGrid title="Unit Economics" rows={t.unitEconomics} accent="text-amber-700" />
-      <KpiGrid title="Retention" rows={t.retention} accent="text-amber-700" />
+      <KpiGrid title="Revenue" rows={t.revenueMetrics} accent="text-primary" />
+      <KpiGrid title="Unit Economics" rows={t.unitEconomics} accent="text-primary" />
+      <KpiGrid title="Retention" rows={t.retention} accent="text-primary" />
 
       {t.redFlags.length > 0 && (
         <section className="bg-card rounded-2xl p-6 ring-1 ring-foreground/10">

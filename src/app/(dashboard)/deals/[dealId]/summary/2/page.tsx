@@ -71,8 +71,8 @@ export default function SummaryV2Page() {
       <aside className="lg:sticky lg:top-4 self-start space-y-5">
         <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5">
           <div className="flex items-center gap-2.5">
-            <div className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-amber-50 ring-1 ring-amber-200">
-              <Building2 className="h-4 w-4 text-amber-700" />
+            <div className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-primary/10 ring-1 ring-primary/30">
+              <Building2 className="h-4 w-4 text-primary" />
             </div>
             <h1 className="font-heading text-lg font-bold leading-tight truncate">
               {es.companyName}
@@ -141,8 +141,8 @@ export default function SummaryV2Page() {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-2.5">
-                  <div className="grid place-items-center h-9 w-9 rounded-full bg-amber-50 ring-1 ring-amber-200">
-                    <Icon className="h-4 w-4 text-amber-700" />
+                  <div className="grid place-items-center h-9 w-9 rounded-full bg-primary/10 ring-1 ring-primary/30">
+                    <Icon className="h-4 w-4 text-primary" />
                   </div>
                   <div>
                     <h2 className="font-heading text-[17px] font-bold leading-tight">
@@ -245,10 +245,10 @@ export default function SummaryV2Page() {
         </section>
 
         {es.recommendedNextSteps.length > 0 && (
-          <section className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
+          <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
             <div className="flex items-center gap-2 mb-3">
-              <ArrowRight className="h-4 w-4 text-amber-900" />
-              <p className="font-mono text-[11px] uppercase tracking-widest font-bold text-amber-900">
+              <ArrowRight className="h-4 w-4 text-primary" />
+              <p className="font-mono text-[11px] uppercase tracking-widest font-bold text-primary">
                 Recommended Next Steps
               </p>
             </div>
@@ -258,7 +258,7 @@ export default function SummaryV2Page() {
                   key={i}
                   className="grid grid-cols-[2rem_1fr] gap-2 items-baseline text-[13px] leading-[1.55]"
                 >
-                  <span className="font-mono text-[11px] uppercase tracking-widest font-bold text-amber-900 tabular-nums">
+                  <span className="font-mono text-[11px] uppercase tracking-widest font-bold text-primary tabular-nums">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <span className="text-foreground/85">{step}</span>

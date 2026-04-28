@@ -14,8 +14,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
-import { buttonVariants } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { useDeals } from "@/hooks/use-deals"
 import { STAGE_BADGE_COLORS } from "@/lib/constants"
 
@@ -31,28 +29,40 @@ export function AppSidebar() {
   const { deals, loading } = useDeals()
 
   return (
-    <Sidebar>
-      <SidebarHeader className="border-b px-4 py-3">
-        <Link href="/deals" className="flex items-center gap-2">
-          <BarChart3 className="h-6 w-6" />
-          <span className="text-lg font-bold tracking-tight font-heading">SAM</span>
+    <Sidebar className="border-r border-[#0F3D2E]/10 bg-white">
+      <SidebarHeader className="border-b border-[#0F3D2E]/10 px-4 py-3.5">
+        <Link href="/deals" className="group flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] shadow-md shadow-primary/20 ring-1 ring-[#D4FF6B]/20 group-hover:shadow-lg group-hover:shadow-primary/30 transition-all">
+            <BarChart3 className="h-4 w-4 text-[#D4FF6B]" />
+          </div>
+          <span className="text-lg font-bold font-heading tracking-tight text-[#0A2E22]">Sam</span>
         </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="flex items-center justify-between">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Deals</span>
-            <Link href="/deals?new=true" className={buttonVariants({ variant: "ghost", size: "icon", className: "h-5 w-5" })}>
+          <SidebarGroupLabel className="flex items-center justify-between px-2 pt-4 pb-2">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-semibold">
+              Deals
+            </span>
+            <Link
+              href="/deals?new=true"
+              className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#0F3D2E]/5 hover:bg-primary/15 text-[#0F3D2E] hover:text-primary transition-colors"
+              aria-label="New deal"
+            >
               <Plus className="h-3.5 w-3.5" />
             </Link>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             {loading ? (
-              <p className="px-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">loading...</p>
+              <p className="px-3 text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                Loading…
+              </p>
             ) : deals.length === 0 ? (
-              <p className="px-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">No deals yet</p>
+              <p className="px-3 text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                No deals yet
+              </p>
             ) : (
-              <SidebarMenu>
+              <SidebarMenu className="gap-1">
                 {deals.map((deal) => {
                   const isActive = pathname.startsWith(`/deals/${deal.id}`)
                   const verdict = deal.analysis?.executiveSummary.verdict
@@ -62,23 +72,42 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         render={<Link href={`/deals/${deal.id}/summary`} />}
                         isActive={isActive}
-                        className={`h-auto py-2.5 ${isActive ? "border-l-2 border-l-amber-500 rounded-l-none" : ""}`}
+                        className={`h-auto py-2.5 rounded-xl transition-colors ${
+                          isActive
+                            ? "bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/5 ring-1 ring-primary/30"
+                            : "hover:bg-[#F4FAF6]"
+                        }`}
                       >
                         <div className="flex w-full items-start justify-between gap-2">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${verdict ? verdictDotColors[verdict] ?? "bg-gray-300" : "bg-gray-300"}`} />
-                              <span className="truncate font-medium text-sm">{deal.companyName}</span>
+                              <span
+                                className={`inline-block h-2 w-2 shrink-0 rounded-full ${
+                                  verdict ? verdictDotColors[verdict] ?? "bg-gray-300" : "bg-gray-300"
+                                }`}
+                              />
+                              <span className="truncate font-heading font-semibold text-[13px] text-[#0A2E22]">
+                                {deal.companyName}
+                              </span>
                               {score !== undefined && (
-                                <span className="ml-auto text-[10px] font-mono font-semibold text-amber-600 tabular-nums">{score}</span>
+                                <span className="ml-auto text-[10px] font-mono font-bold text-primary tabular-nums">
+                                  {score}
+                                </span>
                               )}
                             </div>
                             <div className="mt-1 flex items-center gap-2">
-                              <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${STAGE_BADGE_COLORS[deal.stage] ?? ""}`}>
+                              <span
+                                className={`inline-flex items-center rounded-full px-2 py-0 text-[9px] font-mono font-bold uppercase tracking-widest ${
+                                  STAGE_BADGE_COLORS[deal.stage] ?? "bg-gray-100 text-gray-700"
+                                }`}
+                              >
                                 {deal.stage}
-                              </Badge>
-                              <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
-                                {new Date(deal.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                              </span>
+                              <span className="text-[10px] font-mono text-muted-foreground">
+                                {new Date(deal.createdAt).toLocaleDateString("en-GB", {
+                                  day: "numeric",
+                                  month: "short",
+                                })}
                               </span>
                             </div>
                           </div>

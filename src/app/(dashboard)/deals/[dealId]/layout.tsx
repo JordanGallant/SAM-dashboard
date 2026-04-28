@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { updateDealStatus } from "@/app/actions/deals"
 import type { PipelineStatus } from "@/lib/types/deal"
+import { DealBottomSheet } from "@/components/layout/deal-bottom-sheet"
 
 export default function DealDetailLayout({ children }: { children: React.ReactNode }) {
   const params = useParams()
@@ -87,7 +88,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 md:pb-0">
       {/* Deal header — editorial, single line */}
       <div className="space-y-2">
         <Link href="/deals" className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
@@ -155,7 +156,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
                         : score >= 70
                         ? "bg-emerald-500"
                         : score >= 40
-                        ? "bg-amber-500"
+                        ? "bg-primary/100"
                         : "bg-red-500"
                     return (
                       <li key={key}>
@@ -193,6 +194,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
           </nav>
         )}
       </div>
+      <DealBottomSheet />
     </div>
   )
 }

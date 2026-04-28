@@ -14,7 +14,7 @@ import { ArrowRight, TrendingUp, AlertTriangle, Clock } from "lucide-react"
 const SEV_WEIGHT: Record<string, number> = { Critical: 3, Warning: 2, Info: 1 }
 function scoreHue(score: number) {
   if (score >= 70) return { text: "text-emerald-700", dot: "bg-emerald-500", bar: "bg-emerald-500" }
-  if (score >= 40) return { text: "text-amber-700", dot: "bg-amber-500", bar: "bg-amber-500" }
+  if (score >= 40) return { text: "text-amber-700", dot: "bg-primary/100", bar: "bg-primary/100" }
   return { text: "text-red-700", dot: "bg-red-500", bar: "bg-red-500" }
 }
 
@@ -108,7 +108,7 @@ export default function SummaryV1Page() {
 
       {/* Compact domain strip */}
       <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5">
-        <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-amber-700 mb-4">Domain Read</p>
+        <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-primary mb-4">Domain Read</p>
         <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${es.scorecard.length}, minmax(0, 1fr))` }}>
           {es.scorecard.map((row) => {
             const rh = scoreHue(row.score)
@@ -128,16 +128,16 @@ export default function SummaryV1Page() {
 
       {/* The decision block — highlighted, what happens next */}
       {firstStep && (
-        <section className="relative overflow-hidden rounded-2xl bg-amber-50 border-2 border-amber-200 p-6">
+        <section className="relative overflow-hidden rounded-2xl bg-primary/5 border-2 border-primary/30 p-6">
           <div className="flex items-start gap-4">
-            <div className="shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-amber-700">
-              <ArrowRight className="h-5 w-5 text-white" />
+            <div className="shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-primary">
+              <ArrowRight className="h-5 w-5 text-primary-foreground" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-amber-900 font-bold">The Call</p>
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-primary font-bold">The Call</p>
               <p className="mt-1 text-[15px] leading-[1.6] text-foreground">{firstStep}</p>
               {es.recommendedNextSteps.length > 1 && (
-                <p className="mt-2 text-[11px] font-mono uppercase tracking-wider text-amber-900/70">
+                <p className="mt-2 text-[11px] font-mono uppercase tracking-wider text-primary/70">
                   {es.recommendedNextSteps.length - 1} further step{es.recommendedNextSteps.length - 1 === 1 ? "" : "s"} on full review
                 </p>
               )}

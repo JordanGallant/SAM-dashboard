@@ -13,7 +13,7 @@ function MetricList({ rows }: { rows: MetricRow[] }) {
     <ol className="space-y-3 list-none">
       {rows.map((row, i) => (
         <li key={i} className="grid grid-cols-[2rem_1fr_auto] gap-3 items-baseline border-b pb-2 last:border-0">
-          <span className="font-mono text-amber-700 tabular-nums text-sm">{String(i + 1).padStart(2, "0")}</span>
+          <span className="font-mono text-primary tabular-nums text-sm">{String(i + 1).padStart(2, "0")}</span>
           <div>
             <span className="font-semibold text-[14px]">{row.metric}</span>
             {row.statusNote && <p className="text-[12px] text-muted-foreground leading-snug mt-0.5">{row.statusNote}</p>}
@@ -35,7 +35,7 @@ export default function TractionV2Page() {
   return (
     <article className="mx-auto max-w-3xl">
       <header className="border-b pb-6 mb-8">
-        <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-700">Domain · Traction</p>
+        <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary">Domain · Traction</p>
         <h1 className="mt-3 font-heading font-bold leading-[1.05] text-4xl">Traction Analysis</h1>
         <p className="mt-3 text-sm text-muted-foreground italic">
           {t.verdict} · Data {t.dataCompleteness}% complete

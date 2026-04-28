@@ -75,11 +75,11 @@ function BillingContent() {
   return (
     <div className="max-w-3xl space-y-6">
       {showExpired && (
-        <div className="rounded-md bg-amber-50 border border-amber-200 p-4 flex gap-3">
-          <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+        <div className="rounded-md bg-primary/10 border border-primary/30 p-4 flex gap-3">
+          <AlertTriangle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <div>
-            <p className="font-medium text-amber-900">Your trial has ended</p>
-            <p className="text-sm text-amber-800 mt-0.5">
+            <p className="font-medium text-primary">Your trial has ended</p>
+            <p className="text-sm text-primary mt-0.5">
               Subscribe to a plan below to continue using SAM.
             </p>
           </div>
@@ -111,11 +111,11 @@ function BillingContent() {
       {!isInactive && (
         <Card>
           <CardHeader>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Current plan</p>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Current plan</p>
             <CardTitle className="flex items-center gap-2 text-sm font-medium mt-1">
               <Badge className="bg-primary/10 text-primary border-0 font-mono">{config.label}</Badge>
               {isTrialing && (
-                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 font-mono">
+                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 font-mono">
                   Trial · {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} left
                 </Badge>
               )}

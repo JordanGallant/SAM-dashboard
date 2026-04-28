@@ -16,7 +16,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Account</p>
+        <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Account</p>
         <h1 className="mt-1 text-2xl font-bold font-heading">Settings</h1>
       </div>
       <nav className="border-b -mx-4 md:-mx-6 px-4 md:px-6">

@@ -2,11 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
-import { MessageSquare, X, Send } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { MessageSquare, X, Send, Sparkles } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
-import { Separator } from "@/components/ui/separator"
 import { useDeal } from "@/hooks/use-deal"
 import { cn } from "@/lib/utils"
 
@@ -55,7 +52,7 @@ export function DealChat() {
     setSending(true)
     try {
       const apiMessages = nextHistory
-        .slice(1) // drop the greeting seed
+        .slice(1)
         .map((m) => ({ role: m.who === "user" ? "user" : "assistant", content: m.text }))
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -99,51 +96,58 @@ export function DealChat() {
   return (
     <>
       {!open && (
-        <Button
+        <button
           onClick={() => setOpen(true)}
-          size="icon"
-          className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full shadow-lg"
+          className="group fixed bottom-6 right-6 z-40 hidden md:inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-[#D4FF6B] shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all ring-1 ring-[#D4FF6B]/20"
           title="Ask SAM (⌘I)"
+          aria-label="Ask SAM"
         >
           <MessageSquare className="h-5 w-5" />
-        </Button>
+        </button>
       )}
 
       <aside
         aria-hidden={!open}
         className={cn(
-          "fixed right-0 top-0 z-40 flex h-dvh w-[360px] flex-col border-l bg-background shadow-xl transition-transform duration-200 ease-out",
+          "fixed right-0 top-0 z-40 flex h-dvh w-[380px] flex-col bg-white border-l border-[#0F3D2E]/10 shadow-2xl transition-transform duration-200 ease-out",
           open ? "translate-x-0" : "translate-x-full pointer-events-none"
         )}
       >
         {/* Header */}
-        <div className="flex h-14 items-center justify-between gap-3 border-b px-4">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <MessageSquare className="h-3.5 w-3.5" />
+        <div className="flex h-14 items-center justify-between gap-3 border-b border-[#0F3D2E]/10 bg-gradient-to-br from-[#F4FAF6] to-white px-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] ring-1 ring-[#D4FF6B]/20">
+              <MessageSquare className="h-4 w-4 text-[#D4FF6B]" />
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-semibold leading-none">Ask SAM</div>
-              <div className="mt-1 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+              <div className="text-sm font-heading font-bold leading-none text-[#0A2E22]">Ask SAM</div>
+              <div className="mt-1 text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
                 Context-aware
               </div>
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setOpen(false)}>
+          <button
+            onClick={() => setOpen(false)}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#0F3D2E]/70 hover:bg-[#0F3D2E]/5 hover:text-[#0F3D2E] transition-colors"
+            aria-label="Close"
+          >
             <X className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
 
         {/* Context chips */}
-        <div className="border-b bg-muted/30 px-4 py-3">
-          <div className="mb-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="border-b border-[#0F3D2E]/5 bg-[#F4FAF6]/50 px-4 py-3">
+          <div className="mb-2 text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
             In context
           </div>
           <div className="flex flex-wrap gap-1.5">
             {chips.map((c) => (
-              <Badge key={c} variant="outline" className="font-mono text-[10px]">
+              <span
+                key={c}
+                className="inline-flex items-center rounded-full border border-[#0F3D2E]/10 bg-white px-2 py-0.5 font-mono text-[10px] font-semibold text-[#0A2E22]"
+              >
                 {c}
-              </Badge>
+              </span>
             ))}
           </div>
         </div>
@@ -154,25 +158,26 @@ export function DealChat() {
             <div
               key={i}
               className={cn(
-                "max-w-[85%] rounded-xl px-3 py-2 text-[13px] leading-snug",
+                "max-w-[85%] rounded-2xl px-3 py-2 text-[13px] leading-snug",
                 m.who === "sam"
-                  ? "bg-muted text-foreground rounded-bl-sm"
-                  : "ml-auto bg-primary text-primary-foreground rounded-br-sm"
+                  ? "bg-[#F4FAF6] text-[#0A2E22] rounded-bl-sm ring-1 ring-[#0F3D2E]/5"
+                  : "ml-auto bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white rounded-br-sm shadow-sm shadow-primary/20"
               )}
             >
               {m.text}
             </div>
           ))}
           {messages.length === 1 && (
-            <div className="mt-2 space-y-1.5">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+            <div className="mt-3 space-y-1.5">
+              <div className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+                <Sparkles className="h-3 w-3 text-primary" />
                 Suggested
               </div>
               {suggestions.map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="block w-full rounded-md border bg-card px-2.5 py-1.5 text-left text-[12.5px] hover:bg-muted/60"
+                  className="block w-full rounded-xl border border-[#0F3D2E]/10 bg-white px-3 py-2 text-left text-[12.5px] hover:border-primary/30 hover:bg-[#F4FAF6] transition-colors"
                 >
                   {s}
                 </button>
@@ -181,11 +186,9 @@ export function DealChat() {
           )}
         </div>
 
-        <Separator />
-
         {/* Input */}
         <form
-          className="p-3"
+          className="border-t border-[#0F3D2E]/10 bg-white p-3"
           onSubmit={(e) => {
             e.preventDefault()
             send(input)
@@ -203,13 +206,18 @@ export function DealChat() {
               }}
               rows={1}
               placeholder={deal ? `Ask about ${deal.companyName}…` : "Ask about your deals…"}
-              className="min-h-9 max-h-[120px] resize-none text-sm"
+              className="min-h-10 max-h-[120px] resize-none text-sm rounded-xl border-[#0F3D2E]/15 focus-visible:border-primary/40 focus-visible:ring-primary/20"
             />
-            <Button type="submit" size="icon" className="h-9 w-9 shrink-0" disabled={!input.trim() || sending}>
+            <button
+              type="submit"
+              disabled={!input.trim() || sending}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-[#D4FF6B] shadow-md shadow-primary/25 hover:shadow-lg hover:shadow-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              aria-label="Send"
+            >
               <Send className="h-4 w-4" />
-            </Button>
+            </button>
           </div>
-          <p className="mt-2 text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+          <p className="mt-2 text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
             ⌘I to toggle · Shift+Enter for newline
           </p>
         </form>

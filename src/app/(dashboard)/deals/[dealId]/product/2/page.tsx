@@ -16,7 +16,7 @@ export default function ProductV2Page() {
   return (
     <article className="mx-auto max-w-3xl">
       <header className="border-b pb-6 mb-8">
-        <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-700">Domain · Product</p>
+        <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary">Domain · Product</p>
         <h1 className="mt-3 font-heading font-bold leading-[1.05] text-4xl">Product Analysis</h1>
         <p className="mt-3 text-sm text-muted-foreground italic">
           {p.verdict} · PMF: {p.pmfStatus} · Data {p.dataCompleteness}%
@@ -26,7 +26,7 @@ export default function ProductV2Page() {
       <div className="md:grid md:grid-cols-[1fr_auto] md:gap-8">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground mb-3">The problem</p>
-          <blockquote className="border-l-4 border-amber-700 pl-5 py-1 italic text-[18px] leading-[1.55] text-foreground/85">
+          <blockquote className="border-l-4 border-primary pl-5 py-1 italic text-[18px] leading-[1.55] text-foreground/85">
             {p.problemType}
           </blockquote>
           <p className="mt-5 text-[15px] leading-[1.75] text-foreground/85">
@@ -59,7 +59,7 @@ export default function ProductV2Page() {
       <ol className="space-y-4 list-none">
         {p.moat.map((m, i) => (
           <li key={i} className="grid grid-cols-[2rem_1fr_auto] gap-3 items-baseline">
-            <span className="font-mono text-amber-700 tabular-nums text-sm">{String(i + 1).padStart(2, "0")}</span>
+            <span className="font-mono text-primary tabular-nums text-sm">{String(i + 1).padStart(2, "0")}</span>
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="font-semibold text-[15px]">{m.type}</span>
@@ -69,7 +69,7 @@ export default function ProductV2Page() {
               </div>
               <p className="mt-1 text-[13.5px] leading-[1.6] text-foreground/75">{m.evidence}</p>
             </div>
-            <span className={`font-mono text-2xl font-bold tabular-nums ${m.strength >= 7 ? "text-emerald-700" : m.strength >= 4 ? "text-amber-700" : "text-red-700"}`}>
+            <span className={`font-mono text-2xl font-bold tabular-nums ${m.strength >= 7 ? "text-emerald-700" : m.strength >= 4 ? "text-primary" : "text-red-700"}`}>
               {m.strength}
             </span>
           </li>

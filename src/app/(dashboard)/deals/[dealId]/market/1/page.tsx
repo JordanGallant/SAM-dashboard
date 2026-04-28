@@ -8,12 +8,12 @@ import { useDeal } from "@/hooks/use-deal"
 const threatColor: Record<string, string> = {
   "Very High": "text-red-700 font-bold",
   High: "text-red-600",
-  Medium: "text-amber-600",
+  Medium: "text-primary",
   Low: "text-emerald-600",
 }
 
 function scoreHue(score: number) {
-  return score >= 70 ? "text-emerald-600" : score >= 40 ? "text-amber-600" : "text-red-600"
+  return score >= 70 ? "text-emerald-600" : score >= 40 ? "text-primary" : "text-red-600"
 }
 
 export default function MarketV1Page() {
@@ -34,14 +34,14 @@ export default function MarketV1Page() {
       </div>
 
       <section>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; MARKET SIZE</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; MARKET SIZE</p>
         <div className="border-y border-border divide-y divide-border">
           <div className="grid grid-cols-[4rem_1fr_1fr_1fr_2fr] gap-3 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
             <span>Metric</span><span>Founder Claim</span><span>Validated</span><span>Variance</span><span>Assessment</span>
           </div>
           {m.marketSize.map((row) => (
             <div key={row.metric} className="grid grid-cols-[4rem_1fr_1fr_1fr_2fr] gap-3 py-1.5 items-start">
-              <span className="font-bold text-amber-700">{row.metric}</span>
+              <span className="font-bold text-primary">{row.metric}</span>
               <span className="text-foreground/85">{row.founderClaim}</span>
               <span className="text-foreground/85">{row.validatedEstimate}</span>
               <span className="text-foreground/70">{row.variance}</span>
@@ -52,7 +52,7 @@ export default function MarketV1Page() {
       </section>
 
       <section>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; WHY NOW</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; WHY NOW</p>
         <p className="text-[12.5px] leading-[1.7] max-w-prose whitespace-pre-wrap">
           <span className="text-red-700 font-bold mr-2">[{m.whyNowScore.toUpperCase()}]</span>
           {m.whyNow}
@@ -60,12 +60,12 @@ export default function MarketV1Page() {
       </section>
 
       <section>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; MARKET DYNAMICS</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; MARKET DYNAMICS</p>
         <p className="text-[12.5px] leading-[1.7] max-w-prose whitespace-pre-wrap text-foreground/85">{m.marketDynamics}</p>
       </section>
 
       <section>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; COMPETITORS ({m.competitors.length})</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; COMPETITORS ({m.competitors.length})</p>
         <div className="border-y border-border divide-y divide-border">
           <div className="grid grid-cols-[1fr_1fr_1fr_3fr] gap-3 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
             <span>Name</span><span>Funding</span><span>Threat</span><span>Differentiation</span>

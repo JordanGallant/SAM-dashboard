@@ -1,5 +1,4 @@
 import { DataCompleteness } from "./data-completeness"
-import { Badge } from "@/components/ui/badge"
 import { DOMAIN_VERDICT_COLORS, getScoreColor } from "@/lib/constants"
 import type { DomainVerdict } from "@/lib/types/analysis"
 
@@ -17,19 +16,27 @@ export function SectionHeader({
   const verdictColor = DOMAIN_VERDICT_COLORS[verdict]
   const scoreColor = getScoreColor(score)
   return (
-    <div className="space-y-3 pb-4 border-b">
+    <div className="space-y-4 pb-5 border-b border-[#0F3D2E]/10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <div>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-amber-600">Analysis</p>
-            <h2 className="text-lg font-semibold font-heading mt-0.5">{title}</h2>
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E] shadow-sm">
+              Analysis
+            </div>
+            <h2 className="mt-2 text-2xl md:text-3xl font-bold font-heading tracking-[-0.02em] text-[#0A2E22]">
+              {title}
+            </h2>
           </div>
-          <Badge variant="outline" className={`${verdictColor.bg} ${verdictColor.text} font-mono uppercase tracking-wider border-0`}>
+          <span
+            className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-widest ring-1 ring-black/5 ${verdictColor.bg} ${verdictColor.text}`}
+          >
             {verdict}
-          </Badge>
+          </span>
         </div>
         <div className="flex items-baseline gap-1">
-          <span className={`text-3xl font-mono font-bold leading-none ${scoreColor.text}`}>{score}</span>
+          <span className={`text-4xl font-mono font-bold leading-none tabular-nums ${scoreColor.text}`}>
+            {score}
+          </span>
           <span className="text-xs font-mono text-muted-foreground">/100</span>
         </div>
       </div>

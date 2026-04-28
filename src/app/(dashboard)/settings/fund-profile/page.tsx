@@ -77,7 +77,7 @@ export default function FundProfilePage() {
       <Card className="border-dashed">
         <CardContent className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3 min-w-0">
-            <Sparkles className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+            <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
             <div className="min-w-0">
               <p className="text-sm font-medium">Prefer the guided setup?</p>
               <p className="text-xs text-muted-foreground">Walk through the 3-step wizard instead of editing fields directly.</p>

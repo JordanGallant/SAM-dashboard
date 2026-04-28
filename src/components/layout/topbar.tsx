@@ -2,11 +2,8 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Settings, LogOut } from "lucide-react"
+import { Settings, LogOut, Building2 } from "lucide-react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { buttonVariants } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { createClient } from "@/lib/supabase/client"
 import { useFundProfile } from "@/hooks/use-fund-profile"
 
@@ -22,19 +19,35 @@ export function Topbar() {
   }
 
   return (
-    <header className="flex h-14 items-center gap-3 border-b bg-background px-4">
-      <SidebarTrigger />
-      <Separator orientation="vertical" className="h-5" />
-      <span className="text-sm font-medium text-muted-foreground">
-        {fund?.name ?? "Your Fund"}
-      </span>
+    <header className="flex h-14 items-center gap-3 border-b border-[#0F3D2E]/10 bg-white/90 backdrop-blur px-4 sticky top-0 z-30">
+      <SidebarTrigger className="text-[#0F3D2E] hover:bg-[#F4FAF6]" />
+      <span className="h-5 w-px bg-[#0F3D2E]/10" aria-hidden />
+
+      {/* Fund identity chip */}
+      <div className="flex items-center gap-2 rounded-full border border-[#0F3D2E]/10 bg-white px-3 py-1">
+        <div className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-[#0F3D2E] to-[#00A86B]">
+          <Building2 className="h-3 w-3 text-[#D4FF6B]" />
+        </div>
+        <span className="text-[11px] font-mono font-semibold uppercase tracking-widest text-[#0A2E22]">
+          {fund?.name ?? "Your Fund"}
+        </span>
+      </div>
+
       <div className="ml-auto flex items-center gap-1">
-        <Link href="/settings" className={buttonVariants({ variant: "ghost", size: "icon", className: "h-8 w-8" })}>
+        <Link
+          href="/settings"
+          className="flex h-8 w-8 items-center justify-center rounded-full text-[#0F3D2E]/70 hover:bg-[#F4FAF6] hover:text-[#0F3D2E] transition-colors"
+          aria-label="Settings"
+        >
           <Settings className="h-4 w-4" />
         </Link>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleLogout}>
+        <button
+          onClick={handleLogout}
+          className="flex h-8 w-8 items-center justify-center rounded-full text-[#0F3D2E]/70 hover:bg-red-50 hover:text-red-600 transition-colors"
+          aria-label="Log out"
+        >
           <LogOut className="h-4 w-4" />
-        </Button>
+        </button>
       </div>
     </header>
   )

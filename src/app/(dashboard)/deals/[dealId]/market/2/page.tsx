@@ -16,7 +16,7 @@ export default function MarketV2Page() {
   return (
     <article className="mx-auto max-w-3xl">
       <header className="border-b pb-6 mb-8">
-        <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-700">
+        <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary">
           Domain · Market
         </p>
         <h1 className="mt-3 font-heading font-bold leading-[1.05] text-4xl">Market Analysis</h1>
@@ -31,7 +31,7 @@ export default function MarketV2Page() {
             Why now
           </p>
           <p className="text-[17px] leading-[1.7] text-foreground">
-            <span className="float-left mr-2 mt-1 font-heading text-[64px] leading-[0.8] font-bold text-amber-700">
+            <span className="float-left mr-2 mt-1 font-heading text-[64px] leading-[0.8] font-bold text-primary">
               {(m.whyNow.trim().charAt(0) || "—")}
             </span>
             {m.whyNow.trim().slice(1)}
@@ -58,8 +58,8 @@ export default function MarketV2Page() {
 
       <section className="grid grid-cols-3 gap-6">
         {m.marketSize.map((row) => (
-          <div key={row.metric} className="border-l-2 border-amber-700 pl-3">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-amber-700">{row.metric}</p>
+          <div key={row.metric} className="border-l-2 border-primary pl-3">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-primary">{row.metric}</p>
             <p className="mt-1 text-lg font-semibold leading-tight">{row.validatedEstimate}</p>
             <p className="mt-2 text-[12px] leading-[1.5] text-muted-foreground italic">
               Founder: {row.founderClaim}
@@ -86,7 +86,7 @@ export default function MarketV2Page() {
       <ol className="space-y-5 list-none">
         {m.competitors.map((c, i) => (
           <li key={c.name} className="grid grid-cols-[2rem_1fr] gap-3">
-            <span className="font-mono text-amber-700 tabular-nums text-sm pt-1">{String(i + 1).padStart(2, "0")}</span>
+            <span className="font-mono text-primary tabular-nums text-sm pt-1">{String(i + 1).padStart(2, "0")}</span>
             <div>
               <div className="flex flex-wrap items-baseline gap-2">
                 <span className="font-semibold text-[15px]">{c.name}</span>

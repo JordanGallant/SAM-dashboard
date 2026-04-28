@@ -21,8 +21,8 @@ export function DomainRadar({ scorecard, height = 280 }: { scorecard: ScorecardR
           <PolarRadiusAxis domain={[0, 100]} tickCount={5} tick={{ fontSize: 9, fill: "#A8A29E" }} axisLine={false} />
           <Radar
             dataKey="score"
-            stroke="#D97706"
-            fill="#D97706"
+            stroke="var(--primary)"
+            fill="var(--primary)"
             fillOpacity={0.18}
             strokeWidth={2}
             animationDuration={800}

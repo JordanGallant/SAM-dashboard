@@ -6,12 +6,12 @@ import { useParams } from "next/navigation"
 import { useDeal } from "@/hooks/use-deal"
 
 function scoreHue(score: number) {
-  return score >= 70 ? "text-emerald-600" : score >= 40 ? "text-amber-600" : "text-red-600"
+  return score >= 70 ? "text-emerald-600" : score >= 40 ? "text-primary" : "text-red-600"
 }
 
 const STATUS_CHAR: Record<string, { ch: string; cls: string }> = {
   check: { ch: "✓", cls: "text-emerald-600" },
-  warning: { ch: "!", cls: "text-amber-600" },
+  warning: { ch: "!", cls: "text-primary" },
   critical: { ch: "✕", cls: "text-red-600" },
   gap: { ch: "∅", cls: "text-muted-foreground" },
 }
@@ -35,27 +35,27 @@ export default function ProductV1Page() {
 
       <section className="grid grid-cols-2 gap-8">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; PROBLEM TYPE</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; PROBLEM TYPE</p>
           <p className="text-[12.5px]">{p.problemType}</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; PAIN SCORE</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; PAIN SCORE</p>
           <p className="text-[12.5px]">{p.painScore}</p>
         </div>
       </section>
 
       <section>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; EVIDENCE OF PAIN</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; EVIDENCE OF PAIN</p>
         <p className="text-[12.5px] leading-[1.7] text-foreground/85 max-w-prose whitespace-pre-wrap">{p.evidenceOfPain}</p>
       </section>
 
       <section>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; CURRENT SOLUTIONS</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; CURRENT SOLUTIONS</p>
         <p className="text-[12.5px] leading-[1.7] text-foreground/85 max-w-prose whitespace-pre-wrap">{p.currentSolutions}</p>
       </section>
 
       <section>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">
           &gt; SOLUTION COMPARISON ({p.solutionComparison.length})
         </p>
         <div className="border-y border-border divide-y divide-border">
@@ -79,12 +79,12 @@ export default function ProductV1Page() {
       </section>
 
       <section>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; PMF · {p.pmfStatus.toUpperCase()}</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; PMF · {p.pmfStatus.toUpperCase()}</p>
         <p className="text-[12.5px] leading-[1.7] text-foreground/85 max-w-prose whitespace-pre-wrap">{p.pmfDetails}</p>
       </section>
 
       <section>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; MOAT MATRIX</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; MOAT MATRIX</p>
         <div className="border-y border-border divide-y divide-border">
           <div className="grid grid-cols-[1.5fr_1fr_3rem_3fr] gap-3 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
             <span>Type</span><span>Present</span><span>1-10</span><span>Evidence</span>
@@ -95,7 +95,7 @@ export default function ProductV1Page() {
               <span className={row.present ? "text-emerald-600" : "text-red-600"}>
                 [{row.present ? "YES" : "NO "}]
               </span>
-              <span className={`tabular-nums font-bold ${row.strength >= 7 ? "text-emerald-600" : row.strength >= 4 ? "text-amber-600" : "text-red-600"}`}>
+              <span className={`tabular-nums font-bold ${row.strength >= 7 ? "text-emerald-600" : row.strength >= 4 ? "text-primary" : "text-red-600"}`}>
                 {row.strength}
               </span>
               <span className="text-foreground/70">{row.evidence}</span>

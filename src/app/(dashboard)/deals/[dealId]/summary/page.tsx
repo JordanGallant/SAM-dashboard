@@ -356,7 +356,7 @@ export default function SummaryPage() {
               {es.scorecard.map((row) => {
                 const sc = getScoreColor(row.score)
                 const dcLow = row.dataCompleteness < 20
-                const barBg = row.score >= 70 ? "bg-emerald-500" : row.score >= 40 ? "bg-amber-500" : "bg-red-500"
+                const barBg = row.score >= 70 ? "bg-emerald-500" : row.score >= 40 ? "bg-primary/100" : "bg-red-500"
                 return (
                   <div key={row.domain} className="grid grid-cols-[5rem_1fr_1fr] gap-3 items-center text-sm">
                     <span className="font-medium text-[13px]">{row.domain}</span>
@@ -445,7 +445,7 @@ export default function SummaryPage() {
           <ol className="space-y-2 max-w-prose">
             {es.recommendedNextSteps.map((step, i) => (
               <li key={i} className="flex gap-3 text-sm leading-relaxed">
-                <span className="font-mono text-[11px] text-amber-600 tabular-nums pt-1 shrink-0 w-5">
+                <span className="font-mono text-[11px] text-primary tabular-nums pt-1 shrink-0 w-5">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span className="text-foreground/85">{step}</span>

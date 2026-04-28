@@ -16,7 +16,7 @@ export function ScoreGauge({ score, size = 140 }: { score: number; size?: number
   const pct = Math.max(0, Math.min(100, score)) / 100
   const dash = circumference * pct
 
-  // Color band: >=70 emerald, 40-69 amber, <40 red
+  // Traffic-light status (not brand): >=70 emerald, 40-69 amber, <40 red
   const color =
     score >= 70 ? "#059669" : score >= 40 ? "#D97706" : "#DC2626"
 

@@ -8,20 +8,20 @@ import type { MetricRow } from "@/lib/types/analysis"
 
 const STATUS_CHAR: Record<string, { ch: string; cls: string }> = {
   check: { ch: "✓", cls: "text-emerald-600" },
-  warning: { ch: "!", cls: "text-amber-600" },
+  warning: { ch: "!", cls: "text-primary" },
   critical: { ch: "✕", cls: "text-red-600" },
   gap: { ch: "∅", cls: "text-muted-foreground" },
 }
 
 function scoreHue(score: number) {
-  return score >= 70 ? "text-emerald-600" : score >= 40 ? "text-amber-600" : "text-red-600"
+  return score >= 70 ? "text-emerald-600" : score >= 40 ? "text-primary" : "text-red-600"
 }
 
 function MetricTable({ title, rows }: { title: string; rows: MetricRow[] }) {
   if (rows.length === 0) return null
   return (
     <section>
-      <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700 mb-1">&gt; {title}</p>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-primary mb-1">&gt; {title}</p>
       <div className="border-y border-border divide-y divide-border">
         <div className="grid grid-cols-[2rem_1.5fr_1fr_1fr_1fr_2fr] gap-3 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
           <span></span><span>Metric</span><span>Value</span><span>Benchmark</span><span>Growth</span><span>Note</span>

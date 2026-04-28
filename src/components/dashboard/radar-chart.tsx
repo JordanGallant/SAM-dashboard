@@ -8,13 +8,13 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 
 function getBarColor(score: number) {
   if (score >= 70) return "bg-emerald-500"
-  if (score >= 40) return "bg-amber-500"
+  if (score >= 40) return "bg-primary/100"
   return "bg-red-500"
 }
 
 function getBarBg(score: number) {
   if (score >= 70) return "bg-emerald-100"
-  if (score >= 40) return "bg-amber-100"
+  if (score >= 40) return "bg-primary/15"
   return "bg-red-100"
 }
 
@@ -70,7 +70,7 @@ export function DomainRadarChart({ scorecard }: { scorecard: ScorecardRow[] }) {
                 </div>
                 <span className="text-[10px] tabular-nums text-muted-foreground w-20 text-right">
                   {row.dataCompleteness}% data
-                  {row.dataCompleteness < 40 && <span className="text-amber-600"> !</span>}
+                  {row.dataCompleteness < 40 && <span className="text-primary"> !</span>}
                 </span>
               </div>
             </div>

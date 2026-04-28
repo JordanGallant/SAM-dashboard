@@ -29,12 +29,12 @@ export default function MissingInfoPage() {
       </div>
 
       {/* Explicit rule from the project plan */}
-      <Card className="border-amber-200 bg-amber-50/40">
+      <Card className="border-primary/30 bg-primary/10">
         <CardContent className="pt-5 flex gap-3">
-          <Info className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+          <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-amber-900">Missing information does not affect scores.</p>
-            <p className="mt-1 text-xs text-amber-800 leading-relaxed">
+            <p className="text-sm font-medium text-primary">Missing information does not affect scores.</p>
+            <p className="mt-1 text-xs text-primary leading-relaxed">
               Data gaps are reported separately from domain scoring. &quot;Not found&quot; is never treated as a negative signal — sections with insufficient data are flagged as such, not marked weak.
             </p>
           </div>
@@ -55,7 +55,7 @@ export default function MissingInfoPage() {
               <ul className="space-y-1.5">
                 {section.items.map((item, j) => (
                   <li key={j} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <span className="mt-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0" />
+                    <span className="mt-1.5 inline-block h-1.5 w-1.5 rounded-full bg-primary/100 shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -71,7 +71,7 @@ export default function MissingInfoPage() {
               <ol className="space-y-1.5">
                 {section.followUpQuestions.map((q, j) => (
                   <li key={j} className="flex gap-2 text-sm text-muted-foreground">
-                    <span className="font-mono text-amber-600 shrink-0">0{j + 1}</span>
+                    <span className="font-mono text-primary shrink-0">0{j + 1}</span>
                     <span>{q}</span>
                   </li>
                 ))}
