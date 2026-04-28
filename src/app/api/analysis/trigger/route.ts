@@ -26,6 +26,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Deal not found" }, { status: 404 })
     }
 
+    // Idempotency: if an analysis is already in flight for this deal, return that one
+    // instead of firing another (avoids duplicate n8n runs / wasted LLM spend).
+    const { data: inFlight } = await supabase
+      .from("analyses")
+      .select("id, status")
+      .eq("deal_id", dealId)
+      .in("status", ["pending", "processing"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (inFlight) {
+      return NextResponse.json({
+        status: inFlight.status,
+        analysisId: inFlight.id,
+        message: "Analysis already in progress for this deal",
+      })
+    }
+
     const { data: documents } = await supabase
       .from("documents")
       .select("id, filename, doc_type, storage_path")

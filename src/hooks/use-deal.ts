@@ -55,5 +55,17 @@ export function useDeal(dealId: string | undefined) {
     return () => clearInterval(interval)
   }, [analysisStatus, refetch])
 
+  // Cross-component sync: any caller can window.dispatchEvent(new CustomEvent("deal:changed", { detail: { dealId } }))
+  // and every active useDeal instance for that dealId will refetch. Used by upload/delete so the layout button gate updates without a full reload.
+  useEffect(() => {
+    if (!dealId) return
+    function onChanged(e: Event) {
+      const ce = e as CustomEvent<{ dealId?: string }>
+      if (!ce.detail?.dealId || ce.detail.dealId === dealId) refetch()
+    }
+    window.addEventListener("deal:changed", onChanged)
+    return () => window.removeEventListener("deal:changed", onChanged)
+  }, [dealId, refetch])
+
   return { deal, loading, refetch, analysisStatus }
 }

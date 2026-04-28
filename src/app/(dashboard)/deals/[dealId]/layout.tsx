@@ -19,7 +19,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   const params = useParams()
   const pathname = usePathname()
   const dealId = params.dealId as string
-  const { deal, loading, refetch } = useDeal(dealId)
+  const { deal, loading, refetch, analysisStatus } = useDeal(dealId)
   const { config: tierConfig } = useTier()
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState("")
@@ -112,7 +112,13 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
               ))}
             </SelectContent>
           </Select>
-          {!analysis && (
+          {!analysis && (analysisStatus === "pending" || analysisStatus === "processing") && (
+            <div className="ml-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-[12px] font-medium text-primary">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <span>Analysing… ~30 min</span>
+            </div>
+          )}
+          {!analysis && analysisStatus !== "pending" && analysisStatus !== "processing" && (
             <Button
               size="sm"
               onClick={handleRunAnalysis}
@@ -121,7 +127,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
               className="ml-auto"
             >
               {analyzing ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-2 h-3.5 w-3.5" />}
-              {analyzing ? "Starting..." : "Analyze pitch deck"}
+              {analyzing ? "Starting..." : analysisStatus === "failed" ? "Retry analysis" : "Analyze pitch deck"}
             </Button>
           )}
         </div>

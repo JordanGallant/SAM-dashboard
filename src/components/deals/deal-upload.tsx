@@ -47,6 +47,7 @@ export function DealUpload({
       setError(result.error)
     } else {
       onChange()
+      window.dispatchEvent(new CustomEvent("deal:changed", { detail: { dealId } }))
     }
 
     setUploading(false)
@@ -56,6 +57,7 @@ export function DealUpload({
   async function handleDelete(documentId: string) {
     await deleteDocument(documentId, dealId)
     onChange()
+    window.dispatchEvent(new CustomEvent("deal:changed", { detail: { dealId } }))
   }
 
   return (
