@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import type { DealAnalysis } from "@/lib/types/analysis"
+import { reshapeFlatToDealAnalysis } from "@/lib/n8n-reshape"
 
 function getSupabaseAdmin() {
   return createClient(
@@ -11,7 +12,6 @@ function getSupabaseAdmin() {
 
 export async function POST(request: Request) {
   try {
-    // Validate bearer token
     const authHeader = request.headers.get("authorization")
     const expectedToken = process.env.ANALYSIS_CALLBACK_TOKEN
     if (!expectedToken) {
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { analysis_id, job_id, status, result, error } = body
+    const { analysis_id, job_id, status, result, flat_result, error } = body
     const analysisId = analysis_id || job_id
 
     if (!analysisId) {
@@ -43,19 +43,43 @@ export async function POST(request: Request) {
       return NextResponse.json({ received: true })
     }
 
-    if (status !== "completed" || !result) {
+    if (status !== "completed") {
       return NextResponse.json(
-        { error: "status must be 'completed' and result must be provided" },
+        { error: "status must be 'completed' or 'failed'" },
         { status: 400 }
       )
     }
 
-    // Store the full DealAnalysis result as JSONB
+    // Resolve final DealAnalysis: prefer pre-shaped `result`, else reshape `flat_result`
+    let finalResult: DealAnalysis | null = null
+    if (result && typeof result === "object") {
+      finalResult = result as DealAnalysis
+    } else if (flat_result && typeof flat_result === "object") {
+      const { data: existing } = await supabase
+        .from("analyses")
+        .select("id, deal_id, created_at")
+        .eq("id", analysisId)
+        .single()
+      if (!existing) {
+        return NextResponse.json({ error: "analysis row not found" }, { status: 404 })
+      }
+      finalResult = reshapeFlatToDealAnalysis(flat_result as Record<string, string | undefined>, {
+        dealId: existing.deal_id,
+        analysisId: existing.id,
+        createdAt: existing.created_at,
+      })
+    } else {
+      return NextResponse.json(
+        { error: "either 'result' (DealAnalysis) or 'flat_result' (n8n flat object) must be provided" },
+        { status: 400 }
+      )
+    }
+
     const { error: updateErr } = await supabase
       .from("analyses")
       .update({
         status: "completed",
-        result: result as DealAnalysis,
+        result: finalResult,
         completed_at: new Date().toISOString(),
       })
       .eq("id", analysisId)
