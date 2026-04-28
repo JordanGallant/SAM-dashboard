@@ -113,13 +113,7 @@ export default function SummaryPage() {
 
       {/* Right pane — thesis prose, then domain cards, then callouts */}
       <div className="space-y-5">
-        {/* Thesis card — editorial opener with lead sentence + body, key terms emphasized */}
-        <ThesisCard
-          thesis={es.thesis}
-          stage={es.stage}
-          sector={es.sector}
-          raising={es.raising}
-        />
+        <ThesisCard thesis={es.thesis} />
 
 
         {/* Domain cards — one per scorecard row */}
@@ -271,17 +265,7 @@ export default function SummaryPage() {
 // (b) a body in a comfortable measure with subtle emphasis on numbers,
 // percentages, currency amounts, and stage/year mentions so the eye lands
 // on the load-bearing claims first.
-function ThesisCard({
-  thesis,
-  stage,
-  sector,
-  raising,
-}: {
-  thesis: string
-  stage?: string
-  sector?: string
-  raising?: string
-}) {
+function ThesisCard({ thesis }: { thesis: string }) {
   const trimmed = (thesis ?? "").trim()
   // Split on the first sentence terminator followed by whitespace
   const splitIdx = trimmed.search(/[.!?](?=\s+\S)/)
@@ -310,24 +294,9 @@ function ThesisCard({
     )
   }
 
-  const meta = [stage, sector, raising && `Raising ${raising}`].filter(Boolean)
-
   return (
-    <section className="relative rounded-2xl bg-card ring-1 ring-foreground/10 p-6 md:p-7 overflow-hidden">
-      {/* Lime accent bar on the left edge — subtle editorial cue */}
-      <span
-        aria-hidden
-        className="absolute left-0 top-6 bottom-6 w-0.5 rounded-full bg-gradient-to-b from-primary/0 via-primary/60 to-primary/0"
-      />
-
-      <div className="flex items-baseline justify-between gap-3 mb-4">
-        <SectionLabel>Investment Thesis</SectionLabel>
-        {meta.length > 0 && (
-          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/80 hidden md:block">
-            {meta.join(" · ")}
-          </p>
-        )}
-      </div>
+    <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-6 md:p-7">
+      <SectionLabel className="mb-4">Investment Thesis</SectionLabel>
 
       {/* Lead sentence — newspaper deck */}
       <p className="text-[17px] md:text-[18px] leading-[1.45] font-medium text-foreground tracking-[-0.005em] max-w-[58ch]">

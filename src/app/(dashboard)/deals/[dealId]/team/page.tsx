@@ -209,16 +209,12 @@ function InsightBlock({
 }) {
   if (!lead) return null
   return (
-    <div className="relative rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6 overflow-hidden">
-      <span
-        aria-hidden
-        className="absolute left-0 top-6 bottom-6 w-0.5 rounded-full bg-gradient-to-b from-primary/0 via-primary/50 to-primary/0"
-      />
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <span className="grid place-items-center h-7 w-7 rounded-full bg-primary/10 text-primary ring-1 ring-primary/20">
+    <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
+      <div className="flex items-center gap-2">
+        <span className="grid place-items-center h-7 w-7 rounded-md bg-foreground/5 text-foreground/60">
           {icon}
         </span>
-        <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-foreground/70">
+        <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-foreground/60">
           {label}
         </span>
       </div>

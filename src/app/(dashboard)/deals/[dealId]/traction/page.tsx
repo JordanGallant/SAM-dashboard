@@ -1,37 +1,47 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useDeal } from "@/hooks/use-deal"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { MetricTable } from "@/components/dashboard/metric-table"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
-import { useDeal } from "@/hooks/use-deal"
+import { EditorialCard } from "@/components/dashboard/editorial"
+import { TrendingUp, Coins, RefreshCcw } from "lucide-react"
 
 export default function TractionPage() {
   const params = useParams()
   const { deal } = useDeal(params.dealId as string)
   const traction = deal?.analysis?.traction
 
-  if (!traction) return <p className="text-sm text-muted-foreground">No traction analysis available.</p>
+  if (!traction)
+    return <p className="text-sm text-muted-foreground">No traction analysis available.</p>
 
   return (
-    <div className="space-y-6">
-      <SectionHeader title="Traction & Unit Economics" score={traction.score} verdict={traction.verdict} dataCompleteness={traction.dataCompleteness} />
+    <div className="space-y-7 max-w-4xl">
+      <SectionHeader
+        title="Traction & Unit Economics"
+        score={traction.score}
+        verdict={traction.verdict}
+        dataCompleteness={traction.dataCompleteness}
+      />
 
-      <Card>
-        <CardHeader><CardTitle className="text-sm font-medium">Revenue & Growth</CardTitle></CardHeader>
-        <CardContent><MetricTable rows={traction.revenueMetrics} /></CardContent>
-      </Card>
+      <EditorialCard label="Revenue & growth" icon={<TrendingUp className="h-3.5 w-3.5" />}>
+        <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-2.5 md:p-3">
+          <MetricTable rows={traction.revenueMetrics} />
+        </div>
+      </EditorialCard>
 
-      <Card>
-        <CardHeader><CardTitle className="text-sm font-medium">Unit Economics</CardTitle></CardHeader>
-        <CardContent><MetricTable rows={traction.unitEconomics} /></CardContent>
-      </Card>
+      <EditorialCard label="Unit economics" icon={<Coins className="h-3.5 w-3.5" />}>
+        <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-2.5 md:p-3">
+          <MetricTable rows={traction.unitEconomics} />
+        </div>
+      </EditorialCard>
 
-      <Card>
-        <CardHeader><CardTitle className="text-sm font-medium">Retention & Engagement</CardTitle></CardHeader>
-        <CardContent><MetricTable rows={traction.retention} showBenchmark={false} /></CardContent>
-      </Card>
+      <EditorialCard label="Retention & engagement" icon={<RefreshCcw className="h-3.5 w-3.5" />}>
+        <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-2.5 md:p-3">
+          <MetricTable rows={traction.retention} showBenchmark={false} />
+        </div>
+      </EditorialCard>
 
       <RedFlagsList items={traction.redFlags} />
     </div>
