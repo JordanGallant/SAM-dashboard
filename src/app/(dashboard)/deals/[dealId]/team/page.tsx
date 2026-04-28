@@ -5,8 +5,18 @@ import { useDeal } from "@/hooks/use-deal"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
-import { ExternalLink, Sparkles, AlertTriangle, Users, Handshake } from "lucide-react"
+import { ExternalLink, Sparkles, AlertTriangle, Users, Handshake, Search } from "lucide-react"
 import type { FounderRow } from "@/lib/types/analysis"
+
+function profileUrl(founder: FounderRow, companyName: string | undefined) {
+  if (founder.linkedinUrl) return { href: founder.linkedinUrl, kind: "linkedin" as const }
+  // Fallback: a targeted Google search likely to surface their LinkedIn profile
+  const query = [founder.name, companyName, "linkedin"].filter(Boolean).join(" ")
+  return {
+    href: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+    kind: "search" as const,
+  }
+}
 
 const AVATAR_GRADIENTS = [
   "from-[#0F3D2E] to-[#00A86B]",
@@ -69,7 +79,12 @@ export default function TeamPage() {
         ) : (
           <div className={`grid gap-4 ${founderCols}`}>
             {founders.map((f, i) => (
-              <FounderCard key={f.name + i} founder={f} grad={AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]} />
+              <FounderCard
+                key={f.name + i}
+                founder={f}
+                grad={AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]}
+                companyName={deal?.companyName}
+              />
             ))}
           </div>
         )}
@@ -101,7 +116,18 @@ export default function TeamPage() {
 }
 
 // ---------------------------------------------------------------- founder card
-function FounderCard({ founder: f, grad }: { founder: FounderRow; grad: string }) {
+function FounderCard({
+  founder: f,
+  grad,
+  companyName,
+}: {
+  founder: FounderRow
+  grad: string
+  companyName?: string
+}) {
+  const link = profileUrl(f, companyName)
+  const linkLabel = link.kind === "linkedin" ? "View LinkedIn" : "Search on Google"
+  const LinkIcon = link.kind === "linkedin" ? ExternalLink : Search
   return (
     <article className="group relative rounded-2xl bg-card ring-1 ring-foreground/10 hover:ring-foreground/20 transition-shadow hover:shadow-sm overflow-hidden">
       <div className="p-5">
@@ -119,17 +145,15 @@ function FounderCard({ founder: f, grad }: { founder: FounderRow; grad: string }
               <h3 className="text-[15px] font-heading font-bold leading-tight truncate">
                 {f.name}
               </h3>
-              {f.linkedinUrl && (
-                <a
-                  href={f.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
-                  title="LinkedIn profile"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
-              )}
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+                title={linkLabel}
+              >
+                <LinkIcon className="h-3.5 w-3.5" />
+              </a>
             </div>
             {f.role && (
               <p className="mt-0.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -178,18 +202,16 @@ function FounderCard({ founder: f, grad }: { founder: FounderRow; grad: string }
           </div>
         )}
 
-        {/* External profile link, footer-aligned, optional */}
-        {f.linkedinUrl && (
-          <a
-            href={f.linkedinUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
-          >
-            View profile
-            <ExternalLink className="h-3 w-3" />
-          </a>
-        )}
+        {/* Profile lookup link — direct LinkedIn if Flow 8 found one, Google search fallback */}
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {linkLabel}
+          <LinkIcon className="h-3 w-3" />
+        </a>
       </div>
     </article>
   )
