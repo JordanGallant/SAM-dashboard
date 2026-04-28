@@ -113,13 +113,14 @@ export default function SummaryPage() {
 
       {/* Right pane — thesis prose, then domain cards, then callouts */}
       <div className="space-y-5">
-        {/* Thesis card — editorial opener */}
-        <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-6">
-          <SectionLabel>Thesis</SectionLabel>
-          <p className="mt-3 text-[14.5px] leading-[1.7] text-foreground/85 max-w-prose">
-            {es.thesis}
-          </p>
-        </section>
+        {/* Thesis card — editorial opener with lead sentence + body, key terms emphasized */}
+        <ThesisCard
+          thesis={es.thesis}
+          stage={es.stage}
+          sector={es.sector}
+          raising={es.raising}
+        />
+
 
         {/* Domain cards — one per scorecard row */}
         {es.scorecard.map((row, i) => {
@@ -262,5 +263,83 @@ export default function SummaryPage() {
         )}
       </div>
     </div>
+  )
+}
+
+// --- Thesis card ---------------------------------------------------------
+// Splits the thesis into (a) a lead sentence rendered as a "deck" line,
+// (b) a body in a comfortable measure with subtle emphasis on numbers,
+// percentages, currency amounts, and stage/year mentions so the eye lands
+// on the load-bearing claims first.
+function ThesisCard({
+  thesis,
+  stage,
+  sector,
+  raising,
+}: {
+  thesis: string
+  stage?: string
+  sector?: string
+  raising?: string
+}) {
+  const trimmed = (thesis ?? "").trim()
+  // Split on the first sentence terminator followed by whitespace
+  const splitIdx = trimmed.search(/[.!?](?=\s+\S)/)
+  const lead = splitIdx === -1 ? trimmed : trimmed.slice(0, splitIdx + 1)
+  const rest = splitIdx === -1 ? "" : trimmed.slice(splitIdx + 1).trim()
+
+  // Highlight numbers, percentages, currency, and stage/year tokens.
+  // Keeps everything else as plain text — small visual rhythm, not a wall.
+  const HIGHLIGHT_RE =
+    /(\b(?:USD|EUR|GBP|CHF)\s?\d[\d,.]*\s?(?:[KMB]|trillion|billion|million)?\b|[\$€£]\s?\d[\d,.]*\s?(?:[KMB]|trillion|billion|million)?\b|\b\d+(?:\.\d+)?%\b|\b\d{4}\b|\b\d+(?:\.\d+)?[KMB]?\s?(?:CAGR|ARR|MRR|TAM|SAM|SOM)\b)/g
+
+  function emphasize(text: string) {
+    if (!text) return null
+    const parts = text.split(HIGHLIGHT_RE)
+    return parts.map((part, i) =>
+      i % 2 === 0 ? (
+        <span key={i}>{part}</span>
+      ) : (
+        <span
+          key={i}
+          className="font-semibold text-foreground bg-primary/8 rounded px-0.5"
+        >
+          {part}
+        </span>
+      )
+    )
+  }
+
+  const meta = [stage, sector, raising && `Raising ${raising}`].filter(Boolean)
+
+  return (
+    <section className="relative rounded-2xl bg-card ring-1 ring-foreground/10 p-6 md:p-7 overflow-hidden">
+      {/* Lime accent bar on the left edge — subtle editorial cue */}
+      <span
+        aria-hidden
+        className="absolute left-0 top-6 bottom-6 w-0.5 rounded-full bg-gradient-to-b from-primary/0 via-primary/60 to-primary/0"
+      />
+
+      <div className="flex items-baseline justify-between gap-3 mb-4">
+        <SectionLabel>Investment Thesis</SectionLabel>
+        {meta.length > 0 && (
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/80 hidden md:block">
+            {meta.join(" · ")}
+          </p>
+        )}
+      </div>
+
+      {/* Lead sentence — newspaper deck */}
+      <p className="text-[17px] md:text-[18px] leading-[1.45] font-medium text-foreground tracking-[-0.005em] max-w-[58ch]">
+        {emphasize(lead)}
+      </p>
+
+      {/* Body — comfortable measure, lighter weight */}
+      {rest && (
+        <p className="mt-4 text-[14px] leading-[1.7] text-foreground/75 max-w-[68ch]">
+          {emphasize(rest)}
+        </p>
+      )}
+    </section>
   )
 }
