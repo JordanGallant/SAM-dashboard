@@ -66,41 +66,89 @@ const findings = (texts: (string | undefined)[], severity: Severity): FindingIte
     .filter((t) => t && !/^n\/a$/i.test(t))
     .map((text, i) => ({ id: i + 1, text, severity }))
 
-// Parse the founders_overview_text block:
-//   JOHN DOE - CEO
-//   * Background: ...
-//   * Key Strength: ...
-//   * Key Concern: ...
+// Parse the founders_overview_text block. Flow 8 emits one founder block
+// like the example below, with a single blank line BETWEEN sections of one
+// founder and TWO blank lines between separate founders:
 //
-//   JANE SMITH - CTO
+//   JOHN DOE | CEO & Founder
+//   --------------------------------------------------
+//   BACKGROUND:
+//   2-3 sentence summary
+//
+//   KEY STRENGTH:
+//   1-2 sentences
+//
+//   KEY CONCERN:
+//   1-2 sentences
+//
+//
+//   JANE SMITH | CTO
 //   ...
+//
+// We split on 2+ consecutive blank lines for founder boundaries, then within
+// each block locate the BACKGROUND / KEY STRENGTH / KEY CONCERN sections by
+// label and capture every line up to the next labeled section.
 const parseFounders = (text: string | undefined): FounderRow[] => {
   if (!text) return []
-  const blocks = text
-    .split(/\n\s*\n/)
+
+  // Founder boundary = blank-line that's followed by another blank-line.
+  const founderBlocks = text
+    .split(/\n[ \t]*\n[ \t]*\n+/) // 2+ blank lines
     .map((b) => b.trim())
     .filter(Boolean)
 
-  const out: FounderRow[] = []
-  for (const block of blocks) {
-    const lines = block.split("\n").map((l) => l.trim())
-    const header = lines[0] ?? ""
-    const [namePart, rolePart] = header.split(/\s*[-|]\s*/, 2)
-    if (!namePart) continue
+  // Fallback parser kept for the older list-bullet format ("* Background: ...").
+  const grabBulletAfter = (lines: string[], label: RegExp) => {
+    const idx = lines.findIndex((l) => label.test(l))
+    if (idx === -1) return ""
+    return lines[idx].replace(label, "").replace(/^\*?\s*/, "").trim()
+  }
 
-    const grabAfter = (label: RegExp) => {
-      const idx = lines.findIndex((l) => label.test(l))
-      if (idx === -1) return ""
-      return lines[idx].replace(label, "").replace(/^\*?\s*/, "").trim()
+  // Section parser for the divider-line format. Returns the joined lines from
+  // just-after the label up to (but not including) the next label or end.
+  const grabSection = (lines: string[], label: RegExp) => {
+    const start = lines.findIndex((l) => label.test(l))
+    if (start === -1) return ""
+    const stops = [/^BACKGROUND\s*:?$/i, /^KEY\s+STRENGTH\s*:?$/i, /^KEY\s+CONCERN\s*:?$/i]
+    const buf: string[] = []
+    for (let i = start + 1; i < lines.length; i++) {
+      const l = lines[i].trim()
+      if (!l) continue
+      if (l.startsWith("---") || l.startsWith("___")) continue
+      if (stops.some((s) => s.test(l))) break
+      buf.push(l)
     }
+    return buf.join(" ").trim()
+  }
 
-    out.push({
-      name: namePart.replace(/^\*+/, "").trim(),
-      role: (rolePart ?? "").trim(),
-      background: grabAfter(/^\*?\s*background\s*:/i),
-      strength: grabAfter(/^\*?\s*key\s+strength\s*:/i),
-      keyConcern: grabAfter(/^\*?\s*key\s+concern\s*:/i),
-    })
+  const out: FounderRow[] = []
+  for (const block of founderBlocks) {
+    const rawLines = block
+      .split("\n")
+      .map((l) => l.trim())
+      .filter((l) => !l.startsWith("---") && !l.startsWith("___"))
+
+    if (rawLines.length === 0) continue
+
+    // First non-empty line is the header: "NAME | role"  or  "NAME - role"
+    const header = rawLines.find(Boolean) ?? ""
+    const [namePartRaw, rolePartRaw] = header.split(/\s*[-|]\s*/, 2)
+    const name = (namePartRaw ?? "").replace(/^\*+/, "").trim()
+    const role = (rolePartRaw ?? "").trim()
+    if (!name || /^(KEY\s+(STRENGTH|CONCERN)|BACKGROUND)\s*:?$/i.test(name)) continue
+
+    // Try the divider format first (Flow 8's current shape), then the bullet fallback.
+    const background =
+      grabSection(rawLines, /^BACKGROUND\s*:?$/i) ||
+      grabBulletAfter(rawLines, /^\*?\s*background\s*:/i)
+    const strength =
+      grabSection(rawLines, /^KEY\s+STRENGTH\s*:?$/i) ||
+      grabBulletAfter(rawLines, /^\*?\s*key\s+strength\s*:/i)
+    const keyConcern =
+      grabSection(rawLines, /^KEY\s+CONCERN\s*:?$/i) ||
+      grabBulletAfter(rawLines, /^\*?\s*key\s+concern\s*:/i)
+
+    out.push({ name, role, background, strength, keyConcern })
   }
   return out
 }
