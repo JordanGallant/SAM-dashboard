@@ -6,8 +6,15 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, FileText, Loader2, Trash2 } from "lucide-react"
-import { uploadDocument, deleteDocument } from "@/app/actions/documents"
+import { registerDocument, deleteDocument } from "@/app/actions/documents"
+import { createClient } from "@/lib/supabase/client"
 import type { DealDocument, DocType } from "@/lib/types/deal"
+
+const MAX_UPLOAD_BYTES = 50 * 1024 * 1024 // 50 MB cap to keep storage costs sane
+
+function safeName(name: string) {
+  return name.replace(/[^a-zA-Z0-9.\-_]/g, "_")
+}
 
 const docTypeLabels: Record<DocType, string> = {
   "pitch-deck": "Pitch Deck",
@@ -34,24 +41,52 @@ export function DealUpload({
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    setUploading(true)
     setError("")
 
-    const formData = new FormData()
-    formData.append("file", file)
-    formData.append("docType", docType)
-
-    const result = await uploadDocument(dealId, formData)
-
-    if (result.error) {
-      setError(result.error)
-    } else {
-      onChange()
-      window.dispatchEvent(new CustomEvent("deal:changed", { detail: { dealId } }))
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setError(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max 50 MB.`)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+      return
     }
 
-    setUploading(false)
-    if (fileInputRef.current) fileInputRef.current.value = ""
+    setUploading(true)
+    try {
+      // 1. Direct browser → Supabase Storage upload (bypasses Vercel's 4.5MB server-action cap)
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error("Not authenticated")
+
+      const storagePath = `${user.id}/${dealId}/${Date.now()}_${safeName(file.name)}`
+
+      const { error: uploadError } = await supabase.storage
+        .from("pitch-decks")
+        .upload(storagePath, file, { contentType: file.type, upsert: false })
+
+      if (uploadError) throw new Error(uploadError.message)
+
+      // 2. Server action just records the metadata row — no file body crosses Vercel
+      const result = await registerDocument({
+        dealId,
+        filename: file.name,
+        docType,
+        storagePath,
+        sizeBytes: file.size,
+      })
+
+      if (result.error) {
+        // Clean up orphan if the DB insert failed
+        await supabase.storage.from("pitch-decks").remove([storagePath])
+        throw new Error(result.error)
+      }
+
+      onChange()
+      window.dispatchEvent(new CustomEvent("deal:changed", { detail: { dealId } }))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed")
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+    }
   }
 
   async function handleDelete(documentId: string) {
