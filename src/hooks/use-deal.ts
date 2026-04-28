@@ -50,11 +50,15 @@ export function useDeal(dealId: string | undefined) {
   // Realtime: subscribe to analyses + documents inserts/updates for this deal.
   // The n8n callback writes to analyses.result on completion — Supabase pushes the change
   // here within ~100ms, so the UI updates without a manual reload.
+  // Unique channel suffix avoids collisions when multiple useDeal instances mount for the same dealId
+  // (Supabase returns the SAME channel object on repeat .channel(name) calls, so re-using `deal-${id}`
+  // would throw "cannot add callbacks after subscribe()").
   useEffect(() => {
     if (!dealId) return
     const supabase = createClient()
+    const channelName = `deal-${dealId}-${Math.random().toString(36).slice(2, 10)}`
     const channel = supabase
-      .channel(`deal-${dealId}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "analyses", filter: `deal_id=eq.${dealId}` },
