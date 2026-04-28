@@ -47,16 +47,40 @@ export function useDeal(dealId: string | undefined) {
     refetch()
   }, [refetch])
 
+  // Realtime: subscribe to analyses + documents inserts/updates for this deal.
+  // The n8n callback writes to analyses.result on completion — Supabase pushes the change
+  // here within ~100ms, so the UI updates without a manual reload.
+  useEffect(() => {
+    if (!dealId) return
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`deal-${dealId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "analyses", filter: `deal_id=eq.${dealId}` },
+        () => refetch()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "documents", filter: `deal_id=eq.${dealId}` },
+        () => refetch()
+      )
+      .subscribe()
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [dealId, refetch])
+
+  // Polling fallback while pending/processing in case Realtime is blocked (corp proxies, etc.)
+  // 60s cadence — Realtime is the primary signal, this is a safety net.
   useEffect(() => {
     if (analysisStatus !== "pending" && analysisStatus !== "processing") return
-    const interval = setInterval(() => {
-      refetch()
-    }, 30000)
+    const interval = setInterval(refetch, 60000)
     return () => clearInterval(interval)
   }, [analysisStatus, refetch])
 
-  // Cross-component sync: any caller can window.dispatchEvent(new CustomEvent("deal:changed", { detail: { dealId } }))
-  // and every active useDeal instance for that dealId will refetch. Used by upload/delete so the layout button gate updates without a full reload.
+  // Window-event bridge — kept for cases where another component does an optimistic
+  // mutation before Realtime fires (e.g., document upload completion).
   useEffect(() => {
     if (!dealId) return
     function onChanged(e: Event) {
