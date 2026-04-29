@@ -9,6 +9,7 @@ const bullets = [
   "Framework consistency across every deal, every analyst",
   "Shared memo library so institutional knowledge stays institutional",
   "Your associates focus on the deals that matter, not the ones they'll pass",
+  "Save analyst hours on deals that never reach partner review",
 ]
 
 const currentState = [
@@ -48,7 +49,7 @@ export default function ForVCFundsPage() {
               </span>
             </h1>
             <p className="mt-6 text-base md:text-lg text-white/65 max-w-2xl mx-auto leading-relaxed">
-              Your analysts&apos; time is the most expensive input in your fund. Sam runs the structured first pass on every deck that enters your inbox, so your team spends their hours on the deals that move to IC.
+              Your analysts&apos; time is the most expensive input in your fund. Sam runs the structured first pass on every deck that enters your inbox, so your time is spent on the deals that deserve deeper work.
             </p>
           </div>
         </section>
@@ -180,9 +181,26 @@ export default function ForVCFundsPage() {
                     not a sales rep.
                   </span>
                 </h2>
-                <p className="mt-4 text-white/65 max-w-xl mx-auto">
-                  €399 / month · 5 seats · unlimited memos · shared library · priority processing.
+                <p className="mt-4 text-white/70 max-w-xl mx-auto">
+                  Custom pricing — based on team size and deal flow. Book a walkthrough.
                 </p>
+
+                <ul className="mt-8 grid gap-2.5 sm:grid-cols-2 max-w-2xl mx-auto text-left">
+                  {[
+                    "Turn every inbound deck into a consistent first-screen memo.",
+                    "Free up analyst time before partner review.",
+                    "Apply your fund's own scoring logic across every deal.",
+                    "Keep a searchable record of why you advanced, paused or passed.",
+                  ].map((b) => (
+                    <li key={b} className="flex items-start gap-2.5 text-[13px] text-white/80 leading-snug">
+                      <span className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#D4FF6B]/15 ring-1 ring-[#D4FF6B]/30">
+                        <Check className="h-2.5 w-2.5 text-[#D4FF6B] stroke-[3]" />
+                      </span>
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+
                 <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link
                     href="/register?tier=fund"

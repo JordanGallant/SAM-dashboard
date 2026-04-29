@@ -5,15 +5,15 @@ import { ArrowRight, Check, User, X, Sparkles } from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal"
 
 const bullets = [
-  "Defensible verdicts on every deck, not reactions",
-  "A searchable record of every evaluation you've made",
-  "First-call prep without the weekend homework",
-  "Structured scoring so you can compare deal twelve to deal two",
+  "Walk into every founder call with a memo already prepared.",
+  "Ask sharper questions, or confidently skip the meeting.",
+  "Remember exactly why you passed, even a year later.",
+  "Screen more inbound decks without lowering your investment discipline.",
 ]
 
 const currentState = [
   "Fifty decks a month, no associate, no framework",
-  "You pass on a deal in March — by September you've forgotten why",
+  "You passed on a deal last March. By September, you can't remember why.",
   "Your memory is not a filing system",
 ]
 
@@ -107,7 +107,7 @@ export default function ForAnglesPage() {
                       <Check className="h-5 w-5 text-[#D4FF6B] stroke-[2.5]" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">Your second opinion</p>
+                      <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">Your structured second opinion</p>
                       <p className="text-base font-heading font-semibold text-white">Memo before the first call</p>
                     </div>
                   </div>
@@ -130,10 +130,10 @@ export default function ForAnglesPage() {
                 What changes
               </div>
               <h2 className="mt-5 text-3xl md:text-4xl lg:text-5xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0A2E22]">
-                On your desk,
+                On your desk
                 <br />
                 <span className="bg-gradient-to-r from-[#0F3D2E] via-[#1A6B47] to-[#00A86B] bg-clip-text text-transparent">
-                  starting Monday.
+                  before your next founder call.
                 </span>
               </h2>
             </Reveal>
@@ -178,7 +178,7 @@ export default function ForAnglesPage() {
                   {" "}/ month.
                 </h2>
                 <p className="mt-4 text-white/65 max-w-xl mx-auto">
-                  Cancel anytime. Servers in the EU. No model training on your data.
+                  Start with your first deck and let SAM support you. Cancel anytime · EU-based processing · no model training on your decks.
                 </p>
                 <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link

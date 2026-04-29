@@ -122,9 +122,20 @@ export function Comparison() {
               ))}
             </motion.ul>
 
-            <motion.p variants={item} className="mt-10 pt-6 border-t border-white/10 text-xs md:text-sm text-white/50 font-mono leading-relaxed">
-              Sam is not a startup database (that&apos;s Dealroom). Not a CRM (Affinity). Not a data platform (PitchBook). Sam is the evaluation layer on top of the deck.
-            </motion.p>
+            <motion.div
+              variants={item}
+              className="mt-10 pt-6 border-t border-white/10"
+            >
+              <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/70 mb-3">
+                Position statement
+              </p>
+              <p className="text-xl md:text-2xl font-heading font-bold leading-snug text-white tracking-[-0.01em]">
+                Sam is not a startup database. Not a CRM. Not a data platform.{" "}
+                <span className="bg-gradient-to-r from-[#D4FF6B] via-[#C8F25F] to-[#7FD9AA] bg-clip-text text-transparent">
+                  Sam is the evaluation layer between the deck and the decision.
+                </span>
+              </p>
+            </motion.div>
           </motion.div>
 
           {/* RIGHT — lime panel + memo passport + floating chips (the composition moved from hero) */}
@@ -171,7 +182,7 @@ export function Comparison() {
                   <RingGauge score={82} size={112} />
                   <div className="flex-1">
                     <div className="inline-flex items-center rounded-md bg-[#D4FF6B]/15 ring-1 ring-[#D4FF6B]/30 px-2.5 py-1 mb-2">
-                      <span className="text-xs font-bold font-heading text-[#D4FF6B]">STRONG BUY</span>
+                      <span className="text-xs font-bold font-heading text-[#D4FF6B]">HIGH PRIORITY</span>
                     </div>
                     <p className="text-[10px] font-mono uppercase tracking-widest text-white/40 mb-0.5">Verdict</p>
                     <p className="text-[11px] text-white/70 leading-relaxed">

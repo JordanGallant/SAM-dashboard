@@ -38,6 +38,18 @@ const questions = [
     q: "Is Sam suitable for a solo angel investor, or only for funds?",
     a: "Both. The Angel tier is priced for individual investors handling their own deal flow. The Fund tier adds team accounts, priority processing, and shared memo libraries. Same framework, different workflow.",
   },
+  {
+    q: "What stages and sectors does Sam support?",
+    a: "Pre-seed through Series A across most sectors. The framework is stage-aware — pre-seed is judged on team and market signal, Series A weights traction and unit economics more heavily. Deeply regulated verticals (healthtech, defence) work, but sector-specific diligence still belongs with the human.",
+  },
+  {
+    q: "Can I export memos to my CRM, Notion, or Word?",
+    a: "Yes. Memos export as a Word document and as a shareable link. CRM-native pushes (Affinity, Hubspot) are on the roadmap.",
+  },
+  {
+    q: "What happens to my pitch deck after the analysis runs?",
+    a: "It stays in your account, encrypted at rest in the EU, until you delete it or it expires under your retention policy. It is never used for model training.",
+  },
 ]
 
 export function FAQ() {
@@ -74,15 +86,6 @@ export function FAQ() {
               <Mail className="h-3.5 w-3.5" />
               hello@sam.ai
             </a>
-
-            <div className="mt-8 flex items-center gap-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <span className="flex h-1.5 w-1.5 rounded-full bg-primary" />
-                {questions.length.toString().padStart(2, "0")} questions
-              </span>
-              <span className="text-border">·</span>
-              <span>Updated April 2026</span>
-            </div>
           </Reveal>
 
           {/* Right: accordion Q&A */}

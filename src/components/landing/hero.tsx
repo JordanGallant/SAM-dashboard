@@ -236,7 +236,7 @@ export function Hero() {
                 <div className="rounded-full bg-[#D4FF6B] shadow-xl shadow-[#D4FF6B]/30 px-3.5 py-1.5 flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-[#0A2E22]" />
                   <span className="text-[11px] font-mono uppercase tracking-widest text-[#0A2E22] font-bold">
-                    Strong Buy
+                    High Priority
                   </span>
                 </div>
               </motion.div>

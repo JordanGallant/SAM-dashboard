@@ -29,6 +29,105 @@ export default function SamplePage() {
           </div>
         </section>
 
+        {/* Live dashboard mockups — what investors actually see in product */}
+        <section className="relative py-20 md:py-24 border-b overflow-hidden bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#133F2E] text-white">
+          <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[#D4FF6B]/10 blur-3xl pointer-events-none" />
+          <div
+            className="absolute inset-0 opacity-[0.04] pointer-events-none"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
+            }}
+          />
+          <div className="relative mx-auto max-w-6xl px-4">
+            <div className="max-w-3xl mb-10 md:mb-14">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">In the dashboard</p>
+              <h2 className="mt-2 text-3xl md:text-4xl font-bold font-heading tracking-[-0.025em] leading-tight text-white">
+                The same memo,{" "}
+                <span className="bg-gradient-to-r from-[#D4FF6B] via-[#C8F25F] to-[#7FD9AA] bg-clip-text text-transparent">
+                  rendered in product.
+                </span>
+              </h2>
+              <p className="mt-4 text-base text-white/70 leading-relaxed">
+                Every memo is a structured document. You can read it as text, export it to Word, or work through each domain in the dashboard.
+              </p>
+            </div>
+
+            {/* Featured — Summary (the marquee shot) */}
+            <figure className="group mb-5 md:mb-6">
+              <div className="rounded-2xl bg-[#0F1B17]/80 ring-1 ring-white/10 shadow-2xl shadow-black/40 overflow-hidden transition-transform group-hover:-translate-y-0.5">
+                <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1A14]/80 px-4 py-2.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+                  <span className="ml-3 flex-1 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] font-mono text-white/40 truncate">
+                    sam.ai/deals/vrey/summary
+                  </span>
+                </div>
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/design/dashboard-summary.png"
+                    alt="Sam dashboard — Executive summary"
+                    className="absolute inset-0 w-full h-full object-cover object-top"
+                    loading="lazy"
+                  />
+                  {/* subtle bottom fade so the crop reads as intentional */}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0F1B17] to-transparent" />
+                </div>
+              </div>
+              <figcaption className="mt-3.5 px-1 max-w-2xl">
+                <p className="text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">
+                  Executive summary
+                </p>
+                <p className="mt-1 text-[13px] md:text-[14px] text-white/70 leading-relaxed">
+                  Overall score, verdict, radar across the five domains, and the investment thesis at a glance.
+                </p>
+              </figcaption>
+            </figure>
+
+            {/* Supporting trio — uniform tiles, top-aligned crop so heights match */}
+            <div className="grid gap-5 md:gap-6 md:grid-cols-3">
+              {[
+                { src: "/design/dashboard-team.png", slug: "team", label: "Team analysis", desc: "Founder cards with backgrounds, strengths, concerns, and red flags." },
+                { src: "/design/dashboard-market.png", slug: "market", label: "Market analysis", desc: "TAM / SAM / SOM validated, competitive landscape, market timing." },
+                { src: "/design/dashboard-finance.png", slug: "finance", label: "Financial analysis", desc: "Cash, burn, runway, valuation methods, investor signals." },
+              ].map((m) => (
+                <figure key={m.src} className="group">
+                  <div className="rounded-2xl bg-[#0F1B17]/80 ring-1 ring-white/10 shadow-2xl shadow-black/40 overflow-hidden transition-transform group-hover:-translate-y-0.5">
+                    <div className="flex items-center gap-1.5 border-b border-white/10 bg-[#0A1A14]/80 px-3 py-1.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-400/70" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-amber-400/70" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/70" />
+                      <span className="ml-2 text-[9px] font-mono text-white/35 truncate">
+                        sam.ai/deals/vrey/{m.slug}
+                      </span>
+                    </div>
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={m.src}
+                        alt={`Sam dashboard — ${m.label}`}
+                        className="absolute inset-0 w-full h-full object-cover object-top"
+                        loading="lazy"
+                      />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#0F1B17] to-transparent" />
+                    </div>
+                  </div>
+                  <figcaption className="mt-3 px-1">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">
+                      {m.label}
+                    </p>
+                    <p className="mt-1 text-[12.5px] text-white/70 leading-relaxed">{m.desc}</p>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* The memo */}
         <section className="py-16">
           <div className="mx-auto max-w-4xl px-4 space-y-6">

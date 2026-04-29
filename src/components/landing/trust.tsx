@@ -4,26 +4,26 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal"
 const pillars = [
   {
     icon: MapPin,
-    label: "EU servers only",
-    desc: "Processing and storage within the European Union — full stack, no exceptions.",
+    label: "Designed for EU processing",
+    desc: "Sam is built around EU-based processing and storage. GDPR is treated as an architectural constraint, not a compliance checkbox.",
     code: "EU-01",
   },
   {
     icon: Shield,
     label: "GDPR by design",
-    desc: "Architectural decision, not a compliance checkbox bolted on at the end.",
+    desc: "Data minimisation, retention rules, and processing scopes are baked into the framework, not bolted on afterwards.",
     code: "EU-02",
   },
   {
     icon: Lock,
-    label: "No model training",
-    desc: "Your submitted material is never used to train any model — ours or anyone else's.",
+    label: "No model training on your decks",
+    desc: "Your submitted decks are never used to train any model — ours or anyone else's.",
     code: "EU-03",
   },
   {
     icon: UserCheck,
-    label: "Built by investors",
-    desc: "Framework designed by people who have evaluated deals for a living.",
+    label: "Deletion on your schedule",
+    desc: "You set the retention window. When it ends, decks and derived artefacts are removed from storage.",
     code: "EU-04",
   },
 ]
@@ -54,11 +54,7 @@ export function Trust() {
             </h2>
 
             <p className="mt-6 text-base md:text-lg text-muted-foreground leading-relaxed">
-              Sam runs on European servers. Your pitch decks are processed there, stored there, and deleted on your schedule. No submitted material is used to train any model — ours, or anyone else&apos;s.
-            </p>
-
-            <p className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
-              The framework was designed by people who have evaluated early-stage companies for a living — not by people who studied the problem from a distance.
+              Sam is designed for EU-based processing. GDPR by design. No model training on submitted decks. Decks and derived artefacts are deleted on the retention schedule you set.
             </p>
 
             {/* Data-residency compass badge */}
@@ -74,7 +70,7 @@ export function Trust() {
                   Data in · Data out
                 </p>
                 <p className="text-sm font-mono font-bold text-[#0A2E22]">
-                  Never leaves the EU
+                  EU-based processing
                 </p>
               </div>
               <div className="flex items-center px-5 bg-[#F4FAF6]">

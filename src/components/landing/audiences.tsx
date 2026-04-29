@@ -6,6 +6,8 @@ const audiences = [
   {
     icon: User,
     label: "For angels",
+    badge: "Best for solo deal flow",
+    cta: "See the Angels workflow",
     workflow: "Solo · deck only",
     bigStat: "50+",
     bigStatLabel: "decks / month",
@@ -16,6 +18,8 @@ const audiences = [
   {
     icon: Network,
     label: "For syndicates & scouts",
+    badge: "Best for shared notes",
+    cta: "See the Pro workflow",
     workflow: "Shared notes · supporting docs",
     bigStat: "3–10",
     bigStatLabel: "partners aligned",
@@ -27,6 +31,8 @@ const audiences = [
   {
     icon: Building2,
     label: "For VC funds",
+    badge: "Best for institutional teams",
+    cta: "See the VC workflow",
     workflow: "Team seats · shared library",
     bigStat: "5+",
     bigStatLabel: "analysts · shared memos",
@@ -98,11 +104,15 @@ export function Audiences() {
                         }`}
                       />
                     </div>
-                    {featured && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-[#D4FF6B] px-2.5 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest text-[#0A2E22] shadow-md shadow-[#D4FF6B]/30">
-                        Best fit
-                      </span>
-                    )}
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest shadow-md ${
+                        featured
+                          ? "bg-[#D4FF6B] text-[#0A2E22] shadow-[#D4FF6B]/30"
+                          : "bg-[#0F3D2E]/8 text-[#0F3D2E] shadow-[#0F3D2E]/10 ring-1 ring-[#0F3D2E]/15"
+                      }`}
+                    >
+                      {a.badge}
+                    </span>
                   </div>
 
                   {/* Label */}
@@ -177,7 +187,7 @@ export function Audiences() {
                         : "text-[#0F3D2E] group-hover:text-primary"
                     }`}
                   >
-                    <span>See the workflow</span>
+                    <span>{a.cta}</span>
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 </Link>

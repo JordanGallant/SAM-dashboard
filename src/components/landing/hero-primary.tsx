@@ -15,7 +15,7 @@ const item = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } },
 }
 
-const HERO_LAPTOP_IMAGE = "/design/hero-img.png"
+const HERO_LAPTOP_IMAGE = "/design/hero-img-new.png"
 
 export function HeroPrimary() {
   const router = useRouter()
@@ -57,6 +57,14 @@ export function HeroPrimary() {
               Structured investment memos, scored across five domains — IC-ready in twelve minutes.
             </motion.p>
 
+            <motion.p variants={item} className="mt-4 inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4FF6B] opacity-60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#D4FF6B]" />
+              </span>
+              1.000+ memos generated
+            </motion.p>
+
             {/* Inline email form */}
             <motion.form
               variants={item}
@@ -90,14 +98,30 @@ export function HeroPrimary() {
             </motion.div>
           </div>
 
-          {/* RIGHT — monitor mockup (transparent PNG, no background) */}
+          {/* RIGHT — dashboard screenshot framed as a browser window */}
           <motion.div variants={item} className="relative">
-            <div className="relative aspect-[4/3] flex items-center justify-center">
+            {/* Lime ambient glow behind the window */}
+            <div className="absolute -inset-8 -z-10 rounded-[2rem] bg-[radial-gradient(ellipse_at_center,rgba(212,255,107,0.18),transparent_60%)] blur-2xl" />
+
+            <div className="relative rounded-2xl bg-[#0F1B17]/80 ring-1 ring-white/10 shadow-2xl shadow-black/50 overflow-hidden backdrop-blur">
+              {/* Browser chrome */}
+              <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1A14]/80 px-4 py-2.5">
+                <div className="flex gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+                </div>
+                <div className="ml-3 flex-1 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] font-mono text-white/40 truncate">
+                  sam.ai/deals/vrey/summary
+                </div>
+              </div>
+
+              {/* Screenshot */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={HERO_LAPTOP_IMAGE}
-                alt="Sam dashboard on a monitor"
-                className="relative w-full h-full object-contain"
+                alt="Sam dashboard — VREY memo with overall score, radar chart, and domain breakdowns"
+                className="block w-full h-auto"
               />
             </div>
           </motion.div>

@@ -8,7 +8,7 @@ const steps = [
   {
     icon: Upload,
     title: "Submit the deck",
-    body: "Upload a PDF, or forward the deck to your Sam intake address. Supporting documents — founder memos, data-room exports, financial models — can be attached alongside.",
+    body: "Upload a PDF, or forward the deck to your Sam intake address — based on your tier. Supporting documents — founder memos, data-room exports, financial models — can be attached alongside.",
   },
   {
     icon: Gauge,
@@ -22,7 +22,7 @@ const steps = [
   },
   {
     icon: Scale,
-    title: "Compare, track, decide",
+    title: "Compare, Track and prepare your next decision",
     body: "Every memo follows the same structure. Compare deal twelve to deal two. Reference the thesis you wrote six months ago. Walk into your IC with evidence, not impressions.",
   },
 ]
@@ -31,7 +31,7 @@ const domains = [
   {
     icon: Users,
     name: "Team",
-    body: "Sam evaluates founder backgrounds, complementarity, domain expertise, and execution signals. It scrapes LinkedIn and public sources for prior roles, identifies gaps in team composition, and flags founder-market fit with specifics — not \"strong team\", but \"two-thirds of the team has domain tenure, the commercial lead does not.\"",
+    body: "Sam evaluates founder backgrounds, complementarity, domain expertise, and execution signals. It can enrich with LinkedIn and public sources for prior roles, identifies gaps in team composition, and flags founder-market fit with specifics — not \"strong team\", but \"two-thirds of the team has domain tenure, the commercial lead does not.\"",
   },
   {
     icon: Globe2,
@@ -51,7 +51,7 @@ const domains = [
   {
     icon: Landmark,
     name: "Financials",
-    body: "Sam reviews the deal structure, use of funds, prior round terms, and investor signals. Valuation is benchmarked against comparable recent rounds. Deal terms are scrutinised for anomalies — unusual liquidation preferences, unrealistic multiples, aggressive dilution.",
+    body: "Sam reviews the financial narrative behind the company: business model, revenue quality, burn, runway, valuation, funding need and use of funds — highlighting what is clear, what is missing, and what needs further diligence.",
   },
 ]
 
