@@ -49,7 +49,7 @@ export default function SummaryPage() {
     const isAnalyzing = analysisStatus === "pending" || analysisStatus === "processing"
     const isFailed = analysisStatus === "failed"
     return (
-      <div className="max-w-2xl space-y-5">
+      <div className="max-w-4xl space-y-5">
         {isFailed ? (
           <div className="rounded-2xl border border-red-200 bg-red-50/60 p-8 text-center">
             <AlertCircle className="mx-auto h-6 w-6 text-red-700" />
