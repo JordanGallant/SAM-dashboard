@@ -17,6 +17,7 @@ import {
   Wallet,
   Building2,
   AlertTriangle,
+  AlertCircle,
   Lightbulb,
   ArrowRight,
   FileUp,
@@ -41,24 +42,40 @@ function scoreText(score: number) {
 
 export default function SummaryPage() {
   const params = useParams()
-  const { deal, loading, refetch, analysisStatus } = useDeal(params.dealId as string)
+  const { deal, loading, refetch, analysisStatus, analysisError } = useDeal(params.dealId as string)
   if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>
   if (!deal) return <p className="text-sm text-muted-foreground">Deal not found.</p>
   if (!deal.analysis) {
     const isAnalyzing = analysisStatus === "pending" || analysisStatus === "processing"
+    const isFailed = analysisStatus === "failed"
     return (
       <div className="max-w-2xl space-y-5">
-        <div className="rounded-2xl border border-dashed border-foreground/15 bg-muted/30 p-8 text-center">
-          <FileUp className="mx-auto h-6 w-6 text-muted-foreground/60" />
-          <h2 className="mt-3 font-heading text-lg font-bold">
-            {isAnalyzing ? "Analysis in progress" : "Awaiting analysis"}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground max-w-md mx-auto">
-            {isAnalyzing
-              ? "Your pitch deck is being analyzed. This page will update automatically when results are ready (~30 min)."
-              : "Upload a pitch deck below, then click \"Analyze pitch deck\" at the top of the page."}
-          </p>
-        </div>
+        {isFailed ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50/60 p-8 text-center">
+            <AlertCircle className="mx-auto h-6 w-6 text-red-700" />
+            <h2 className="mt-3 font-heading text-lg font-bold text-red-900">
+              Analysis failed
+            </h2>
+            <p className="mt-1 text-sm text-red-900/80 max-w-md mx-auto">
+              {analysisError || "The pipeline reported a failure but didn't include details."}
+            </p>
+            <p className="mt-3 text-xs text-red-900/70 max-w-md mx-auto">
+              Re-upload the pitch deck (or swap in a different one), then click &quot;Retry analysis&quot; at the top.
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-foreground/15 bg-muted/30 p-8 text-center">
+            <FileUp className="mx-auto h-6 w-6 text-muted-foreground/60" />
+            <h2 className="mt-3 font-heading text-lg font-bold">
+              {isAnalyzing ? "Analysis in progress" : "Awaiting analysis"}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground max-w-md mx-auto">
+              {isAnalyzing
+                ? "Your pitch deck is being analyzed. This page will update automatically when results are ready (~30 min)."
+                : "Upload a pitch deck below, then click \"Analyze pitch deck\" at the top of the page."}
+            </p>
+          </div>
+        )}
         <DealUpload dealId={deal.id} documents={deal.documents} onChange={refetch} />
       </div>
     )

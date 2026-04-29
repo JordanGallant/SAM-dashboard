@@ -9,6 +9,7 @@ import type { AnalysisStatus } from "@/lib/types/analysis"
 export function useDeal(dealId: string | undefined) {
   const [deal, setDeal] = useState<Deal | null>(null)
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus | null>(null)
+  const [analysisError, setAnalysisError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   const refetch = useCallback(async () => {
@@ -30,6 +31,7 @@ export function useDeal(dealId: string | undefined) {
     if (!dealRow) {
       setDeal(null)
       setAnalysisStatus(null)
+      setAnalysisError(null)
       setLoading(false)
       return
     }
@@ -39,6 +41,7 @@ export function useDeal(dealId: string | undefined) {
     const completedResult = status === "completed" ? analysisRow?.result ?? undefined : undefined
 
     setAnalysisStatus(status)
+    setAnalysisError(status === "failed" ? analysisRow?.error ?? null : null)
     setDeal(dbToDeal(dealRow as DbDeal, (docRows ?? []) as DbDocument[], completedResult))
     setLoading(false)
   }, [dealId])
@@ -95,5 +98,5 @@ export function useDeal(dealId: string | undefined) {
     return () => window.removeEventListener("deal:changed", onChanged)
   }, [dealId, refetch])
 
-  return { deal, loading, refetch, analysisStatus }
+  return { deal, loading, refetch, analysisStatus, analysisError }
 }
