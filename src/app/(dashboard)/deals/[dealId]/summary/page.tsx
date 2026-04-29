@@ -7,6 +7,7 @@ import { ScoreGauge } from "@/components/dashboard/score-gauge"
 import { DomainRadar } from "@/components/dashboard/domain-radar"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { DealUpload } from "@/components/deals/deal-upload"
+import { friendlyError } from "@/lib/errors"
 import { DOMAIN_VERDICT_COLORS } from "@/lib/constants"
 import type { DomainName, DomainVerdict } from "@/lib/types/analysis"
 import {
@@ -50,20 +51,25 @@ export default function SummaryPage() {
     const isFailed = analysisStatus === "failed"
     return (
       <div className="max-w-4xl space-y-5">
-        {isFailed ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50/60 p-8 text-center">
-            <AlertCircle className="mx-auto h-6 w-6 text-red-700" />
-            <h2 className="mt-3 font-heading text-lg font-bold text-red-900">
-              Analysis failed
-            </h2>
-            <p className="mt-1 text-sm text-red-900/80 max-w-md mx-auto">
-              {analysisError || "The pipeline reported a failure but didn't include details."}
-            </p>
-            <p className="mt-3 text-xs text-red-900/70 max-w-md mx-auto">
-              Re-upload the pitch deck (or swap in a different one), then click &quot;Retry analysis&quot; at the top.
-            </p>
-          </div>
-        ) : (
+        {isFailed ? (() => {
+          const fe = friendlyError(analysisError, "analysis")
+          return (
+            <div className="rounded-2xl border border-red-200 bg-red-50/60 p-8 text-center">
+              <AlertCircle className="mx-auto h-6 w-6 text-red-700" />
+              <h2 className="mt-3 font-heading text-lg font-bold text-red-900">
+                {fe.title}
+              </h2>
+              {fe.hint && (
+                <p className="mt-1 text-sm text-red-900/80 max-w-md mx-auto">
+                  {fe.hint}
+                </p>
+              )}
+              <p className="mt-3 text-xs text-red-900/70 max-w-md mx-auto">
+                Re-upload the pitch deck (or swap in a different one), then click &quot;Retry analysis&quot; at the top.
+              </p>
+            </div>
+          )
+        })() : (
           <div className="rounded-2xl border border-dashed border-foreground/15 bg-muted/30 p-8 text-center">
             <FileUp className="mx-auto h-6 w-6 text-muted-foreground/60" />
             <h2 className="mt-3 font-heading text-lg font-bold">

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, FileText, Loader2, Trash2, UploadCloud } from "lucide-react"
 import { registerDocument, deleteDocument } from "@/app/actions/documents"
 import { createClient } from "@/lib/supabase/client"
+import { friendlyError, type FriendlyError } from "@/lib/errors"
 import { cn } from "@/lib/utils"
 import type { DealDocument, DocType } from "@/lib/types/deal"
 
@@ -37,14 +38,17 @@ export function DealUpload({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [docType, setDocType] = useState<DocType>("pitch-deck")
   const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState<FriendlyError | null>(null)
   const [dragOver, setDragOver] = useState(false)
 
   async function uploadFile(file: File) {
-    setError("")
+    setError(null)
 
     if (file.size > MAX_UPLOAD_BYTES) {
-      setError(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max 50 MB.`)
+      setError(friendlyError(
+        `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max 50 MB.`,
+        "upload"
+      ))
       return
     }
 
@@ -78,7 +82,7 @@ export function DealUpload({
       onChange()
       window.dispatchEvent(new CustomEvent("deal:changed", { detail: { dealId } }))
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed")
+      setError(friendlyError(err, "upload"))
     } finally {
       setUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ""
@@ -134,7 +138,8 @@ export function DealUpload({
 
       {error && (
         <div className="rounded-md bg-red-50 ring-1 ring-red-200 p-3 text-sm text-red-700">
-          {error}
+          <p className="font-medium">{error.title}</p>
+          {error.hint && <p className="mt-0.5 text-[12.5px] text-red-700/85">{error.hint}</p>}
         </div>
       )}
 

@@ -12,6 +12,7 @@ import { STATUS_BADGE_COLORS, PIPELINE_STAGES } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { updateDealStatus } from "@/app/actions/deals"
+import { friendlyError, type FriendlyError } from "@/lib/errors"
 import type { PipelineStatus } from "@/lib/types/deal"
 import { DealBottomSheet } from "@/components/layout/deal-bottom-sheet"
 
@@ -22,7 +23,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   const { deal, loading, refetch, analysisStatus } = useDeal(dealId)
   const { config: tierConfig } = useTier()
   const [analyzing, setAnalyzing] = useState(false)
-  const [analyzeError, setAnalyzeError] = useState("")
+  const [analyzeError, setAnalyzeError] = useState<FriendlyError | null>(null)
 
   if (loading) {
     return <p className="text-sm text-muted-foreground">Loading deal...</p>
@@ -67,7 +68,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
 
   async function handleRunAnalysis() {
     setAnalyzing(true)
-    setAnalyzeError("")
+    setAnalyzeError(null)
     try {
       const res = await fetch("/api/analysis/trigger", {
         method: "POST",
@@ -76,12 +77,12 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
       })
       const data = await res.json()
       if (!res.ok) {
-        setAnalyzeError(data.error || "Failed to start analysis")
+        setAnalyzeError(friendlyError(data.error || "Failed to start analysis", "trigger"))
       } else {
         refetch()
       }
     } catch (err) {
-      setAnalyzeError(err instanceof Error ? err.message : "Network error")
+      setAnalyzeError(friendlyError(err, "trigger"))
     } finally {
       setAnalyzing(false)
     }
@@ -135,7 +136,10 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
 
       {analyzeError && (
         <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
-          {analyzeError}
+          <p className="font-medium">{analyzeError.title}</p>
+          {analyzeError.hint && (
+            <p className="mt-0.5 text-[12.5px] text-red-700/85">{analyzeError.hint}</p>
+          )}
         </div>
       )}
 
