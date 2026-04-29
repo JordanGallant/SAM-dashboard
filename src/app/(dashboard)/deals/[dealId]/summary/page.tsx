@@ -6,6 +6,7 @@ import { useDeal } from "@/hooks/use-deal"
 import { ScoreGauge } from "@/components/dashboard/score-gauge"
 import { DomainRadar } from "@/components/dashboard/domain-radar"
 import { SectionLabel } from "@/components/dashboard/section-label"
+import { DealUpload } from "@/components/deals/deal-upload"
 import { DOMAIN_VERDICT_COLORS } from "@/lib/constants"
 import type { DomainName, DomainVerdict } from "@/lib/types/analysis"
 import {
@@ -18,6 +19,7 @@ import {
   AlertTriangle,
   Lightbulb,
   ArrowRight,
+  FileUp,
   type LucideIcon,
 } from "lucide-react"
 
@@ -39,9 +41,28 @@ function scoreText(score: number) {
 
 export default function SummaryPage() {
   const params = useParams()
-  const { deal, loading } = useDeal(params.dealId as string)
+  const { deal, loading, refetch, analysisStatus } = useDeal(params.dealId as string)
   if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>
-  if (!deal?.analysis) return <p className="text-sm text-muted-foreground">No analysis yet.</p>
+  if (!deal) return <p className="text-sm text-muted-foreground">Deal not found.</p>
+  if (!deal.analysis) {
+    const isAnalyzing = analysisStatus === "pending" || analysisStatus === "processing"
+    return (
+      <div className="max-w-2xl space-y-5">
+        <div className="rounded-2xl border border-dashed border-foreground/15 bg-muted/30 p-8 text-center">
+          <FileUp className="mx-auto h-6 w-6 text-muted-foreground/60" />
+          <h2 className="mt-3 font-heading text-lg font-bold">
+            {isAnalyzing ? "Analysis in progress" : "Awaiting analysis"}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground max-w-md mx-auto">
+            {isAnalyzing
+              ? "Your pitch deck is being analyzed. This page will update automatically when results are ready (~30 min)."
+              : "Upload a pitch deck below, then click \"Analyze pitch deck\" at the top of the page."}
+          </p>
+        </div>
+        <DealUpload dealId={deal.id} documents={deal.documents} onChange={refetch} />
+      </div>
+    )
+  }
   const es = deal.analysis.executiveSummary
 
   // Distribute findings across domains by ID modulo (so every domain card feels
