@@ -66,6 +66,28 @@ const findings = (texts: (string | undefined)[], severity: Severity): FindingIte
     .filter((t) => t && !/^n\/a$/i.test(t))
     .map((text, i) => ({ id: i + 1, text, severity }))
 
+// Treat empty / N/A / dash / 0-score as "not provided". Used by pct() below.
+const isFilled = (v: unknown): boolean => {
+  if (v == null) return false
+  if (typeof v === "string") {
+    const s = v.trim()
+    if (!s) return false
+    return !/^(n\/a|none|—|-{1,2}|undisclosed|not disclosed)$/i.test(s)
+  }
+  if (typeof v === "number") return Number.isFinite(v) && v > 0
+  if (typeof v === "boolean") return v
+  if (Array.isArray(v)) return v.length > 0
+  return true
+}
+
+// Domain data completeness: integer 0–100 = percent of expected signal fields
+// that came back populated. Drives the "Data X%" chip on each domain page.
+const pct = (vals: unknown[]): number => {
+  if (vals.length === 0) return 0
+  const filled = vals.filter(isFilled).length
+  return Math.round((filled / vals.length) * 100)
+}
+
 // Parse the founders_overview_text block. Flow 8 emits one founder block
 // like the example below, with a single blank line BETWEEN sections of one
 // founder and TWO blank lines between separate founders:
@@ -165,6 +187,52 @@ export function reshapeFlatToDealAnalysis(
   const tractionScore = num(flat.traction_score)
   const financeScore = num(flat.finance_score)
 
+  // --- Per-domain data completeness ----------------------------------------
+  // Each list = the fields we expect Flow 8 to populate for that domain.
+  // "Filled" = non-empty + not N/A. The percentage is the share that came back.
+  const founders = parseFounders(flat.founders_overview_text)
+  const teamCompleteness = pct([
+    founders.length > 0,
+    flat.team_finding,
+    flat.fmf_text,
+    flat.team_dynamics_text,
+    flat.team_verdict,
+  ])
+  const marketCompleteness = pct([
+    flat.tam_val, flat.sam_val, flat.som_val,
+    flat.tam_claim, flat.sam_claim, flat.som_claim,
+    flat.market_dynamics_text,
+    flat.timing_text,
+    flat.comp_type_1, flat.comp_type_2,
+    flat.market_finding,
+  ])
+  const productCompleteness = pct([
+    flat.problem_type, flat.pain_score, flat.current_solutions, flat.pain_evidence,
+    flat.pmf_status, flat.pmf_text,
+    flat.moat_network_pres, flat.moat_data_pres, flat.moat_switch_pres, flat.moat_tech_pres,
+    flat.product_finding,
+  ])
+  const tractionCompleteness = pct([
+    flat.arr_val, flat.hist_rev_val, flat.traj_val,
+    flat.ue_ltv_val, flat.ue_cac_val, flat.ue_margin_val, flat.ue_payback_val, flat.ue_nrr_val,
+    flat.ret_nrr_val, flat.ret_logo_val, flat.ret_cohort_val,
+    flat.traction_finding,
+  ])
+  const financeCompleteness = pct([
+    flat.fin_cash_val, flat.fin_burn_val, flat.fin_runway_val, flat.fin_multiple_val,
+    flat.capital_efficiency_text,
+    flat.inv_1_name,
+    flat.val_cons_val, flat.val_mod_val, flat.val_aggr_val,
+    flat.deal_terms_text,
+    flat.finance_finding,
+  ])
+
+  // Executive-summary completeness = average across the 5 covered domains.
+  // (exitPotential / fundFit / missingInfo aren't emitted by Flow 8 today.)
+  const overallCompleteness = Math.round(
+    (teamCompleteness + marketCompleteness + productCompleteness + tractionCompleteness + financeCompleteness) / 5
+  )
+
   return {
     id: context.analysisId,
     dealId: context.dealId,
@@ -182,11 +250,11 @@ export function reshapeFlatToDealAnalysis(
       confidence: mapConfidence(flat.confidence),
       overallScore: num(flat.overall_score),
       scorecard: [
-        { domain: "Team", score: teamScore, verdict: mapDomainVerdict(flat.team_verdict), keyFinding: trim(flat.team_finding), dataCompleteness: 0 },
-        { domain: "Market", score: marketScore, verdict: mapDomainVerdict(flat.market_verdict), keyFinding: trim(flat.market_finding), dataCompleteness: 0 },
-        { domain: "Product", score: productScore, verdict: mapDomainVerdict(flat.product_verdict), keyFinding: trim(flat.product_finding), dataCompleteness: 0 },
-        { domain: "Traction", score: tractionScore, verdict: mapDomainVerdict(flat.traction_verdict), keyFinding: trim(flat.traction_finding), dataCompleteness: 0 },
-        { domain: "Finance", score: financeScore, verdict: mapDomainVerdict(flat.finance_verdict), keyFinding: trim(flat.finance_finding), dataCompleteness: 0 },
+        { domain: "Team", score: teamScore, verdict: mapDomainVerdict(flat.team_verdict), keyFinding: trim(flat.team_finding), dataCompleteness: teamCompleteness },
+        { domain: "Market", score: marketScore, verdict: mapDomainVerdict(flat.market_verdict), keyFinding: trim(flat.market_finding), dataCompleteness: marketCompleteness },
+        { domain: "Product", score: productScore, verdict: mapDomainVerdict(flat.product_verdict), keyFinding: trim(flat.product_finding), dataCompleteness: productCompleteness },
+        { domain: "Traction", score: tractionScore, verdict: mapDomainVerdict(flat.traction_verdict), keyFinding: trim(flat.traction_finding), dataCompleteness: tractionCompleteness },
+        { domain: "Finance", score: financeScore, verdict: mapDomainVerdict(flat.finance_verdict), keyFinding: trim(flat.finance_finding), dataCompleteness: financeCompleteness },
       ],
       thesis: trim(flat.investment_thesis),
       strengths: findings([flat.strength_1, flat.strength_2, flat.strength_3], "Info"),
@@ -194,14 +262,14 @@ export function reshapeFlatToDealAnalysis(
       recommendedNextSteps: [flat.next_step_1, flat.next_step_2, flat.next_step_3, flat.next_step_4]
         .map(trim)
         .filter(Boolean),
-      dataCompleteness: 0,
+      dataCompleteness: overallCompleteness,
     },
 
     team: {
       score: teamScore,
       verdict: mapDomainVerdict(flat.team_verdict),
-      dataCompleteness: 0,
-      founders: parseFounders(flat.founders_overview_text),
+      dataCompleteness: teamCompleteness,
+      founders,
       founderMarketFit: trim(flat.fmf_text),
       teamDynamics: trim(flat.team_dynamics_text),
       redFlags: findings([flat.team_redflag_1, flat.team_redflag_2, flat.team_redflag_3], "Critical"),
@@ -210,7 +278,7 @@ export function reshapeFlatToDealAnalysis(
     market: {
       score: marketScore,
       verdict: mapDomainVerdict(flat.market_verdict),
-      dataCompleteness: 0,
+      dataCompleteness: marketCompleteness,
       marketSize: [
         { metric: "TAM", founderClaim: trim(flat.tam_claim), validatedEstimate: trim(flat.tam_val), variance: trim(flat.tam_var), assessment: trim(flat.tam_assess) },
         { metric: "SAM", founderClaim: trim(flat.sam_claim), validatedEstimate: trim(flat.sam_val), variance: trim(flat.sam_var), assessment: trim(flat.sam_assess) },
@@ -231,7 +299,7 @@ export function reshapeFlatToDealAnalysis(
     product: {
       score: productScore,
       verdict: mapDomainVerdict(flat.product_verdict),
-      dataCompleteness: 0,
+      dataCompleteness: productCompleteness,
       problemType: trim(flat.problem_type),
       painScore: trim(flat.pain_score),
       currentSolutions: trim(flat.current_solutions),
@@ -256,7 +324,7 @@ export function reshapeFlatToDealAnalysis(
     traction: {
       score: tractionScore,
       verdict: mapDomainVerdict(flat.traction_verdict),
-      dataCompleteness: 0,
+      dataCompleteness: tractionCompleteness,
       revenueMetrics: [
         { metric: "ARR", value: trim(flat.arr_val), benchmark: trim(flat.arr_bench), growth: trim(flat.arr_growth), status: mapStatus(flat.arr_status) },
         { metric: "Historical Revenue", value: trim(flat.hist_rev_val), benchmark: trim(flat.hist_rev_bench), growth: trim(flat.hist_rev_growth), status: mapStatus(flat.hist_rev_status) },
@@ -282,7 +350,7 @@ export function reshapeFlatToDealAnalysis(
     finance: {
       score: financeScore,
       verdict: mapDomainVerdict(flat.finance_verdict),
-      dataCompleteness: 0,
+      dataCompleteness: financeCompleteness,
       financialHealth: [
         { metric: "Cash Position", value: trim(flat.fin_cash_val), status: mapStatus(flat.fin_cash_status) },
         { metric: "Monthly Burn", value: trim(flat.fin_burn_val), status: mapStatus(flat.fin_burn_status) },
