@@ -4,13 +4,18 @@ import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCircle2, FileText, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
 import { useUpload } from "@/components/upload-context"
+import { createClient } from "@/lib/supabase/client"
 
 const STEPS = [
+  "Uploading file",
   "Reading pitch deck",
-  "Extracting company info",
   "Creating deal",
   "Starting analysis",
 ] as const
+
+function safeName(name: string) {
+  return name.replace(/[^a-zA-Z0-9.\-_]/g, "_")
+}
 
 export default function UploadingPage() {
   const router = useRouter()
@@ -36,9 +41,25 @@ export default function UploadingPage() {
 
     ;(async () => {
       try {
-        const form = new FormData()
-        form.append("file", file)
-        const res = await fetch("/api/upload-deck", { method: "POST", body: form })
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) throw new Error("Not signed in")
+
+        // 1. Upload PDF directly to Supabase Storage. The browser's session cookie
+        //    authenticates against bucket RLS — the file body never touches Vercel.
+        const storagePath = `${user.id}/uploads/${crypto.randomUUID()}/${safeName(file.name)}`
+        const { error: upErr } = await supabase.storage
+          .from("pitch-decks")
+          .upload(storagePath, file, { contentType: "application/pdf", upsert: false })
+        if (upErr) throw new Error(upErr.message || "Upload failed")
+
+        // 2. Tell the API where to find it; server does extract + deal + n8n trigger.
+        setStepIndex(1)
+        const res = await fetch("/api/upload-deck", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ storagePath, filename: file.name, size: file.size }),
+        })
         const data = await res.json().catch(() => ({}))
 
         if (!res.ok) throw new Error(data.error || "Upload failed")

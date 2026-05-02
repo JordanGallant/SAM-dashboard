@@ -10,12 +10,7 @@ import { DEAL_STAGES } from "@/lib/constants"
 import type { DealStage } from "@/lib/types/deal"
 
 const exec = promisify(execCb)
-const MAX_BYTES = 50 * 1024 * 1024
 const MAX_TEXT_CHARS = 8000
-
-function safeName(name: string) {
-  return name.replace(/[^a-zA-Z0-9.\-_]/g, "_")
-}
 
 async function extractFirstPagesText(pdfPath: string): Promise<string> {
   const { stdout } = await exec(`pdftotext -l 3 -layout ${JSON.stringify(pdfPath)} -`, {
@@ -83,20 +78,37 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const form = await request.formData()
-    const file = form.get("file")
-    if (!(file instanceof File)) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 })
-    }
-    if (file.size > MAX_BYTES) {
-      return NextResponse.json({ error: "File too large (max 50 MB)" }, { status: 400 })
-    }
-    const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")
-    if (!isPdf) {
-      return NextResponse.json({ error: "Only PDF files are supported" }, { status: 400 })
+    const body = await request.json().catch(() => null)
+    const storagePath = typeof body?.storagePath === "string" ? body.storagePath : ""
+    const filename = typeof body?.filename === "string" ? body.filename : ""
+    const sizeBytes = typeof body?.size === "number" ? body.size : 0
+
+    if (!storagePath || !filename) {
+      return NextResponse.json(
+        { error: "storagePath and filename are required" },
+        { status: 400 }
+      )
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer())
+    // Defence in depth: ensure the path the client gave us actually belongs to this user.
+    if (!storagePath.startsWith(`${user.id}/`)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
+    // Pull the PDF down from Supabase Storage. The body never came through our function,
+    // so we don't hit Vercel's serverless body size limit.
+    const { data: blob, error: dlErr } = await supabase.storage
+      .from("pitch-decks")
+      .download(storagePath)
+
+    if (dlErr || !blob) {
+      return NextResponse.json(
+        { error: dlErr?.message || "Could not read uploaded file" },
+        { status: 400 }
+      )
+    }
+
+    const buffer = Buffer.from(await blob.arrayBuffer())
 
     tempDir = await mkdtemp(path.join(tmpdir(), "deck-"))
     const tempPath = path.join(tempDir, "deck.pdf")
@@ -131,7 +143,6 @@ export async function POST(request: Request) {
       )
     }
 
-    // Upload PDF to Storage. Path uses user id; deal id is added after deal insert.
     const { data: fund } = await supabase
       .from("funds")
       .select("id")
@@ -153,28 +164,20 @@ export async function POST(request: Request) {
       .single()
 
     if (dealErr || !deal) {
+      // Clean up the orphaned upload — no deal row to attach it to.
+      await supabase.storage.from("pitch-decks").remove([storagePath]).catch(() => {})
       return NextResponse.json(
         { error: dealErr?.message || "Failed to create deal" },
         { status: 500 }
       )
     }
 
-    const storagePath = `${user.id}/${deal.id}/${Date.now()}_${safeName(file.name)}`
-    const { error: uploadErr } = await supabase.storage
-      .from("pitch-decks")
-      .upload(storagePath, buffer, { contentType: "application/pdf", upsert: false })
-
-    if (uploadErr) {
-      await supabase.from("deals").delete().eq("id", deal.id)
-      return NextResponse.json({ error: `Upload failed: ${uploadErr.message}` }, { status: 500 })
-    }
-
     const { error: docErr } = await supabase.from("documents").insert({
       deal_id: deal.id,
-      filename: file.name,
+      filename,
       doc_type: "pitch-deck",
       storage_path: storagePath,
-      size_bytes: file.size,
+      size_bytes: sizeBytes || buffer.length,
     })
 
     if (docErr) {
@@ -215,9 +218,9 @@ export async function POST(request: Request) {
                 company_name: deal.company_name,
                 company_stage: deal.stage,
                 sender: user.email,
-                documents: [{ type: "pitch-deck", filename: file.name, url: signedUrl }],
+                documents: [{ type: "pitch-deck", filename, url: signedUrl }],
                 pdf_url: signedUrl,
-                filename: file.name,
+                filename,
                 callback_url: `${appUrl}/api/analysis/callback`,
                 callback_token: callbackToken,
               }),
@@ -254,9 +257,9 @@ export async function POST(request: Request) {
       stage: deal.stage,
     })
   } catch (err) {
-    console.error("Upload deck error", err)
+    console.error("Upload deck finalize error", err)
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Upload failed" },
+      { error: err instanceof Error ? err.message : "Finalize failed" },
       { status: 500 }
     )
   } finally {
