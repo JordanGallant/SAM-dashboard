@@ -2,7 +2,7 @@
 
 import { useState, Suspense, useMemo } from "react"
 import Link from "next/link"
-import { ArrowRight, Briefcase, Search, Trash2, X, Loader2, RefreshCw } from "lucide-react"
+import { ArrowRight, Briefcase, Search, Trash2, X, Loader2, RefreshCw, AlertCircle } from "lucide-react"
 import { DeckUploader } from "@/components/deals/deck-uploader"
 import { FundProfileBanner } from "@/components/dashboard/fund-profile-banner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -72,6 +72,31 @@ function DealsContent() {
       window.alert(`Couldn't start analysis: ${err instanceof Error ? err.message : "network error"}`)
     } finally {
       setRetryingId(null)
+    }
+  }
+
+  const failedDeals = useMemo(
+    () => deals.filter((d) => d.latestAnalysisStatus === "failed"),
+    [deals]
+  )
+
+  const [retryingAll, setRetryingAll] = useState(false)
+  async function retryAllFailed() {
+    if (retryingAll || failedDeals.length === 0) return
+    setRetryingAll(true)
+    try {
+      // Fire sequentially to be polite to the n8n queue. Errors are silently ignored
+      // — the per-row status will reflect the outcome once Realtime fires.
+      for (const d of failedDeals) {
+        await fetch("/api/analysis/trigger", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ dealId: d.id }),
+        }).catch(() => {})
+      }
+      refetch()
+    } finally {
+      setRetryingAll(false)
     }
   }
 
@@ -155,6 +180,33 @@ function DealsContent() {
 
       {!loading && deals.length === 0 && (
         <DeckUploader onCreated={() => refetch()} />
+      )}
+
+      {!loading && failedDeals.length > 0 && (
+        <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50/70 px-4 py-3 ring-1 ring-red-200">
+          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-700" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-red-900">
+              {failedDeals.length === 1 ? "1 analysis failed" : `${failedDeals.length} analyses failed`}
+            </p>
+            <p className="mt-0.5 text-[12.5px] text-red-900/80 leading-snug">
+              {failedDeals.length === 1
+                ? "Click below or use the per-deal Reanalyse button to retry."
+                : "Retry all at once or use the per-deal Reanalyse buttons below."}
+            </p>
+          </div>
+          <button
+            onClick={retryAllFailed}
+            disabled={retryingAll}
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-red-600 hover:bg-red-700 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-widest text-white transition-colors disabled:opacity-60"
+          >
+            {retryingAll ? (
+              <><Loader2 className="h-3 w-3 animate-spin" /> Retrying…</>
+            ) : (
+              <><RefreshCw className="h-3 w-3" /> Retry all</>
+            )}
+          </button>
+        </div>
       )}
 
       {!loading && deals.length > 0 && (

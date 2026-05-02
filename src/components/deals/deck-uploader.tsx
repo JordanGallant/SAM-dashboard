@@ -123,9 +123,10 @@ export function DeckUploader({
       <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
         Drag a PDF here or click to browse. We&apos;ll extract the company info and start the analysis automatically.
       </p>
-      <p className="mt-3 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+      <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-3 py-1.5 text-[11px] font-mono uppercase tracking-widest text-[#0F3D2E] shadow-sm">
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
         PDF only · Max 50 MB
-      </p>
+      </div>
 
       {error && (
         <div className="mt-5 mx-auto max-w-md rounded-xl bg-red-50 ring-1 ring-red-200 p-3 text-sm text-red-700 flex items-start gap-2">

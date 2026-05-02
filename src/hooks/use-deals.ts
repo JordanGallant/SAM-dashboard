@@ -89,5 +89,34 @@ export function useDeals() {
     refetch()
   }, [refetch])
 
+  // Realtime subscription so the deals list updates the moment n8n's callback writes
+  // a result. Without this, statuses can stay "Awaiting" until the user refreshes.
+  // Random suffix avoids channel collisions when the page mounts twice.
+  useEffect(() => {
+    const supabase = createClient()
+    const channelName = `deals-list-${Math.random().toString(36).slice(2, 10)}`
+    const channel = supabase
+      .channel(channelName)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "analyses" },
+        () => refetch()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "deals" },
+        () => refetch()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "documents" },
+        () => refetch()
+      )
+      .subscribe()
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [refetch])
+
   return { deals, loading, refetch }
 }
