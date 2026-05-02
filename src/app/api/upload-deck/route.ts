@@ -217,6 +217,7 @@ export async function POST(request: Request) {
                 company_name: deal.company_name,
                 company_stage: deal.stage,
                 sender: user.email,
+                source: "portal",
                 documents: [{ type: "pitch-deck", filename, url: signedUrl }],
                 pdf_url: signedUrl,
                 filename,

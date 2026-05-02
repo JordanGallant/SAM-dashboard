@@ -116,6 +116,7 @@ export async function POST(request: Request) {
       company_name: deal.company_name,
       company_stage: deal.stage,
       sender: user.email,
+      source: "portal",
       documents: signedDocs,
       pdf_url: signedDocs[0]?.url,
       filename: signedDocs[0]?.filename,
