@@ -175,13 +175,22 @@ export async function POST(request: Request) {
       // Non-fatal: deal exists, file uploaded. User can re-trigger from deal page.
     }
 
+    // Demo accounts skip the n8n pipeline entirely — they still get a deal row + file in storage,
+    // but no LLM spend and (critically) no Flow 8 report email that would loop back into the
+    // Gmail inbox n8n is polling.
+    const demoEmails = (process.env.DEMO_EMAILS || "admin@sam.com")
+      .split(",")
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean)
+    const isDemo = user.email ? demoEmails.includes(user.email.toLowerCase()) : false
+
     // Trigger analysis. Reuse the same shape as /api/analysis/trigger so n8n side is unchanged.
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://test.jgsleepy.xyz"
     const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL
     const n8nToken = process.env.N8N_WEBHOOK_TOKEN
     const callbackToken = process.env.ANALYSIS_CALLBACK_TOKEN
 
-    if (n8nWebhookUrl && n8nToken && callbackToken) {
+    if (!isDemo && n8nWebhookUrl && n8nToken && callbackToken) {
       const { data: analysis } = await supabase
         .from("analyses")
         .insert({ deal_id: deal.id, status: "pending" })

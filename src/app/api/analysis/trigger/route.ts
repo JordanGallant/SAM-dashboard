@@ -15,6 +15,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Demo accounts must not fire n8n — same loop-prevention logic as /api/upload-deck.
+    const demoEmails = (process.env.DEMO_EMAILS || "admin@sam.com")
+      .split(",")
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean)
+    if (user.email && demoEmails.includes(user.email.toLowerCase())) {
+      return NextResponse.json(
+        { error: "Demo accounts can't run real analyses." },
+        { status: 403 }
+      )
+    }
+
     const { data: deal, error: dealErr } = await supabase
       .from("deals")
       .select("id, company_name, stage, user_id")
