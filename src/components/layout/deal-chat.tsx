@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils"
 
 type Msg = { who: "user" | "sam"; text: string }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 function dealIdFromPath(pathname: string) {
   const m = pathname.match(/\/deals\/([^/]+)/)
-  return m?.[1]
+  return m && UUID_RE.test(m[1]) ? m[1] : undefined
 }
 
 export function DealChat() {

@@ -1,22 +1,18 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { exec as execCb } from "node:child_process"
-import { promisify } from "node:util"
-import { writeFile, unlink, mkdtemp } from "node:fs/promises"
-import { tmpdir } from "node:os"
-import path from "node:path"
+import { extractText, getDocumentProxy } from "unpdf"
 import OpenAI from "openai"
 import { DEAL_STAGES } from "@/lib/constants"
 import type { DealStage } from "@/lib/types/deal"
 
-const exec = promisify(execCb)
 const MAX_TEXT_CHARS = 8000
 
-async function extractFirstPagesText(pdfPath: string): Promise<string> {
-  const { stdout } = await exec(`pdftotext -l 3 -layout ${JSON.stringify(pdfPath)} -`, {
-    maxBuffer: 2 * 1024 * 1024,
-  })
-  return stdout.slice(0, MAX_TEXT_CHARS)
+async function extractFirstPagesText(buffer: Buffer): Promise<string> {
+  // unpdf is pure-JS — runs on Vercel serverless without binaries.
+  const pdf = await getDocumentProxy(new Uint8Array(buffer))
+  const { text } = await extractText(pdf, { mergePages: false })
+  const pages = Array.isArray(text) ? text : [String(text)]
+  return pages.slice(0, 3).join("\n").slice(0, MAX_TEXT_CHARS)
 }
 
 async function extractDealMeta(deckText: string): Promise<{ companyName: string; stage: DealStage }> {
@@ -67,8 +63,6 @@ async function extractDealMeta(deckText: string): Promise<{ companyName: string;
 }
 
 export async function POST(request: Request) {
-  let tempDir: string | null = null
-
   try {
     const supabase = await createClient()
     const {
@@ -110,15 +104,11 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await blob.arrayBuffer())
 
-    tempDir = await mkdtemp(path.join(tmpdir(), "deck-"))
-    const tempPath = path.join(tempDir, "deck.pdf")
-    await writeFile(tempPath, buffer)
-
     let deckText: string
     try {
-      deckText = await extractFirstPagesText(tempPath)
+      deckText = await extractFirstPagesText(buffer)
     } catch (err) {
-      console.error("pdftotext failed", err)
+      console.error("PDF extract failed", err)
       return NextResponse.json(
         { error: "Failed to read PDF. The file may be corrupted or password-protected." },
         { status: 400 }
@@ -262,11 +252,5 @@ export async function POST(request: Request) {
       { error: err instanceof Error ? err.message : "Finalize failed" },
       { status: 500 }
     )
-  } finally {
-    if (tempDir) {
-      try {
-        await unlink(path.join(tempDir, "deck.pdf"))
-      } catch {}
-    }
   }
 }
