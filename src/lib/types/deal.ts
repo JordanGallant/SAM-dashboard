@@ -1,4 +1,4 @@
-import type { DealAnalysis } from "./analysis"
+import type { DealAnalysis, AnalysisStatus } from "./analysis"
 
 export type PipelineStatus = "New" | "Reviewing" | "First Call" | "DD" | "Passed" | "Invested"
 export type DealStage = "Pre-seed" | "Seed" | "Series A" | "Series B+"
@@ -22,6 +22,9 @@ export interface Deal {
   tags: string[]
   documents: DealDocument[]
   analysis?: DealAnalysis
+  latestAnalysisStatus?: AnalysisStatus
+  latestAnalysisStartedAt?: string
+  latestAnalysisError?: string
   createdAt: string
   updatedAt: string
 }

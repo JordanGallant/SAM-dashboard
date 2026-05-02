@@ -167,7 +167,19 @@ export function DealChat() {
               {m.text}
             </div>
           ))}
-          {messages.length === 1 && (
+          {sending && (
+            <div
+              className="max-w-[85%] rounded-2xl rounded-bl-sm bg-[#F4FAF6] ring-1 ring-[#0F3D2E]/5 px-3 py-2.5"
+              aria-label="SAM is typing"
+            >
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#0F3D2E]/50 animate-bounce" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#0F3D2E]/50 animate-bounce [animation-delay:150ms]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#0F3D2E]/50 animate-bounce [animation-delay:300ms]" />
+              </span>
+            </div>
+          )}
+          {messages.length === 1 && !sending && (
             <div className="mt-3 space-y-1.5">
               <div className="flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
                 <Sparkles className="h-3 w-3 text-primary" />

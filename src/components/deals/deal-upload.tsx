@@ -12,7 +12,8 @@ import { cn } from "@/lib/utils"
 import type { DealDocument, DocType } from "@/lib/types/deal"
 
 const MAX_UPLOAD_BYTES = 50 * 1024 * 1024 // 50 MB cap to keep storage costs sane
-const ACCEPTED = ".pdf,.docx,.txt,.md"
+const ACCEPTED = ".pdf"
+const ACCEPTED_MIME = "application/pdf"
 
 function safeName(name: string) {
   return name.replace(/[^a-zA-Z0-9.\-_]/g, "_")
@@ -43,6 +44,15 @@ export function DealUpload({
 
   async function uploadFile(file: File) {
     setError(null)
+
+    const isPdf = file.type === ACCEPTED_MIME || file.name.toLowerCase().endsWith(".pdf")
+    if (!isPdf) {
+      setError(friendlyError(
+        `Only PDF files are supported. "${file.name}" is not a PDF.`,
+        "upload"
+      ))
+      return
+    }
 
     if (file.size > MAX_UPLOAD_BYTES) {
       setError(friendlyError(
@@ -116,7 +126,7 @@ export function DealUpload({
             Pitch Deck &amp; Supporting Documents
           </h3>
           <p className="mt-1 text-[12.5px] text-muted-foreground max-w-md">
-            Upload the pitch deck first. Transcripts and DD docs are optional but improve analysis quality.
+            Upload the pitch deck as a <span className="font-semibold">PDF</span>. Transcripts and DD documents are optional and must also be PDFs.
           </p>
         </div>
         <div className="flex flex-col gap-1 shrink-0">
@@ -190,7 +200,7 @@ export function DealUpload({
           {uploading ? "Uploading…" : "Drop a file here, or click to browse"}
         </p>
         <p className="mt-1.5 text-[12px] md:text-[13px] text-muted-foreground max-w-md">
-          Accepted: PDF, DOCX, TXT, MD · Max 50&nbsp;MB
+          PDF only · Max 50&nbsp;MB
         </p>
         <Button
           variant="outline"

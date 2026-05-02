@@ -142,7 +142,7 @@ export default function FundProfilePage() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Check size (EUR)</Label>
+            <Label>Ticket size (EUR)</Label>
             <p className="text-xs text-muted-foreground">
               The range you typically invest per deal. Used to flag deals where the raise size is a poor fit.
             </p>

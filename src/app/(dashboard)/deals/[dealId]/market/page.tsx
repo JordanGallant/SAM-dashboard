@@ -7,6 +7,7 @@ import { SectionLabel } from "@/components/dashboard/section-label"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
 import { THREAT_COLORS, DOMAIN_VERDICT_COLORS } from "@/lib/constants"
 import { Globe, Clock, Swords } from "lucide-react"
+import { DomainSources } from "@/components/dashboard/domain-sources"
 import type { DomainVerdict } from "@/lib/types/analysis"
 
 function leadSplit(text: string): { lead: string; rest: string } {
@@ -55,7 +56,7 @@ export default function MarketPage() {
   const competitors = market.competitors.filter((c) => c.name)
 
   return (
-    <div className="space-y-7 max-w-4xl">
+    <div className="space-y-7 max-w-5xl">
       <SectionHeader
         title="Market Analysis"
         score={market.score}
@@ -79,12 +80,12 @@ export default function MarketPage() {
             return (
               <div
                 key={row.metric}
-                className={`grid grid-cols-[64px_1fr_1fr_88px] md:grid-cols-[80px_1fr_1fr_96px] items-center gap-x-4 px-5 md:px-6 py-4 ${
+                className={`grid grid-cols-[56px_1fr_auto] md:grid-cols-[72px_minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-x-4 gap-y-2 px-5 md:px-6 py-4 ${
                   i > 0 ? "border-t border-foreground/10" : ""
                 }`}
               >
                 {/* Metric tag */}
-                <div className="font-heading text-[14px] font-bold tracking-wide text-foreground">
+                <div className="font-heading text-[14px] font-bold tracking-wide text-foreground pt-0.5">
                   {row.metric}
                 </div>
 
@@ -93,29 +94,28 @@ export default function MarketPage() {
                   <p className="text-[9px] font-mono uppercase tracking-widest text-foreground/50 font-bold">
                     Claim
                   </p>
-                  <p className="mt-0.5 font-mono text-[14px] tabular-nums text-foreground/70 truncate">
+                  <p className="mt-0.5 font-mono text-[13.5px] tabular-nums text-foreground/70 break-words">
                     {row.founderClaim || "—"}
                   </p>
                 </div>
 
                 {/* Validated */}
-                <div className="min-w-0">
+                <div className="min-w-0 col-span-2 md:col-span-1">
                   <p className="text-[9px] font-mono uppercase tracking-widest text-primary font-bold">
                     Validated
                   </p>
-                  <p className="mt-0.5 font-heading text-[16px] font-bold tabular-nums text-foreground truncate">
+                  <p className="mt-0.5 font-heading text-[15px] font-bold tabular-nums text-foreground break-words leading-snug">
                     {row.validatedEstimate || "—"}
                   </p>
                 </div>
 
                 {/* Variance chip */}
-                <div className="justify-self-end">
+                <div className="justify-self-end self-start pt-0.5">
                   <span
-                    className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-mono font-bold tabular-nums ring-1 ${chip}`}
+                    className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-mono font-bold tabular-nums ring-1 whitespace-nowrap ${chip}`}
                   >
                     {arrow}
-                    <span className="hidden md:inline">{row.variance || "N/A"}</span>
-                    <span className="md:hidden">{(row.variance || "N/A").replace(/\s+/g, "")}</span>
+                    {row.variance || "N/A"}
                   </span>
                 </div>
               </div>
@@ -127,7 +127,7 @@ export default function MarketPage() {
       {/* Dynamics + Why Now */}
       <section>
         <SectionLabel className="mb-3">Market Context</SectionLabel>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2">
           <InsightBlock
             icon={<Globe className="h-4 w-4" />}
             label="Market dynamics"
@@ -190,6 +190,8 @@ export default function MarketPage() {
       )}
 
       <RedFlagsList items={market.redFlags} />
+
+      <DomainSources documents={deal?.documents} generatedAt={deal?.analysis?.createdAt} />
     </div>
   )
 }
@@ -229,11 +231,11 @@ function InsightBlock({
           </span>
         )}
       </div>
-      <p className="mt-3 text-[15px] leading-[1.5] font-medium text-foreground tracking-[-0.005em] max-w-[55ch]">
+      <p className="mt-3 text-[15px] leading-[1.5] font-medium text-foreground tracking-[-0.005em]">
         {emphasize(lead)}
       </p>
       {rest && (
-        <p className="mt-2.5 text-[13px] leading-[1.7] text-foreground/70 max-w-[60ch]">
+        <p className="mt-2.5 text-[13px] leading-[1.7] text-foreground/70">
           {emphasize(rest)}
         </p>
       )}

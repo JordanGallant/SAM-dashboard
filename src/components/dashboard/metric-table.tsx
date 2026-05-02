@@ -65,7 +65,9 @@ export function MetricTable({
                 </td>
               )}
               <td className="px-3 py-3">{statusIcons[row.status]}</td>
-              <td className="px-4 py-3 text-[13px] text-muted-foreground leading-relaxed">{row.statusNote ?? ""}</td>
+              <td className="px-4 py-3 text-[13px] text-muted-foreground leading-relaxed">
+                {row.statusNote && row.statusNote.trim() ? row.statusNote : <span className="text-muted-foreground/50">—</span>}
+              </td>
             </tr>
           ))}
         </tbody>

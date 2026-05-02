@@ -6,6 +6,7 @@ import { SectionHeader } from "@/components/dashboard/section-header"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { MetricTable } from "@/components/dashboard/metric-table"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
+import { DomainSources } from "@/components/dashboard/domain-sources"
 import { useDeal } from "@/hooks/use-deal"
 
 export default function ExitPage() {
@@ -40,6 +41,8 @@ export default function ExitPage() {
       </Card>
 
       <RedFlagsList items={exit.redFlags} />
+
+      <DomainSources documents={deal?.documents} generatedAt={deal?.analysis?.createdAt} />
     </div>
   )
 }

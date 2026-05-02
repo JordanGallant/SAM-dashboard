@@ -5,8 +5,29 @@ import { useDeal } from "@/hooks/use-deal"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
-import { ExternalLink, Sparkles, AlertTriangle, Users, Handshake, Search } from "lucide-react"
+import { Sparkles, AlertTriangle, Users, Handshake } from "lucide-react"
+import { DomainSources, type ExternalSource } from "@/components/dashboard/domain-sources"
 import type { FounderRow } from "@/lib/types/analysis"
+
+// Brand glyphs (lucide doesn't ship these). Sized via the parent's font-size or className.
+function LinkedInGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
+      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12Zm1.78 13.02H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
+    </svg>
+  )
+}
+
+function GoogleGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className}>
+      <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47a5.54 5.54 0 0 1-2.4 3.63v3.02h3.88c2.27-2.09 3.54-5.17 3.54-8.89Z" />
+      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.94-2.92l-3.88-3.02c-1.08.72-2.45 1.16-4.06 1.16-3.13 0-5.78-2.11-6.73-4.96H1.27v3.11A11.99 11.99 0 0 0 12 24Z" />
+      <path fill="#FBBC05" d="M5.27 14.26a7.21 7.21 0 0 1 0-4.51V6.64H1.27a12.04 12.04 0 0 0 0 10.73l4-3.11Z" />
+      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.95 1.18 15.24 0 12 0 7.36 0 3.36 2.69 1.27 6.64l4 3.11C6.22 6.86 8.87 4.75 12 4.75Z" />
+    </svg>
+  )
+}
 
 function profileUrl(founder: FounderRow, companyName: string | undefined) {
   if (founder.linkedinUrl) return { href: founder.linkedinUrl, kind: "linkedin" as const }
@@ -111,6 +132,18 @@ export default function TeamPage() {
 
       {/* Red Flags */}
       <RedFlagsList items={team.redFlags} />
+
+      <DomainSources
+        documents={deal?.documents}
+        externalLinks={founders
+          .filter((f) => f.linkedinUrl)
+          .map<ExternalSource>((f) => ({
+            label: `${f.name} — LinkedIn`,
+            url: f.linkedinUrl as string,
+            kind: "linkedin",
+          }))}
+        generatedAt={deal?.analysis?.createdAt}
+      />
     </div>
   )
 }
@@ -126,8 +159,8 @@ function FounderCard({
   companyName?: string
 }) {
   const link = profileUrl(f, companyName)
-  const linkLabel = link.kind === "linkedin" ? "View LinkedIn" : "Search on Google"
-  const LinkIcon = link.kind === "linkedin" ? ExternalLink : Search
+  const isLinkedIn = link.kind === "linkedin"
+  const linkLabel = isLinkedIn ? "View LinkedIn" : "Search on Google"
   return (
     <article className="group relative rounded-2xl bg-card ring-1 ring-foreground/10 hover:ring-foreground/20 transition-shadow hover:shadow-sm overflow-hidden">
       <div className="p-5">
@@ -149,10 +182,16 @@ function FounderCard({
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+                className={`shrink-0 inline-flex items-center transition-colors ${
+                  isLinkedIn ? "text-[#0A66C2] hover:text-[#084c92]" : "text-muted-foreground hover:text-foreground"
+                }`}
                 title={linkLabel}
               >
-                <LinkIcon className="h-3.5 w-3.5" />
+                {isLinkedIn ? (
+                  <LinkedInGlyph className="h-3.5 w-3.5" />
+                ) : (
+                  <GoogleGlyph className="h-3.5 w-3.5" />
+                )}
               </a>
             </div>
             {f.role && (
@@ -207,10 +246,16 @@ function FounderCard({
           href={link.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+          className={`mt-4 inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
+            isLinkedIn ? "text-[#0A66C2] hover:text-[#084c92]" : "text-muted-foreground hover:text-foreground"
+          }`}
         >
+          {isLinkedIn ? (
+            <LinkedInGlyph className="h-3 w-3" />
+          ) : (
+            <GoogleGlyph className="h-3 w-3" />
+          )}
           {linkLabel}
-          <LinkIcon className="h-3 w-3" />
         </a>
       </div>
     </article>

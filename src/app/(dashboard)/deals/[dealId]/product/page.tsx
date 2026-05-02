@@ -6,7 +6,8 @@ import { SectionHeader } from "@/components/dashboard/section-header"
 import { MetricTable } from "@/components/dashboard/metric-table"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
 import { InsightBlock, EditorialCard, leadSplit, emphasize } from "@/components/dashboard/editorial"
-import { Sparkles, Shield, Target, AlertCircle, Check, X, Hourglass } from "lucide-react"
+import { DomainSources } from "@/components/dashboard/domain-sources"
+import { Sparkles, Shield, Target, Check, X, Hourglass } from "lucide-react"
 
 const PROBLEM_TYPE_TONE: Record<string, { dot: string; chip: string }> = {
   "Hair on Fire": { dot: "bg-red-500", chip: "bg-red-50 text-red-700 ring-red-200" },
@@ -63,7 +64,7 @@ export default function ProductPage() {
               <p className="text-[10px] font-mono uppercase tracking-widest font-bold text-foreground/55 mb-1.5">
                 Evidence of pain
               </p>
-              <p className="text-[14px] leading-[1.65] text-foreground/85 max-w-[60ch]">
+              <p className="text-[14px] leading-[1.65] text-foreground/85">
                 {emphasize(product.evidenceOfPain)}
               </p>
             </div>
@@ -74,7 +75,7 @@ export default function ProductPage() {
               <p className="text-[10px] font-mono uppercase tracking-widest font-bold text-foreground/55 mb-1.5">
                 Current solutions
               </p>
-              <p className="text-[13.5px] leading-[1.65] text-foreground/75 max-w-[60ch]">
+              <p className="text-[13.5px] leading-[1.65] text-foreground/75">
                 {emphasize(product.currentSolutions)}
               </p>
             </div>
@@ -116,12 +117,12 @@ export default function ProductPage() {
               return (
                 <div
                   key={m.type}
-                  className="rounded-2xl bg-card ring-1 ring-foreground/10 p-4"
+                  className="flex flex-col rounded-2xl bg-card ring-1 ring-foreground/10 p-4"
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-2 min-h-[24px]">
+                    <div className="flex items-center gap-2 min-w-0">
                       <span
-                        className={`grid place-items-center h-6 w-6 rounded-md ${
+                        className={`shrink-0 grid place-items-center h-6 w-6 rounded-md ${
                           m.present
                             ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
                             : m.strength > 0
@@ -131,11 +132,11 @@ export default function ProductPage() {
                       >
                         <StatusIcon className="h-3 w-3" />
                       </span>
-                      <span className="text-[13.5px] font-heading font-bold leading-none">
+                      <span className="text-[13.5px] font-heading font-bold leading-tight truncate">
                         {m.type}
                       </span>
                     </div>
-                    <span className="font-mono text-[11px] tabular-nums text-foreground/70">
+                    <span className="shrink-0 font-mono text-[11px] tabular-nums text-foreground/70">
                       {m.strength}/10
                     </span>
                   </div>
@@ -164,15 +165,9 @@ export default function ProductPage() {
         </EditorialCard>
       )}
 
-      {product.redFlags.length > 0 && (
-        <div className="flex items-center gap-2">
-          <AlertCircle className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-foreground/60">
-            Risk flags
-          </span>
-        </div>
-      )}
       <RedFlagsList items={product.redFlags} />
+
+      <DomainSources documents={deal?.documents} generatedAt={deal?.analysis?.createdAt} />
     </div>
   )
 }

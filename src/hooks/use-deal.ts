@@ -37,11 +37,23 @@ export function useDeal(dealId: string | undefined) {
     }
 
     const analysisRow = latestAnalysis as DbAnalysis | null
-    const status = analysisRow?.status ?? null
-    const completedResult = status === "completed" ? analysisRow?.result ?? undefined : undefined
+    let status = analysisRow?.status ?? null
+    let derivedError = status === "failed" ? analysisRow?.error ?? null : null
+
+    // Read-time stale detector: pending/processing > 1h is treated as failed.
+    if (
+      (status === "pending" || status === "processing") &&
+      analysisRow?.created_at &&
+      Date.now() - new Date(analysisRow.created_at).getTime() > 60 * 60 * 1000
+    ) {
+      status = "failed"
+      derivedError = derivedError ?? "Analysis stalled — no callback received within 1 hour"
+    }
+
+    const completedResult = analysisRow?.status === "completed" ? analysisRow?.result ?? undefined : undefined
 
     setAnalysisStatus(status)
-    setAnalysisError(status === "failed" ? analysisRow?.error ?? null : null)
+    setAnalysisError(derivedError)
     setDeal(dbToDeal(dealRow as DbDeal, (docRows ?? []) as DbDocument[], completedResult))
     setLoading(false)
   }, [dealId])

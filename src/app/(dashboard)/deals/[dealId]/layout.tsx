@@ -5,7 +5,7 @@ import { usePathname, useParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Play, Loader2, ArrowLeft, Lock } from "lucide-react"
+import { Play, Loader2, ArrowLeft, Lock, Download } from "lucide-react"
 import { useTier } from "@/lib/tier-context"
 import { useDeal } from "@/hooks/use-deal"
 import { STATUS_BADGE_COLORS, PIPELINE_STAGES } from "@/lib/constants"
@@ -24,6 +24,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   const { config: tierConfig } = useTier()
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState<FriendlyError | null>(null)
+  const [downloading, setDownloading] = useState(false)
 
   if (loading) {
     return <p className="text-sm text-muted-foreground">Loading deal...</p>
@@ -64,6 +65,35 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   async function handleStatusChange(status: string | null) {
     if (!status) return
     await updateDealStatus(dealId, status as PipelineStatus)
+  }
+
+  async function handleDownload() {
+    if (downloading || !deal) return
+    setDownloading(true)
+    try {
+      const res = await fetch("/api/export/word", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dealId }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || "Download failed")
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `${deal.companyName.replace(/[^a-zA-Z0-9]/g, "_")}_analysis.docx`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setAnalyzeError(friendlyError(err, "trigger"))
+    } finally {
+      setDownloading(false)
+    }
   }
 
   async function handleRunAnalysis() {
@@ -129,6 +159,23 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
             >
               {analyzing ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-2 h-3.5 w-3.5" />}
               {analyzing ? "Starting..." : analysisStatus === "failed" ? "Retry analysis" : "Analyze pitch deck"}
+            </Button>
+          )}
+          {analysis && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleDownload}
+              disabled={downloading}
+              className="ml-auto"
+              title="Download analysis as a Word document"
+            >
+              {downloading ? (
+                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-3.5 w-3.5" />
+              )}
+              {downloading ? "Preparing…" : "Download"}
             </Button>
           )}
         </div>

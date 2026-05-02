@@ -1,12 +1,14 @@
 "use client"
 
 
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useDeal } from "@/hooks/use-deal"
 import { ScoreGauge } from "@/components/dashboard/score-gauge"
 import { DomainRadar } from "@/components/dashboard/domain-radar"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { DealUpload } from "@/components/deals/deal-upload"
+import { DomainSources, type ExternalSource } from "@/components/dashboard/domain-sources"
 import { friendlyError } from "@/lib/errors"
 import { DOMAIN_VERDICT_COLORS } from "@/lib/constants"
 import type { DomainName, DomainVerdict } from "@/lib/types/analysis"
@@ -102,7 +104,16 @@ export default function SummaryPage() {
     .sort((a, b) => (SEV_WEIGHT[b.severity] ?? 0) - (SEV_WEIGHT[a.severity] ?? 0))
     .slice(0, 4)
 
+  const founderLinks = (deal.analysis.team?.founders ?? [])
+    .filter((f) => f.linkedinUrl)
+    .map<ExternalSource>((f) => ({
+      label: `${f.name} — LinkedIn`,
+      url: f.linkedinUrl as string,
+      kind: "linkedin",
+    }))
+
   return (
+    <div className="space-y-6">
     <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
       {/* Left rail — sticky company card + gauge + radar + scorecard list */}
       <aside className="lg:sticky lg:top-4 self-start space-y-5">
@@ -126,11 +137,7 @@ export default function SummaryPage() {
         <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5">
           <div className="flex flex-col items-center">
             <ScoreGauge score={es.overallScore} size={150} />
-            <span className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-700 font-mono text-[10px] uppercase tracking-widest font-bold">
-              <span className="h-1.5 w-1.5 rounded-full bg-red-600" />
-              {es.verdict}
-            </span>
-            <p className="mt-2 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+            <p className="mt-3 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
               {es.confidence} confidence · Data {es.dataCompleteness}%
             </p>
           </div>
@@ -166,6 +173,7 @@ export default function SummaryPage() {
           const dv = DOMAIN_VERDICT_COLORS[row.verdict as DomainVerdict]
           const strengths = findingsForDomain(i, "strength")
           const risks = findingsForDomain(i, "risk")
+          const slug = row.domain.toLowerCase()
           return (
             <section
               key={row.domain}
@@ -177,9 +185,12 @@ export default function SummaryPage() {
                     <Icon className="h-4 w-4 text-primary" />
                   </div>
                   <div>
-                    <h2 className="font-heading text-[17px] font-bold leading-tight">
+                    <Link
+                      href={`/deals/${deal.id}/${slug}`}
+                      className="font-heading text-[17px] font-bold leading-tight hover:text-primary hover:underline underline-offset-4 decoration-primary/40 transition-colors inline-block"
+                    >
                       {row.domain}
-                    </h2>
+                    </Link>
                     <span
                       className={`mt-0.5 inline-flex rounded px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider ${dv.bg} ${dv.text}`}
                     >
@@ -300,6 +311,8 @@ export default function SummaryPage() {
           </section>
         )}
       </div>
+    </div>
+    <DomainSources documents={deal.documents} externalLinks={founderLinks} generatedAt={deal.analysis.createdAt} />
     </div>
   )
 }

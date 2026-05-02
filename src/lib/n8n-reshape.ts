@@ -18,6 +18,15 @@ const num = (s: string | undefined, fallback = 0): number => {
   return Number.isFinite(n) ? n : fallback
 }
 
+// Score helper: clamps any incoming value to 0–100. Catches LLM oddities like
+// "110/10" or out-of-range outputs that produced invalid scorecards before.
+const score = (s: string | undefined): number => {
+  const n = num(s)
+  if (n < 0) return 0
+  if (n > 100) return 100
+  return n
+}
+
 const trim = (s: string | undefined) => (s ?? "").trim()
 
 const mapDomainVerdict = (s: string | undefined): DomainVerdict => {
@@ -66,13 +75,18 @@ const findings = (texts: (string | undefined)[], severity: Severity): FindingIte
     .filter((t) => t && !/^n\/a$/i.test(t))
     .map((text, i) => ({ id: i + 1, text, severity }))
 
-// Treat empty / N/A / dash / 0-score as "not provided". Used by pct() below.
+// Treat empty / N/A / dash / 0-score / common placeholder phrases as "not provided".
+// Used by pct() below — the previous version under-counted gaps because the LLM
+// often returns "TBD" / "Unknown" / "Not specified" instead of leaving fields blank,
+// which inflated dataCompleteness toward 100% even when the deck had nothing useful.
+const PLACEHOLDER_RE = /^(n\/a|none|—|-{1,2}|undisclosed|not disclosed|tbd|tba|unknown|not specified|not provided|not available|not yet|pending|info missing|missing|no data|unspecified|undetermined|to be determined|\?+)$/i
+
 const isFilled = (v: unknown): boolean => {
   if (v == null) return false
   if (typeof v === "string") {
     const s = v.trim()
     if (!s) return false
-    return !/^(n\/a|none|—|-{1,2}|undisclosed|not disclosed)$/i.test(s)
+    return !PLACEHOLDER_RE.test(s)
   }
   if (typeof v === "number") return Number.isFinite(v) && v > 0
   if (typeof v === "boolean") return v
@@ -181,11 +195,11 @@ export function reshapeFlatToDealAnalysis(
 ): DealAnalysis {
   const now = context.createdAt ?? new Date().toISOString()
 
-  const teamScore = num(flat.team_score)
-  const marketScore = num(flat.market_score)
-  const productScore = num(flat.product_score)
-  const tractionScore = num(flat.traction_score)
-  const financeScore = num(flat.finance_score)
+  const teamScore = score(flat.team_score)
+  const marketScore = score(flat.market_score)
+  const productScore = score(flat.product_score)
+  const tractionScore = score(flat.traction_score)
+  const financeScore = score(flat.finance_score)
 
   // --- Per-domain data completeness ----------------------------------------
   // Each list = the fields we expect Flow 8 to populate for that domain.
@@ -248,7 +262,7 @@ export function reshapeFlatToDealAnalysis(
       mrr: trim(flat.MRR ?? flat.arr_val),
       verdict: mapVerdict(flat.verdict),
       confidence: mapConfidence(flat.confidence),
-      overallScore: num(flat.overall_score),
+      overallScore: score(flat.overall_score),
       scorecard: [
         { domain: "Team", score: teamScore, verdict: mapDomainVerdict(flat.team_verdict), keyFinding: trim(flat.team_finding), dataCompleteness: teamCompleteness },
         { domain: "Market", score: marketScore, verdict: mapDomainVerdict(flat.market_verdict), keyFinding: trim(flat.market_finding), dataCompleteness: marketCompleteness },

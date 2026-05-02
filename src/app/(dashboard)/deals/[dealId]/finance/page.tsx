@@ -6,6 +6,7 @@ import { SectionHeader } from "@/components/dashboard/section-header"
 import { MetricTable } from "@/components/dashboard/metric-table"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
 import { InsightBlock, EditorialCard, leadSplit, emphasize } from "@/components/dashboard/editorial"
+import { DomainSources } from "@/components/dashboard/domain-sources"
 import { Coins, Banknote, Users, Calculator, Handshake } from "lucide-react"
 
 const VALUATION_TONE: Record<string, { dot: string; chip: string }> = {
@@ -110,6 +111,8 @@ export default function FinancePage() {
       )}
 
       <RedFlagsList items={finance.redFlags} />
+
+      <DomainSources documents={deal?.documents} generatedAt={deal?.analysis?.createdAt} />
     </div>
   )
 }

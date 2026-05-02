@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Plus, BarChart3 } from "lucide-react"
+import { UploadCloud, BarChart3 } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -45,11 +45,12 @@ export function AppSidebar() {
               Deals
             </span>
             <Link
-              href="/deals?new=true"
+              href="/deals"
               className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#0F3D2E]/5 hover:bg-primary/15 text-[#0F3D2E] hover:text-primary transition-colors"
-              aria-label="New deal"
+              aria-label="Upload pitch deck"
+              title="Upload pitch deck"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <UploadCloud className="h-3.5 w-3.5" />
             </Link>
           </SidebarGroupLabel>
           <SidebarGroupContent>

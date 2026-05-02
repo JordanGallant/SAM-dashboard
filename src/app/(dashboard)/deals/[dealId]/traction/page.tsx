@@ -6,6 +6,7 @@ import { SectionHeader } from "@/components/dashboard/section-header"
 import { MetricTable } from "@/components/dashboard/metric-table"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
 import { EditorialCard } from "@/components/dashboard/editorial"
+import { DomainSources } from "@/components/dashboard/domain-sources"
 import { TrendingUp, Coins, RefreshCcw } from "lucide-react"
 
 export default function TractionPage() {
@@ -44,6 +45,8 @@ export default function TractionPage() {
       </EditorialCard>
 
       <RedFlagsList items={traction.redFlags} />
+
+      <DomainSources documents={deal?.documents} generatedAt={deal?.analysis?.createdAt} />
     </div>
   )
 }
