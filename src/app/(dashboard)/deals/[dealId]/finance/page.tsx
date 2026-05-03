@@ -27,7 +27,7 @@ export default function FinancePage() {
   const deal_terms = leadSplit(finance.dealTerms)
 
   return (
-    <div className="space-y-7 max-w-4xl">
+    <div className="space-y-7">
       <SectionHeader
         title="Financial Analysis"
         score={finance.score}

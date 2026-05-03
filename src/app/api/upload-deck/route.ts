@@ -4,6 +4,7 @@ import { extractText, getDocumentProxy } from "unpdf"
 import OpenAI from "openai"
 import { DEAL_STAGES } from "@/lib/constants"
 import type { DealStage } from "@/lib/types/deal"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 
 const MAX_TEXT_CHARS = 8000
 
@@ -64,6 +65,25 @@ async function extractDealMeta(deckText: string): Promise<{ companyName: string;
 
 export async function POST(request: Request) {
   try {
+    // Burst / brute-force protection. Applied BEFORE auth so unauthenticated
+    // floods (token brute force, scrapers) are throttled at the network edge
+    // of the app, not after we've done the auth round-trip.
+    const ip = getClientIp(request.headers)
+    const rl = checkRateLimit(`upload:${ip}`, { limit: 10, windowMs: 60_000 })
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: `Too many requests. Retry in ${rl.retryAfter}s.` },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rl.retryAfter),
+            "X-RateLimit-Limit": String(rl.limit),
+            "X-RateLimit-Window": "60",
+          },
+        }
+      )
+    }
+
     const supabase = await createClient()
     const {
       data: { user },
@@ -135,7 +155,7 @@ export async function POST(request: Request) {
 
     const { data: fund } = await supabase
       .from("funds")
-      .select("id")
+      .select("*")
       .eq("user_id", user.id)
       .maybeSingle()
 
@@ -205,6 +225,18 @@ export async function POST(request: Request) {
         const signedUrl = signed?.signedUrl
         if (signedUrl) {
           try {
+            const fundProfileForN8n = fund
+              ? {
+                  name: fund.name,
+                  thesis: fund.thesis,
+                  stageFocus: fund.stage_focus,
+                  sectorFocus: fund.sector_focus,
+                  geoFocus: fund.geo_focus,
+                  ticketSizeMin: fund.ticket_size_min,
+                  ticketSizeMax: fund.ticket_size_max,
+                  additional: fund.additional,
+                }
+              : null
             const n8nResp = await fetch(n8nWebhookUrl, {
               method: "POST",
               headers: {
@@ -222,6 +254,7 @@ export async function POST(request: Request) {
                 filename,
                 callback_url: `${appUrl}/api/analysis/callback`,
                 callback_token: callbackToken,
+                fund_profile: fundProfileForN8n,
               }),
             })
 

@@ -27,6 +27,7 @@ export default function FundProfilePage() {
   const [geoFocus, setGeoFocus] = useState<string[]>([])
   const [ticketMin, setTicketMin] = useState("")
   const [ticketMax, setTicketMax] = useState("")
+  const [additional, setAdditional] = useState("")
 
   useEffect(() => {
     if (fund) {
@@ -38,6 +39,7 @@ export default function FundProfilePage() {
       setGeoFocus(fund.geoFocus ?? [])
       setTicketMin(fund.ticketSizeMin ? String(fund.ticketSizeMin) : "")
       setTicketMax(fund.ticketSizeMax ? String(fund.ticketSizeMax) : "")
+      setAdditional(fund.additional ?? "")
     }
   }, [fund])
 
@@ -59,6 +61,7 @@ export default function FundProfilePage() {
       geoFocus,
       ticketSizeMin: ticketMin ? parseInt(ticketMin) : undefined,
       ticketSizeMax: ticketMax ? parseInt(ticketMax) : undefined,
+      additional,
     })
 
     if (result.error) setError(result.error)
@@ -156,6 +159,18 @@ export default function FundProfilePage() {
                 <Input type="number" placeholder="2000000" value={ticketMax} onChange={(e) => setTicketMax(e.target.value)} />
               </div>
             </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Additional</Label>
+            <p className="text-xs text-muted-foreground">
+              Restrictions, side-letter constraints, or anything else SAM should weigh when scoring fund fit (e.g. &quot;no defense or gambling&quot;, &quot;must be GDPR-ready&quot;, &quot;EU-only LPs&quot;).
+            </p>
+            <Textarea
+              value={additional}
+              onChange={(e) => setAdditional(e.target.value)}
+              rows={4}
+              placeholder="Anything outside the standard fields…"
+            />
           </div>
         </CardContent>
       </Card>

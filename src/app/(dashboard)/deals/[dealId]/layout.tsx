@@ -5,7 +5,13 @@ import { usePathname, useParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Play, Loader2, ArrowLeft, Lock, Download } from "lucide-react"
+import { Play, Loader2, ArrowLeft, Lock, Download, FileText, FileType } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useTier } from "@/lib/tier-context"
 import { useDeal } from "@/hooks/use-deal"
 import { STATUS_BADGE_COLORS, PIPELINE_STAGES } from "@/lib/constants"
@@ -40,7 +46,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   }
 
   const analysis = deal.analysis
-  const tabKeys = new Set(["summary", "team", "market", "product", "traction", "finance", "exit", "fund-fit", "missing-info"])
+  const tabKeys = new Set(["summary", "team", "market", "product", "traction", "finance", "exit", "fund-fit", "missing-info", "ask"])
   const activeTab = pathname.split("/").filter(Boolean).reverse().find((s) => tabKeys.has(s)) || "summary"
 
   const gatedTabs: Record<string, boolean> = {
@@ -67,11 +73,12 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
     await updateDealStatus(dealId, status as PipelineStatus)
   }
 
-  async function handleDownload() {
+  async function handleDownload(format: "word" | "pdf") {
     if (downloading || !deal) return
     setDownloading(true)
     try {
-      const res = await fetch("/api/export/word", {
+      const endpoint = format === "pdf" ? "/api/export/pdf" : "/api/export/word"
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dealId }),
@@ -84,7 +91,8 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `${deal.companyName.replace(/[^a-zA-Z0-9]/g, "_")}_analysis.docx`
+      const ext = format === "pdf" ? "pdf" : "docx"
+      a.download = `${deal.companyName.replace(/[^a-zA-Z0-9]/g, "_")}_Investment_Memo.${ext}`
       document.body.appendChild(a)
       a.click()
       a.remove()
@@ -119,7 +127,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <div className="space-y-6 pb-20 md:pb-0">
+    <div className="space-y-6 pb-20 md:pb-0 mx-auto max-w-[1400px]">
       {/* Deal header — editorial, single line */}
       <div className="space-y-2">
         <Link href="/deals" className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
@@ -162,21 +170,43 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
             </Button>
           )}
           {analysis && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleDownload}
-              disabled={downloading}
-              className="ml-auto"
-              title="Download analysis as a Word document"
-            >
-              {downloading ? (
-                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Download className="mr-2 h-3.5 w-3.5" />
-              )}
-              {downloading ? "Preparing…" : "Download"}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={downloading}
+                    className="ml-auto"
+                  />
+                }
+              >
+                {downloading ? (
+                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Download className="mr-2 h-3.5 w-3.5" />
+                )}
+                {downloading ? "Preparing…" : "Download"}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => handleDownload("pdf")}
+                  disabled={downloading}
+                  className="cursor-pointer"
+                >
+                  <FileText className="mr-2 h-3.5 w-3.5 text-red-600" />
+                  PDF (.pdf)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleDownload("word")}
+                  disabled={downloading}
+                  className="cursor-pointer"
+                >
+                  <FileType className="mr-2 h-3.5 w-3.5 text-blue-600" />
+                  Word document (.docx)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>
@@ -236,7 +266,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
                           </span>
                           {isGated && <Lock className="h-3 w-3 shrink-0 text-muted-foreground" />}
                           <span className="truncate">{label}</span>
-                          {!isGated && (
+                          {!isGated && key !== "ask" && (
                             <span className="ml-auto font-mono text-[11px] tabular-nums text-muted-foreground group-hover:text-foreground">
                               {score ?? "—"}
                             </span>
@@ -257,9 +287,15 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
 }
 
 const NAV_GROUPS: { label: string; items: { key: string; label: string }[] }[] = [
-  { label: "Overview", items: [{ key: "summary", label: "Executive Summary" }] },
   {
-    label: "Domains",
+    label: "Overview",
+    items: [
+      { key: "summary", label: "Executive Summary" },
+      { key: "summary#next-steps", label: "Recommended Next Steps" },
+    ],
+  },
+  {
+    label: "Domain",
     items: [
       { key: "team", label: "Team" },
       { key: "market", label: "Market" },
@@ -272,8 +308,9 @@ const NAV_GROUPS: { label: string; items: { key: string; label: string }[] }[] =
   {
     label: "Review",
     items: [
+      { key: "missing-info", label: "Missing Information" },
       { key: "fund-fit", label: "Fund Fit" },
-      { key: "missing-info", label: "Missing Info" },
     ],
   },
+  { label: "Co-pilot", items: [{ key: "ask", label: "Ask SAM" }] },
 ]

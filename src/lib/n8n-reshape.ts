@@ -27,6 +27,14 @@ const score = (s: string | undefined): number => {
   return n
 }
 
+// Same idea, scale 0–10 — for moat strength etc.
+const score10 = (s: string | undefined): number => {
+  const n = num(s)
+  if (n < 0) return 0
+  if (n > 10) return 10
+  return n
+}
+
 const trim = (s: string | undefined) => (s ?? "").trim()
 
 const mapDomainVerdict = (s: string | undefined): DomainVerdict => {
@@ -327,10 +335,10 @@ export function reshapeFlatToDealAnalysis(
       pmfStatus: trim(flat.pmf_status),
       pmfDetails: trim(flat.pmf_text),
       moat: [
-        { type: "Network Effects", present: /yes|building/i.test(flat.moat_network_pres ?? ""), strength: num(flat.moat_network_str), evidence: trim(flat.moat_network_evid) },
-        { type: "Proprietary Data", present: /yes|building/i.test(flat.moat_data_pres ?? ""), strength: num(flat.moat_data_str), evidence: trim(flat.moat_data_evid) },
-        { type: "Switching Costs", present: /yes|building/i.test(flat.moat_switch_pres ?? ""), strength: num(flat.moat_switch_str), evidence: trim(flat.moat_switch_evid) },
-        { type: "Technology/IP", present: /yes|building/i.test(flat.moat_tech_pres ?? ""), strength: num(flat.moat_tech_str), evidence: trim(flat.moat_tech_evid) },
+        { type: "Network Effects", present: /yes|building/i.test(flat.moat_network_pres ?? ""), strength: score10(flat.moat_network_str), evidence: trim(flat.moat_network_evid) },
+        { type: "Proprietary Data", present: /yes|building/i.test(flat.moat_data_pres ?? ""), strength: score10(flat.moat_data_str), evidence: trim(flat.moat_data_evid) },
+        { type: "Switching Costs", present: /yes|building/i.test(flat.moat_switch_pres ?? ""), strength: score10(flat.moat_switch_str), evidence: trim(flat.moat_switch_evid) },
+        { type: "Technology/IP", present: /yes|building/i.test(flat.moat_tech_pres ?? ""), strength: score10(flat.moat_tech_str), evidence: trim(flat.moat_tech_evid) },
       ],
       redFlags: findings([flat.product_redflag_1, flat.product_redflag_2], "Critical"),
     },

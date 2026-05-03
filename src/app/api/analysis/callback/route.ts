@@ -22,7 +22,18 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { analysis_id, job_id, status, result, flat_result, error } = body
+    const {
+      analysis_id,
+      job_id,
+      status,
+      result,
+      flat_result,
+      error,
+      kind,
+      fund_fit,
+      missing_info,
+      exit_potential,
+    } = body
     const analysisId = analysis_id || job_id
 
     if (!analysisId) {
@@ -30,6 +41,98 @@ export async function POST(request: Request) {
     }
 
     const supabase = getSupabaseAdmin()
+
+    // Fund-fit callback (separate flow). Persists to fund_fit_result column AND, if the
+    // main analysis row already has result, patches result.fundFit so the UI sees it
+    // without waiting for a re-fetch.
+    if (kind === "fund-fit") {
+      if (!fund_fit || typeof fund_fit !== "object") {
+        return NextResponse.json({ error: "fund_fit object required" }, { status: 400 })
+      }
+      const { data: existing } = await supabase
+        .from("analyses")
+        .select("id, result")
+        .eq("id", analysisId)
+        .maybeSingle()
+      if (!existing) {
+        return NextResponse.json({ error: "analysis row not found" }, { status: 404 })
+      }
+      const patch: Record<string, unknown> = { fund_fit_result: fund_fit }
+      if (existing.result && typeof existing.result === "object") {
+        patch.result = { ...(existing.result as Record<string, unknown>), fundFit: fund_fit }
+      }
+      const { error: updErr } = await supabase
+        .from("analyses")
+        .update(patch)
+        .eq("id", analysisId)
+      if (updErr) {
+        console.error("Fund-fit callback update error:", updErr)
+        return NextResponse.json({ error: updErr.message }, { status: 500 })
+      }
+      return NextResponse.json({ received: true, kind: "fund-fit" })
+    }
+
+    // Missing-info callback (Flow 11). Persists to missing_info_result and patches
+    // result.missingInfo so the existing UI sees it without read changes.
+    if (kind === "missing-info") {
+      if (!missing_info || typeof missing_info !== "object") {
+        return NextResponse.json({ error: "missing_info object required" }, { status: 400 })
+      }
+      const { data: existing } = await supabase
+        .from("analyses")
+        .select("id, result")
+        .eq("id", analysisId)
+        .maybeSingle()
+      if (!existing) {
+        return NextResponse.json({ error: "analysis row not found" }, { status: 404 })
+      }
+      const patch: Record<string, unknown> = { missing_info_result: missing_info }
+      if (existing.result && typeof existing.result === "object") {
+        patch.result = { ...(existing.result as Record<string, unknown>), missingInfo: missing_info }
+      }
+      const { error: updErr } = await supabase
+        .from("analyses")
+        .update(patch)
+        .eq("id", analysisId)
+      if (updErr) {
+        console.error("Missing-info callback update error:", updErr)
+        return NextResponse.json({ error: updErr.message }, { status: 500 })
+      }
+      return NextResponse.json({ received: true, kind: "missing-info" })
+    }
+
+    // Exit Potential callback (Flow 12). Same merge pattern: persist to the
+    // exit_potential_result column AND patch result.exitPotential so the UI
+    // sees it instantly via Realtime.
+    if (kind === "exit-potential") {
+      if (!exit_potential || typeof exit_potential !== "object") {
+        return NextResponse.json({ error: "exit_potential object required" }, { status: 400 })
+      }
+      const { data: existing } = await supabase
+        .from("analyses")
+        .select("id, result")
+        .eq("id", analysisId)
+        .maybeSingle()
+      if (!existing) {
+        return NextResponse.json({ error: "analysis row not found" }, { status: 404 })
+      }
+      const patch: Record<string, unknown> = { exit_potential_result: exit_potential }
+      if (existing.result && typeof existing.result === "object") {
+        patch.result = {
+          ...(existing.result as Record<string, unknown>),
+          exitPotential: exit_potential,
+        }
+      }
+      const { error: updErr } = await supabase
+        .from("analyses")
+        .update(patch)
+        .eq("id", analysisId)
+      if (updErr) {
+        console.error("Exit-potential callback update error:", updErr)
+        return NextResponse.json({ error: updErr.message }, { status: 500 })
+      }
+      return NextResponse.json({ received: true, kind: "exit-potential" })
+    }
 
     if (status === "failed" || error) {
       await supabase
@@ -88,6 +191,10 @@ export async function POST(request: Request) {
       console.error("Callback update error:", updateErr)
       return NextResponse.json({ error: updateErr.message }, { status: 500 })
     }
+
+    // Fund-fit and missing-info are triggered from n8n Flow 0 (Trigger Fund Fit
+    // and Trigger Missing Info nodes that run after Trigger Report). They post
+    // back here with `kind: "fund-fit"` / `kind: "missing-info"` payloads above.
 
     return NextResponse.json({ received: true })
   } catch (err) {

@@ -25,7 +25,7 @@ const audiences = [
     bigStatLabel: "partners aligned",
     workflowIcon: MessagesSquare,
     body: "Your deal notes live across three tools and two heads. Sam produces a consistent memo per deal that your syndicate partners can actually compare and reference.",
-    href: "/#pricing",
+    href: "/how-it-works",
     featured: true,
   },
   {

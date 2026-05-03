@@ -1,8 +1,25 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request.headers)
+    const rl = checkRateLimit(`trigger:${ip}`, { limit: 10, windowMs: 60_000 })
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: `Too many requests. Retry in ${rl.retryAfter}s.` },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rl.retryAfter),
+            "X-RateLimit-Limit": String(rl.limit),
+            "X-RateLimit-Window": "60",
+          },
+        }
+      )
+    }
+
     const { dealId } = await request.json()
 
     if (!dealId) {
@@ -110,6 +127,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "n8n not configured" }, { status: 500 })
     }
 
+    const { data: fund } = await supabase
+      .from("funds")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle()
+    const fundProfileForN8n = fund
+      ? {
+          name: fund.name,
+          thesis: fund.thesis,
+          stageFocus: fund.stage_focus,
+          sectorFocus: fund.sector_focus,
+          geoFocus: fund.geo_focus,
+          ticketSizeMin: fund.ticket_size_min,
+          ticketSizeMax: fund.ticket_size_max,
+          additional: fund.additional,
+        }
+      : null
     const n8nPayload = {
       job_id: analysis.id,
       deal_id: dealId,
@@ -121,6 +155,7 @@ export async function POST(request: Request) {
       filename: signedDocs[0]?.filename,
       callback_url: `${appUrl}/api/analysis/callback`,
       callback_token: callbackToken,
+      fund_profile: fundProfileForN8n,
     }
 
     const n8nResponse = await fetch(n8nWebhookUrl, {

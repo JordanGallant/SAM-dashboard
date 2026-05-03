@@ -34,7 +34,7 @@ export default function ProductPage() {
   const ptTone = PROBLEM_TYPE_TONE[ptKey]
 
   return (
-    <div className="space-y-7 max-w-4xl">
+    <div className="space-y-7">
       <SectionHeader
         title="Product Analysis"
         score={product.score}
@@ -112,8 +112,9 @@ export default function ProductPage() {
         <EditorialCard label="Moat assessment" icon={<Shield className="h-3.5 w-3.5" />}>
           <div className="grid gap-3 sm:grid-cols-2">
             {product.moat.map((m) => {
-              const StatusIcon = m.present ? Check : m.strength > 0 ? Hourglass : X
-              const strengthPct = Math.max(0, Math.min(10, m.strength)) * 10
+              const strengthClamped = Math.max(0, Math.min(10, m.strength))
+              const StatusIcon = m.present ? Check : strengthClamped > 0 ? Hourglass : X
+              const strengthPct = strengthClamped * 10
               return (
                 <div
                   key={m.type}
@@ -137,7 +138,7 @@ export default function ProductPage() {
                       </span>
                     </div>
                     <span className="shrink-0 font-mono text-[11px] tabular-nums text-foreground/70">
-                      {m.strength}/10
+                      {strengthClamped}/10
                     </span>
                   </div>
                   {/* Strength bar */}

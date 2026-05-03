@@ -18,7 +18,7 @@ export default function TractionPage() {
     return <p className="text-sm text-muted-foreground">No traction analysis available.</p>
 
   return (
-    <div className="space-y-7 max-w-4xl">
+    <div className="space-y-7">
       <SectionHeader
         title="Traction & Unit Economics"
         score={traction.score}

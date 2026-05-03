@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { upsertHubspotContact } from "@/lib/hubspot"
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -11,6 +12,15 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error && data.session) {
+      // Capture lead in HubSpot the moment email is confirmed. Fire-and-forget
+      // — never block the redirect on a CRM hiccup.
+      const email = data.session.user.email
+      if (email) {
+        void upsertHubspotContact(email, {
+          lifecyclestage: "lead",
+        }).catch(() => {})
+      }
+
       // If a specific next URL was provided, use it
       if (next) {
         return NextResponse.redirect(`${origin}${next}`)

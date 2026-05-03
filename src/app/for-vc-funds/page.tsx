@@ -49,7 +49,7 @@ export default function ForVCFundsPage() {
               </span>
             </h1>
             <p className="mt-6 text-base md:text-lg text-white/65 max-w-2xl mx-auto leading-relaxed">
-              Your analysts&apos; time is the most expensive input in your fund. Sam runs the structured first pass on every deck that enters your inbox, so your time is spent on the deals that deserve deeper work.
+              Your analysts&apos; time is the most expensive input in your fund. Sam runs the structured first pass on every deck that enters your inbox, so your team spends time on the deals that deserve deeper work.
             </p>
           </div>
         </section>

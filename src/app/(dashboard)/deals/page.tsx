@@ -16,6 +16,7 @@ import {
   STAGE_BADGE_COLORS,
 } from "@/lib/constants"
 import { deleteDeal } from "@/app/actions/deals"
+import { verdictLabel } from "@/lib/verdict-label"
 import type { Deal, DealStage, PipelineStatus } from "@/lib/types/deal"
 
 type ScoreBucket = "all" | "high" | "mid" | "low"
@@ -459,7 +460,7 @@ function DealRow({
           )}
           {verdict && (
             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest ring-1 ring-black/5 ${VERDICT_COLORS[verdict].bg} ${VERDICT_COLORS[verdict].text}`}>
-              {verdict}
+              {verdictLabel(verdict)}
             </span>
           )}
           {score !== undefined && scoreColor && (

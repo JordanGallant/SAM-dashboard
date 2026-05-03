@@ -29,7 +29,7 @@ export default function FundFitPage() {
   const total = fit.criteria.length
 
   return (
-    <div className="space-y-7 max-w-5xl">
+    <div className="space-y-7">
       <SectionHeader title="Fund Fit" score={fit.score} verdict={fit.verdict} dataCompleteness={fit.dataCompleteness} />
 
       <EditorialCard

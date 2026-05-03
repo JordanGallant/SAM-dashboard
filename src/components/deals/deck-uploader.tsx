@@ -67,10 +67,14 @@ export function DeckUploader({
         />
         <button
           onClick={() => fileInputRef.current?.click()}
+          title="PDF only · Max 50 MB"
           className="group inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
         >
           <UploadCloud className="h-4 w-4" />
           Upload pitch deck
+          <span className="ml-1 text-[10px] font-mono uppercase tracking-widest text-white/70 hidden sm:inline">
+            · PDF
+          </span>
         </button>
         {error && (
           <span className="ml-2 inline-flex items-center gap-1 text-[12px] text-red-700">

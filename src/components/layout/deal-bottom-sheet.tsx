@@ -1,26 +1,18 @@
 "use client"
 
 /**
- * Mobile-only bottom sheet combining deal nav + chat.
- * Always-visible bar at the bottom (md:hidden). Tap either pill opens a
- * bottom Sheet with a segmented toggle — users can flip between navigating
- * and asking SAM without dismissing the sheet.
+ * Mobile-only bottom bar: a Tabs pill (opens nav sheet) and an Ask SAM pill
+ * that navigates to /deals/[id]/ask. Chat is its own page now — no overlay.
  */
 
 import Link from "next/link"
 import { useParams, usePathname } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
-import { List, MessageSquare, Send, Lock } from "lucide-react"
+import { useState } from "react"
+import { List, MessageSquare, Lock } from "lucide-react"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Textarea } from "@/components/ui/textarea"
 import { useDeal } from "@/hooks/use-deal"
 import { useTier } from "@/lib/tier-context"
 import { cn } from "@/lib/utils"
-
-type Mode = "nav" | "chat"
-type Msg = { who: "user" | "sam"; text: string }
 
 const NAV_GROUPS: { label: string; items: { key: string; label: string }[] }[] = [
   { label: "Overview", items: [{ key: "summary", label: "Executive Summary" }] },
@@ -42,6 +34,7 @@ const NAV_GROUPS: { label: string; items: { key: string; label: string }[] }[] =
       { key: "missing-info", label: "Missing Info" },
     ],
   },
+  { label: "Co-pilot", items: [{ key: "ask", label: "Ask SAM" }] },
 ]
 
 export function DealBottomSheet() {
@@ -52,12 +45,11 @@ export function DealBottomSheet() {
   const { config: tierConfig } = useTier()
 
   const [open, setOpen] = useState(false)
-  const [mode, setMode] = useState<Mode>("nav")
 
   if (!dealId || !deal?.analysis) return null
 
   const analysis = deal.analysis
-  const tabKeys = new Set(["summary", "team", "market", "product", "traction", "finance", "exit", "fund-fit", "missing-info"])
+  const tabKeys = new Set(["summary", "team", "market", "product", "traction", "finance", "exit", "fund-fit", "missing-info", "ask"])
   const activeTab = pathname.split("/").filter(Boolean).reverse().find((s) => tabKeys.has(s)) || "summary"
   const activeLabel = NAV_GROUPS.flatMap((g) => g.items).find((i) => i.key === activeTab)?.label ?? "Summary"
 
@@ -86,10 +78,7 @@ export function DealBottomSheet() {
       >
         <div className="flex items-stretch gap-2 px-3 py-2">
           <button
-            onClick={() => {
-              setMode("nav")
-              setOpen(true)
-            }}
+            onClick={() => setOpen(true)}
             className="flex-1 flex items-center gap-2 rounded-lg bg-muted px-3 py-2.5 text-left active:bg-muted/80 transition-colors"
           >
             <List className="h-4 w-4 text-primary shrink-0" />
@@ -102,75 +91,35 @@ export function DealBottomSheet() {
               </p>
             </div>
           </button>
-          <button
-            onClick={() => {
-              setMode("chat")
-              setOpen(true)
-            }}
+          <Link
+            href={`/deals/${dealId}/ask`}
             className="flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-2.5 active:opacity-90 transition-opacity"
           >
             <MessageSquare className="h-4 w-4 shrink-0" />
             <span className="text-[12.5px] font-semibold">Ask SAM</span>
-          </button>
+          </Link>
         </div>
       </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
           side="bottom"
-          className="h-[85dvh] max-h-[85dvh] p-0 flex flex-col"
+          className="h-[80dvh] max-h-[80dvh] p-0 flex flex-col"
           showCloseButton={false}
         >
-          <SheetTitle className="sr-only">
-            {mode === "nav" ? "Deal navigation" : "Ask SAM"}
-          </SheetTitle>
+          <SheetTitle className="sr-only">Deal navigation</SheetTitle>
           {/* Drag handle affordance */}
           <div className="pt-2 pb-0 flex justify-center">
             <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
           </div>
 
-          {/* Segmented control */}
-          <div className="px-4 pt-3 pb-2">
-            <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
-              <button
-                onClick={() => setMode("nav")}
-                className={cn(
-                  "flex items-center justify-center gap-2 rounded-md py-2 text-[13px] font-medium transition-colors",
-                  mode === "nav"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground"
-                )}
-              >
-                <List className="h-3.5 w-3.5" />
-                Tabs
-              </button>
-              <button
-                onClick={() => setMode("chat")}
-                className={cn(
-                  "flex items-center justify-center gap-2 rounded-md py-2 text-[13px] font-medium transition-colors",
-                  mode === "chat"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground"
-                )}
-              >
-                <MessageSquare className="h-3.5 w-3.5" />
-                Ask SAM
-              </button>
-            </div>
-          </div>
-
-          {/* Content switches by mode */}
-          {mode === "nav" ? (
-            <NavList
-              dealId={dealId}
-              activeTab={activeTab}
-              gatedTabs={gatedTabs}
-              getTabScore={getTabScore}
-              onPick={() => setOpen(false)}
-            />
-          ) : (
-            <ChatPanel deal={deal} dealId={dealId} />
-          )}
+          <NavList
+            dealId={dealId}
+            activeTab={activeTab}
+            gatedTabs={gatedTabs}
+            getTabScore={getTabScore}
+            onPick={() => setOpen(false)}
+          />
         </SheetContent>
       </Sheet>
     </>
@@ -231,7 +180,7 @@ function NavList({
                     </span>
                     {isGated && <Lock className="h-3 w-3 shrink-0 text-muted-foreground" />}
                     <span className="truncate">{label}</span>
-                    {!isGated && (
+                    {!isGated && key !== "ask" && (
                       <span className="ml-auto font-mono text-[12px] tabular-nums text-muted-foreground">
                         {score ?? "—"}
                       </span>
@@ -243,150 +192,6 @@ function NavList({
           </ul>
         </div>
       ))}
-    </div>
-  )
-}
-
-function ChatPanel({
-  deal,
-  dealId,
-}: {
-  deal: ReturnType<typeof useDeal>["deal"]
-  dealId: string
-}) {
-  const [input, setInput] = useState("")
-  const [sending, setSending] = useState(false)
-  const [messages, setMessages] = useState<Msg[]>([
-    { who: "sam", text: "Hi — I have context on this deal. Ask me anything." },
-  ])
-  const scrollRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })
-  }, [messages])
-
-  const send = async (text: string) => {
-    const trimmed = text.trim()
-    if (!trimmed || sending) return
-    const next: Msg[] = [...messages, { who: "user", text: trimmed }]
-    setMessages(next)
-    setInput("")
-    setSending(true)
-    try {
-      const apiMessages = next.slice(1).map((m) => ({
-        role: m.who === "user" ? "user" : "assistant",
-        content: m.text,
-      }))
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: apiMessages, dealId }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || "Request failed")
-      setMessages((m) => [...m, { who: "sam", text: data.reply || "(empty response)" }])
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Something went wrong"
-      setMessages((m) => [...m, { who: "sam", text: `Error: ${msg}` }])
-    } finally {
-      setSending(false)
-    }
-  }
-
-  const chips: string[] = []
-  if (deal) {
-    chips.push(deal.companyName)
-    if (deal.stage) chips.push(deal.stage)
-    const es = deal.analysis?.executiveSummary
-    if (es?.overallScore !== undefined) chips.push(`Score ${es.overallScore}`)
-    if (es?.verdict) chips.push(es.verdict)
-  }
-
-  const suggestions = deal
-    ? [
-        `Biggest risks for ${deal.companyName}?`,
-        `Why this score?`,
-        `Draft a founder email`,
-      ]
-    : []
-
-  return (
-    <div className="flex-1 flex flex-col min-h-0">
-      {chips.length > 0 && (
-        <div className="border-b bg-muted/30 px-4 py-2.5">
-          <div className="flex flex-wrap gap-1.5">
-            {chips.map((c) => (
-              <Badge key={c} variant="outline" className="font-mono text-[10px]">
-                {c}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
-      <div ref={scrollRef} className="flex-1 space-y-2.5 overflow-y-auto px-4 py-3">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={cn(
-              "max-w-[85%] rounded-xl px-3 py-2 text-[13.5px] leading-snug",
-              m.who === "sam"
-                ? "bg-muted text-foreground rounded-bl-sm"
-                : "ml-auto bg-primary text-primary-foreground rounded-br-sm"
-            )}
-          >
-            {m.text}
-          </div>
-        ))}
-        {messages.length === 1 && suggestions.length > 0 && (
-          <div className="mt-2 space-y-1.5">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-              Suggested
-            </div>
-            {suggestions.map((s) => (
-              <button
-                key={s}
-                onClick={() => send(s)}
-                className="block w-full rounded-md border bg-card px-2.5 py-2 text-left text-[13px] active:bg-muted/60"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <form
-        className="border-t p-3"
-        onSubmit={(e) => {
-          e.preventDefault()
-          send(input)
-        }}
-        style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
-      >
-        <div className="flex items-end gap-2">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault()
-                send(input)
-              }
-            }}
-            rows={1}
-            placeholder={deal ? `Ask about ${deal.companyName}…` : "Ask about your deal…"}
-            className="min-h-9 max-h-[120px] resize-none text-[14px]"
-          />
-          <Button
-            type="submit"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            disabled={!input.trim() || sending}
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-        </div>
-      </form>
     </div>
   )
 }

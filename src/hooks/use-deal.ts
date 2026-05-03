@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { dbToDeal, type DbDeal, type DbDocument, type DbAnalysis } from "@/lib/db-mappers"
 import type { Deal } from "@/lib/types/deal"
-import type { AnalysisStatus } from "@/lib/types/analysis"
+import type { AnalysisStatus, DealAnalysis } from "@/lib/types/analysis"
+import { recomputeCompleteness } from "@/lib/recompute-completeness"
 
 export function useDeal(dealId: string | undefined) {
   const [deal, setDeal] = useState<Deal | null>(null)
@@ -50,7 +51,10 @@ export function useDeal(dealId: string | undefined) {
       derivedError = derivedError ?? "Analysis stalled — no callback received within 1 hour"
     }
 
-    const completedResult = analysisRow?.status === "completed" ? analysisRow?.result ?? undefined : undefined
+    const rawResult = analysisRow?.status === "completed" ? analysisRow?.result ?? undefined : undefined
+    const completedResult: DealAnalysis | undefined = rawResult
+      ? recomputeCompleteness(rawResult)
+      : undefined
 
     setAnalysisStatus(status)
     setAnalysisError(derivedError)

@@ -11,4 +11,5 @@ export interface FundProfile {
   ticketSizeMax: number
   fundSize: number
   portfolioCompanies: string[]
+  additional?: string
 }

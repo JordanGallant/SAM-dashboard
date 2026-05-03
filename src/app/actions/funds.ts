@@ -14,6 +14,7 @@ export interface FundInput {
   ticketSizeMax?: number
   fundSize?: number
   portfolioCompanies?: string[]
+  additional?: string
 }
 
 export async function upsertFund(input: FundInput) {
@@ -40,6 +41,7 @@ export async function upsertFund(input: FundInput) {
     ticket_size_max: input.ticketSizeMax ?? null,
     fund_size: input.fundSize ?? null,
     portfolio_companies: input.portfolioCompanies ?? [],
+    additional: input.additional?.trim() ? input.additional.trim() : null,
     updated_at: new Date().toISOString(),
   }
 

@@ -1,11 +1,13 @@
 "use client"
 
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useDeal } from "@/hooks/use-deal"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
-import { Sparkles, AlertTriangle, Users, Handshake } from "lucide-react"
+import { InsightBlock, leadSplit } from "@/components/dashboard/editorial"
+import { Sparkles, AlertTriangle, Users, Handshake, MessageSquare, ArrowRight } from "lucide-react"
 import { DomainSources, type ExternalSource } from "@/components/dashboard/domain-sources"
 import type { FounderRow } from "@/lib/types/analysis"
 
@@ -53,13 +55,6 @@ function initials(name: string) {
     .slice(0, 2)
     .map((p) => p[0]?.toUpperCase() ?? "")
     .join("") || "?"
-}
-
-function leadSplit(text: string): { lead: string; rest: string } {
-  const t = (text ?? "").trim()
-  const idx = t.search(/[.!?](?=\s+\S)/)
-  if (idx === -1) return { lead: t, rest: "" }
-  return { lead: t.slice(0, idx + 1), rest: t.slice(idx + 1).trim() }
 }
 
 export default function TeamPage() {
@@ -132,6 +127,19 @@ export default function TeamPage() {
 
       {/* Red Flags */}
       <RedFlagsList items={team.redFlags} />
+
+      <Link
+        href={`/deals/${params.dealId}/ask?scope=team`}
+        className="group flex items-center justify-between gap-3 rounded-xl bg-[#F4FAF6]/60 ring-1 ring-[#0F3D2E]/10 px-4 py-3 hover:bg-[#F4FAF6] hover:ring-[#0F3D2E]/20 transition-colors"
+      >
+        <span className="flex items-center gap-2.5 min-w-0">
+          <MessageSquare className="h-3.5 w-3.5 text-primary shrink-0" />
+          <span className="text-[13px] text-foreground/80 group-hover:text-foreground">
+            Ask SAM about the team
+          </span>
+        </span>
+        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
+      </Link>
 
       <DomainSources
         documents={deal?.documents}
@@ -262,37 +270,3 @@ function FounderCard({
   )
 }
 
-// ---------------------------------------------------------------- insight block
-function InsightBlock({
-  icon,
-  label,
-  lead,
-  rest,
-}: {
-  icon: React.ReactNode
-  label: string
-  lead: string
-  rest: string
-}) {
-  if (!lead) return null
-  return (
-    <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
-      <div className="flex items-center gap-2">
-        <span className="grid place-items-center h-7 w-7 rounded-md bg-foreground/5 text-foreground/60">
-          {icon}
-        </span>
-        <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-foreground/60">
-          {label}
-        </span>
-      </div>
-      <p className="mt-3 text-[15px] leading-[1.5] font-medium text-foreground tracking-[-0.005em] max-w-[55ch]">
-        {lead}
-      </p>
-      {rest && (
-        <p className="mt-2.5 text-[13px] leading-[1.7] text-foreground/70 max-w-[60ch]">
-          {rest}
-        </p>
-      )}
-    </div>
-  )
-}

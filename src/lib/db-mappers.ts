@@ -40,6 +40,7 @@ export interface DbFund {
   ticket_size_max: number | null
   fund_size: number | null
   portfolio_companies: string[] | null
+  additional: string | null
 }
 
 export interface DbAnalysis {
@@ -93,5 +94,6 @@ export function dbToFund(row: DbFund): FundProfile {
     ticketSizeMax: row.ticket_size_max ?? 0,
     fundSize: row.fund_size ?? 0,
     portfolioCompanies: row.portfolio_companies ?? [],
+    additional: row.additional ?? "",
   }
 }

@@ -1,13 +1,13 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { SectionHeader } from "@/components/dashboard/section-header"
-import { SectionLabel } from "@/components/dashboard/section-label"
 import { MetricTable } from "@/components/dashboard/metric-table"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
+import { EditorialCard, emphasize } from "@/components/dashboard/editorial"
 import { DomainSources } from "@/components/dashboard/domain-sources"
 import { useDeal } from "@/hooks/use-deal"
+import { TrendingUp, Calendar, Building2 } from "lucide-react"
 
 export default function ExitPage() {
   const params = useParams()
@@ -17,28 +17,46 @@ export default function ExitPage() {
   if (!exit) return <p className="text-sm text-muted-foreground">No exit analysis available.</p>
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <SectionHeader title="Exit Potential" score={exit.score} verdict={exit.verdict} dataCompleteness={exit.dataCompleteness} />
 
-      <Card>
-        <CardHeader><SectionLabel>Comparable exits</SectionLabel></CardHeader>
-        <CardContent><MetricTable rows={exit.comparableExits} /></CardContent>
-      </Card>
+      {exit.comparableExits.length > 0 && (
+        <EditorialCard label="Comparable exits" icon={<TrendingUp className="h-3.5 w-3.5" />}>
+          <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-2.5 md:p-3">
+            <MetricTable rows={exit.comparableExits} />
+          </div>
+        </EditorialCard>
+      )}
 
-      <Card>
-        <CardHeader><SectionLabel>Realistic exit range</SectionLabel></CardHeader>
-        <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{exit.exitRange}</p></CardContent>
-      </Card>
+      {exit.exitRange && (
+        <EditorialCard label="Realistic exit range">
+          <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
+            <p className="text-[14px] leading-[1.65] text-foreground/80 max-w-[60ch]">
+              {emphasize(exit.exitRange)}
+            </p>
+          </div>
+        </EditorialCard>
+      )}
 
-      <Card>
-        <CardHeader><SectionLabel>Exit timeline</SectionLabel></CardHeader>
-        <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{exit.exitTimeline}</p></CardContent>
-      </Card>
+      {exit.exitTimeline && (
+        <EditorialCard label="Exit timeline" icon={<Calendar className="h-3.5 w-3.5" />}>
+          <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
+            <p className="text-[14px] leading-[1.65] text-foreground/80 max-w-[60ch]">
+              {emphasize(exit.exitTimeline)}
+            </p>
+          </div>
+        </EditorialCard>
+      )}
 
-      <Card>
-        <CardHeader><SectionLabel>Acquirer landscape</SectionLabel></CardHeader>
-        <CardContent><p className="text-sm text-muted-foreground leading-relaxed">{exit.acquirerLandscape}</p></CardContent>
-      </Card>
+      {exit.acquirerLandscape && (
+        <EditorialCard label="Acquirer landscape" icon={<Building2 className="h-3.5 w-3.5" />}>
+          <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
+            <p className="text-[14px] leading-[1.65] text-foreground/80 max-w-[60ch]">
+              {emphasize(exit.acquirerLandscape)}
+            </p>
+          </div>
+        </EditorialCard>
+      )}
 
       <RedFlagsList items={exit.redFlags} />
 

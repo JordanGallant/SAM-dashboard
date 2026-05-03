@@ -288,7 +288,7 @@ export default function SummaryPage() {
         </section>
 
         {es.recommendedNextSteps.length > 0 && (
-          <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
+          <section id="next-steps" className="scroll-mt-24 rounded-2xl border border-primary/30 bg-primary/5 p-5">
             <div className="flex items-center gap-2 mb-3">
               <ArrowRight className="h-4 w-4 text-primary" />
               <p className="font-mono text-[11px] uppercase tracking-widest font-bold text-primary">

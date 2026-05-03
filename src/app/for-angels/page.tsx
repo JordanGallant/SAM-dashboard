@@ -12,9 +12,7 @@ const bullets = [
 ]
 
 const currentState = [
-  "Fifty decks a month, no associate, no framework",
   "You passed on a deal last March. By September, you can't remember why.",
-  "Your memory is not a filing system",
 ]
 
 export default function ForAnglesPage() {
