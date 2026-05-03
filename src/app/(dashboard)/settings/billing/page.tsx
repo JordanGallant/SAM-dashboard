@@ -2,12 +2,11 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import { ExternalLink, Loader2, Check, X, AlertTriangle, Sparkles, CreditCard, Tag } from "lucide-react"
+import { ExternalLink, Loader2, Check, X, AlertTriangle, Sparkles, CreditCard } from "lucide-react"
 import { useTier } from "@/lib/tier-context"
 import { TIER_CONFIG } from "@/lib/tier-config"
 import type { Tier } from "@/lib/types/user"
 import { createClient } from "@/lib/supabase/client"
-import { PromoCodeInput } from "@/components/dashboard/promo-code-input"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { cn } from "@/lib/utils"
 
@@ -92,33 +91,10 @@ function BillingContent() {
           <div>
             <p className="font-heading font-bold text-blue-900 text-sm">Subscription required</p>
             <p className="text-[13px] text-blue-800/90 mt-0.5">
-              Pick a plan below to get access, or redeem a promo code for a free trial.
+              Pick a plan below to get access. You can apply a coupon at checkout.
             </p>
           </div>
         </div>
-      )}
-
-      {/* Promo code redemption for inactive / expired users */}
-      {(isInactive || isExpiredTrial) && (
-        <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="grid place-items-center h-10 w-10 rounded-xl bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/10 ring-1 ring-[#0F3D2E]/10 shrink-0">
-              <Tag className="h-5 w-5 text-[#0F3D2E]" />
-            </div>
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
-                Promo code
-              </p>
-              <h3 className="mt-1 font-heading text-[15px] font-bold leading-tight">
-                Got a code?
-              </h3>
-              <p className="mt-1 text-[12.5px] text-muted-foreground max-w-md">
-                Redeem it here to start a trial without entering payment info.
-              </p>
-            </div>
-          </div>
-          <PromoCodeInput />
-        </section>
       )}
 
       {showCanceled && (

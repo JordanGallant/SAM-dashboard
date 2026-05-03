@@ -1,14 +1,14 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { buttonVariants, Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { BarChart3, Loader2, Check, Tag } from "lucide-react"
+import { BarChart3, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { TIER_CONFIG } from "@/lib/tier-config"
 import type { Tier } from "@/lib/types/user"
@@ -18,45 +18,15 @@ function RegisterContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tierParam = (searchParams.get("tier") as Tier) || "professional"
-  const codeParam = searchParams.get("code") || ""
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
-  const [promoCode, setPromoCode] = useState(codeParam)
-  const [codeValid, setCodeValid] = useState<null | { days: number }>(null)
-  const [codeChecking, setCodeChecking] = useState(false)
-  const [codeError, setCodeError] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
   const tier = TIER_CONFIG[tierParam]
-
-  // Auto-validate code if provided via URL
-  useEffect(() => {
-    if (codeParam) validatePromo(codeParam)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [codeParam])
-
-  async function validatePromo(code: string) {
-    setCodeChecking(true)
-    setCodeError("")
-    setCodeValid(null)
-    try {
-      const res = await fetch(`/api/auth/apply-trial?code=${encodeURIComponent(code)}`)
-      const data = await res.json()
-      if (data.valid) {
-        setCodeValid({ days: data.days })
-      } else {
-        setCodeError("That code isn't valid")
-      }
-    } catch {
-      setCodeError("Couldn't verify code")
-    } finally {
-      setCodeChecking(false)
-    }
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -73,7 +43,6 @@ function RegisterContent() {
       password,
       options: {
         data: { full_name: name, pending_tier: tierParam },
-        // After email confirmation, route through callback which checks pending_tier
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
@@ -84,34 +53,11 @@ function RegisterContent() {
       return
     }
 
-    // If Supabase email confirmation is ON, there's no session yet.
-    // Supabase returns user but no session → show check-email page.
     if (!data.session) {
       router.push(`/auth/check-email?email=${encodeURIComponent(email)}`)
       return
     }
 
-    // Session exists (email confirmation is off) → proceed
-    // If we have a valid promo code, apply it
-    if (codeValid && promoCode) {
-      // Wait a moment for the profile trigger to fire
-      await new Promise((r) => setTimeout(r, 800))
-
-      const applyRes = await fetch("/api/auth/apply-trial", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: promoCode, tier: tierParam }),
-      })
-
-      if (applyRes.ok) {
-        router.push("/setup")
-        router.refresh()
-        return
-      }
-      // If apply fails, fall through to paid flow
-    }
-
-    // No code (or code failed) — route through checkout-redirect page
     router.push(`/checkout-redirect?tier=${tierParam}`)
   }
 
@@ -158,51 +104,14 @@ function RegisterContent() {
             <Input id="confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
           </div>
 
-          {/* Promo code section */}
-          <div className="rounded-md border bg-muted/30 p-3 space-y-2">
-            <Label htmlFor="promo" className="flex items-center gap-1.5 text-xs font-medium">
-              <Tag className="h-3.5 w-3.5" />
-              Promo code (optional)
-            </Label>
-            <div className="flex gap-2">
-              <Input
-                id="promo"
-                placeholder="e.g. FOUNDER90"
-                value={promoCode}
-                onChange={(e) => {
-                  setPromoCode(e.target.value.toUpperCase())
-                  setCodeValid(null)
-                  setCodeError("")
-                }}
-                className="font-mono text-sm"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={!promoCode || codeChecking}
-                onClick={() => validatePromo(promoCode)}
-              >
-                {codeChecking ? <Loader2 className="h-3 w-3 animate-spin" /> : "Apply"}
-              </Button>
-            </div>
-            {codeValid && (
-              <p className="text-xs text-emerald-700 flex items-center gap-1">
-                <Check className="h-3 w-3" /> {codeValid.days}-day free trial will activate
-              </p>
-            )}
-            {codeError && <p className="text-xs text-red-700">{codeError}</p>}
-            {!codeValid && !codeError && (
-              <p className="text-xs text-muted-foreground">
-                Have a code? Apply it to skip the payment screen and start a free trial.
-              </p>
-            )}
-          </div>
-
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {codeValid ? "Start Free Trial" : "Continue to Payment"}
+            Continue to Payment
           </Button>
+
+          <p className="text-center text-[11px] text-muted-foreground">
+            Have a coupon? You can apply it on the next screen.
+          </p>
         </form>
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
