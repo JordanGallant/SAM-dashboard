@@ -1,11 +1,13 @@
 "use client"
 
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { EditorialCard } from "@/components/dashboard/editorial"
 import { DomainSources } from "@/components/dashboard/domain-sources"
 import { useDeal } from "@/hooks/use-deal"
-import { Check, X, Compass, Target, ShieldAlert } from "lucide-react"
+import { useFundProfile } from "@/hooks/use-fund-profile"
+import { Check, X, Compass, Target, ShieldAlert, Sparkles, ArrowRight, Settings } from "lucide-react"
 import { TierGate } from "@/components/dashboard/tier-gate"
 import { useTier } from "@/lib/tier-context"
 
@@ -13,6 +15,7 @@ export default function FundFitPage() {
   const params = useParams()
   const { config } = useTier()
   const { deal } = useDeal(params.dealId as string)
+  const { fund, loading: fundLoading } = useFundProfile()
   const fit = deal?.analysis?.fundFit
 
   if (!config.fundFit) {
@@ -20,6 +23,70 @@ export default function FundFitPage() {
       <TierGate feature="Fund Fit Scoring" requiredTier="professional">
         <div />
       </TierGate>
+    )
+  }
+
+  // Check if fund profile is effectively empty — name unset, no thesis, no
+  // structured focus areas, AND no mandate doc uploaded. Without any of
+  // these, Flow 10 has nothing to score against.
+  const fundProfileEmpty =
+    !fundLoading &&
+    (!fund ||
+      ((!fund.name ||
+        fund.name.trim() === "" ||
+        fund.name === "(awaiting fund details)") &&
+        !fund.thesis?.trim() &&
+        (!fund.stageFocus || fund.stageFocus.length === 0) &&
+        (!fund.sectorFocus || fund.sectorFocus.length === 0) &&
+        !fund.onePagerFilename))
+
+  if (fundProfileEmpty) {
+    return (
+      <div className="space-y-6">
+        <SectionHeader
+          title="Fund Fit"
+          score={0}
+          verdict="Insufficient Data"
+          dataCompleteness={0}
+        />
+        <div className="rounded-2xl ring-1 ring-primary/30 bg-gradient-to-br from-primary/5 via-primary/[0.02] to-transparent p-7 md:p-9">
+          <div className="flex items-start gap-4 mb-5">
+            <div className="grid place-items-center h-11 w-11 rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] shadow-md shadow-primary/20 ring-1 ring-[#D4FF6B]/20 shrink-0">
+              <Sparkles className="h-5 w-5 text-[#D4FF6B]" />
+            </div>
+            <div>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+                Fund profile required
+              </p>
+              <h2 className="mt-1.5 font-heading text-xl font-bold tracking-[-0.01em] text-[#0A2E22]">
+                Add your fund info to unlock Fund Fit
+              </h2>
+              <p className="mt-2 text-[13.5px] text-muted-foreground max-w-md leading-relaxed">
+                SAM scores how well a deal matches your thesis, stage, sector, geography, and
+                ticket size. Fastest path: drop a 1-pager and we&apos;ll extract the rest.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/settings/fund-profile"
+              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
+            >
+              <Settings className="h-4 w-4" />
+              Add fund info
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <Link
+              href="/setup"
+              className="inline-flex items-center gap-2 rounded-full ring-1 ring-foreground/15 hover:ring-foreground/30 hover:bg-foreground/5 px-4 py-2 text-[13px] font-medium transition-colors"
+            >
+              Use the guided setup
+            </Link>
+          </div>
+        </div>
+
+        <DomainSources documents={deal?.documents} generatedAt={deal?.analysis?.createdAt} />
+      </div>
     )
   }
 
