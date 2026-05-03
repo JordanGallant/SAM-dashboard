@@ -86,7 +86,7 @@ const tiers: Tier[] = [
     seats: "Unlimited seats",
     description: "For fund teams running first-screening at scale, with shared memory.",
     cta: "Book a walkthrough",
-    ctaHref: "/register?tier=fund",
+    ctaHref: "mailto:hello@sam.ai?subject=SAM%20Fund%20-%20Walkthrough%20request",
     popular: false,
     features: customFeatures,
   },

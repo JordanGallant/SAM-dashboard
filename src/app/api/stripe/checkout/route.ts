@@ -12,8 +12,20 @@ const PRICE_IDS: Record<Tier, string | undefined> = {
 export async function POST(request: Request) {
   try {
     const { tier } = (await request.json()) as { tier: Tier }
-    const priceId = PRICE_IDS[tier]
 
+    // Fund tier is custom-priced — no self-serve checkout. Direct to sales.
+    if (tier === "fund") {
+      return NextResponse.json(
+        {
+          error: "Fund tier requires a walkthrough",
+          contact: true,
+          mailto: "hello@sam.ai?subject=SAM%20Fund%20-%20Walkthrough%20request",
+        },
+        { status: 400 }
+      )
+    }
+
+    const priceId = PRICE_IDS[tier]
     if (!priceId) {
       return NextResponse.json({ error: "Invalid tier" }, { status: 400 })
     }
