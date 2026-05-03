@@ -12,4 +12,6 @@ export interface FundProfile {
   fundSize: number
   portfolioCompanies: string[]
   additional?: string
+  onePagerFilename?: string
+  onePagerUploadedAt?: string
 }

@@ -142,6 +142,8 @@ export async function POST(request: Request) {
           ticketSizeMin: fund.ticket_size_min,
           ticketSizeMax: fund.ticket_size_max,
           additional: fund.additional,
+          onePagerText: fund.one_pager_text,
+          onePagerFilename: fund.one_pager_filename,
         }
       : null
     const n8nPayload = {

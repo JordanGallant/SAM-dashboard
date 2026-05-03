@@ -41,6 +41,9 @@ export interface DbFund {
   fund_size: number | null
   portfolio_companies: string[] | null
   additional: string | null
+  one_pager_text: string | null
+  one_pager_filename: string | null
+  one_pager_uploaded_at: string | null
 }
 
 export interface DbAnalysis {
@@ -95,5 +98,7 @@ export function dbToFund(row: DbFund): FundProfile {
     fundSize: row.fund_size ?? 0,
     portfolioCompanies: row.portfolio_companies ?? [],
     additional: row.additional ?? "",
+    onePagerFilename: row.one_pager_filename ?? undefined,
+    onePagerUploadedAt: row.one_pager_uploaded_at ?? undefined,
   }
 }

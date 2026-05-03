@@ -45,6 +45,9 @@ export async function updateSession(request: NextRequest) {
       "/for-vc-funds",
       "/privacy",
       "/sample",
+      "/mockup1",
+      "/mockup2",
+      "/mockup3",
     ]
     const isPublic =
       publicRoutes.some((route) => pathname === route) ||

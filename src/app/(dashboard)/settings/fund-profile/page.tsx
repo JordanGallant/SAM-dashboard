@@ -12,6 +12,7 @@ import { Loader2, CheckCircle2, Sparkles } from "lucide-react"
 import { useFundProfile } from "@/hooks/use-fund-profile"
 import { upsertFund } from "@/app/actions/funds"
 import { DEAL_STAGES, SECTORS, GEOS } from "@/lib/constants"
+import { FundDocUploader } from "@/components/settings/fund-doc-uploader"
 
 export default function FundProfilePage() {
   const { fund, loading, refetch } = useFundProfile()
@@ -89,6 +90,18 @@ export default function FundProfilePage() {
           <Link href="/setup" className={buttonVariants({ variant: "outline", size: "sm", className: "shrink-0" })}>
             Use guided setup
           </Link>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">Mandate document</CardTitle>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Upload your fund 1-pager. SAM treats it as the authoritative source on your thesis, restrictions, and stage focus — much richer than checkboxes.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <FundDocUploader />
         </CardContent>
       </Card>
 
