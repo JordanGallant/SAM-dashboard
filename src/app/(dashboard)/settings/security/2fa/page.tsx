@@ -4,11 +4,9 @@ import { useEffect, useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, CheckCircle2, Shield, AlertTriangle } from "lucide-react"
+import { Loader2, CheckCircle2, Shield, AlertTriangle, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { SectionLabel } from "@/components/dashboard/section-label"
 
@@ -37,11 +35,6 @@ function TwoFactorSetup() {
   async function startEnrollment() {
     const supabase = createClient()
 
-    // `listFactors()` only returns verified factors in `totp`. Unverified
-    // (pending) factors from abandoned attempts are in `all` — we must
-    // read from there and unenroll them before enrolling a fresh factor,
-    // otherwise Supabase rejects the new enrollment with a duplicate
-    // friendly-name error.
     const { data: factors } = await supabase.auth.mfa.listFactors()
     const verified = factors?.totp?.find((f) => f.status === "verified")
     if (verified) {
@@ -107,138 +100,181 @@ function TwoFactorSetup() {
   }
 
   return (
-    <div className="max-w-xl space-y-6">
+    <div className="mx-auto max-w-2xl space-y-7">
       <div>
-        <SectionLabel>Security</SectionLabel>
-        <h1 className="mt-1 text-xl font-bold font-heading">Set up two-factor authentication</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Use an authenticator app — Google Authenticator, Authy, or 1Password — to generate a 6-digit code on every sign-in.
+        <Link
+          href="/settings/security"
+          className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-3 w-3" />
+          Security
+        </Link>
+        <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+          Set up
+        </p>
+        <h1 className="mt-1 font-heading text-2xl font-bold tracking-[-0.01em] text-[#0A2E22]">
+          Two-factor authentication
+        </h1>
+        <p className="mt-1.5 text-sm text-muted-foreground max-w-md">
+          Scan the QR code with an authenticator app, then enter the 6-digit code to enable.
         </p>
       </div>
 
       {required && step !== "done" && (
-        <Card className="border-primary/30 bg-primary/10">
-          <CardContent className="pt-5 flex gap-3">
-            <AlertTriangle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-primary">2FA is required for your plan</p>
-              <p className="mt-1 text-xs text-primary leading-relaxed">
-                Fund tier accounts must have 2FA enabled to access the dashboard. Complete setup below to continue.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl ring-1 ring-primary/30 bg-primary/5 p-5 flex gap-3">
+          <AlertTriangle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-heading font-bold text-primary">
+              2FA required for your plan
+            </p>
+            <p className="mt-1 text-[12.5px] text-primary/85 leading-relaxed">
+              Fund tier accounts must have 2FA enabled to access the dashboard. Complete
+              setup below to continue.
+            </p>
+          </div>
+        </div>
       )}
 
       {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
+        <div className="rounded-md bg-red-50 ring-1 ring-red-200 p-3 text-sm text-red-700">
+          {error}
+        </div>
       )}
 
       {step === "loading" && (
-        <Card>
-          <CardContent className="pt-6 flex items-center gap-3 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Preparing your 2FA code...
-          </CardContent>
-        </Card>
+        <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6 flex items-center gap-3 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Preparing your 2FA code…
+        </section>
       )}
 
       {step === "enroll" && enrollment && (
-        <Card>
-          <CardHeader>
-            <SectionLabel>Step 1 · Install an authenticator app</SectionLabel>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              If you don&apos;t already have one, install Google Authenticator on your phone. Authy and 1Password also work.
+        <>
+          {/* Step 1 — install app */}
+          <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
+            <SectionLabel className="mb-3">Step 1 · Install an authenticator app</SectionLabel>
+            <p className="text-sm text-muted-foreground max-w-md">
+              If you don&apos;t already have one, install Google Authenticator. Authy and
+              1Password also work.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
               <a
                 href="https://apps.apple.com/app/google-authenticator/id388497605"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between rounded-md border p-3 text-sm hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between rounded-xl ring-1 ring-foreground/10 hover:ring-foreground/25 hover:bg-muted/40 px-4 py-3 text-sm transition-colors"
               >
                 <span className="font-medium">Google Authenticator · iOS</span>
-                <span className="text-[11px] font-mono text-muted-foreground">App Store ↗</span>
+                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
               </a>
               <a
                 href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between rounded-md border p-3 text-sm hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between rounded-xl ring-1 ring-foreground/10 hover:ring-foreground/25 hover:bg-muted/40 px-4 py-3 text-sm transition-colors"
               >
                 <span className="font-medium">Google Authenticator · Android</span>
-                <span className="text-[11px] font-mono text-muted-foreground">Play Store ↗</span>
+                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
               </a>
             </div>
+          </section>
 
-            <hr />
-
-            <SectionLabel>Step 2 · Scan this QR code</SectionLabel>
-            <p className="text-sm text-muted-foreground">
-              In Google Authenticator, tap <span className="font-medium">+</span> → <span className="font-medium">Scan a QR code</span>, then point your camera at the image below.
+          {/* Step 2 — scan / paste */}
+          <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
+            <SectionLabel className="mb-3">Step 2 · Scan the QR code</SectionLabel>
+            <p className="text-sm text-muted-foreground max-w-md">
+              In your authenticator app, tap <span className="font-semibold">+</span> →{" "}
+              <span className="font-semibold">Scan a QR code</span>, then point at the image
+              below.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 items-center">
-              <div className="bg-white p-3 rounded-lg border">
-                <Image src={enrollment.qrCode} alt="2FA QR code" width={180} height={180} unoptimized />
+
+            <div className="mt-5 flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+              <div className="rounded-xl bg-white ring-1 ring-foreground/15 p-3 shrink-0">
+                <Image
+                  src={enrollment.qrCode}
+                  alt="2FA QR code"
+                  width={180}
+                  height={180}
+                  unoptimized
+                />
               </div>
               <div className="flex-1 w-full">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Or enter this secret manually</p>
-                <div className="rounded-md bg-muted/50 border p-3 font-mono text-xs break-all select-all">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">
+                  Or enter this secret manually
+                </p>
+                <div className="rounded-xl bg-muted/40 ring-1 ring-foreground/10 px-3 py-3 font-mono text-xs break-all select-all">
                   {enrollment.secret}
                 </div>
-                <p className="mt-2 text-[11px] text-muted-foreground">
-                  In the app, tap <span className="font-medium">+</span> → <span className="font-medium">Enter a setup key</span> and paste this.
+                <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">
+                  In the app, tap <span className="font-semibold">+</span> →{" "}
+                  <span className="font-semibold">Enter a setup key</span> and paste this.
                 </p>
               </div>
             </div>
+          </section>
 
-            <hr />
-            <div>
-              <SectionLabel>Step 3 · Enter the 6-digit code</SectionLabel>
-              <form onSubmit={verifyCode} className="mt-3 space-y-3">
-                <Label htmlFor="code" className="text-sm">Type the code currently shown in your authenticator app</Label>
+          {/* Step 3 — verify */}
+          <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
+            <SectionLabel className="mb-3">Step 3 · Enter the 6-digit code</SectionLabel>
+            <form onSubmit={verifyCode} className="mt-3 space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="code" className="text-sm">
+                  Type the code currently shown in your authenticator app
+                </Label>
                 <Input
                   id="code"
                   placeholder="000000"
                   maxLength={6}
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                  className="text-center text-2xl font-mono tracking-widest"
+                  className="text-center text-2xl font-mono tabular-nums tracking-[0.4em]"
                   autoComplete="one-time-code"
                   autoFocus
                 />
-                <Button type="submit" disabled={code.length !== 6 || verifying} className="w-full">
-                  {verifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Verify and enable 2FA
-                </Button>
-              </form>
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+              <button
+                type="submit"
+                disabled={code.length !== 6 || verifying}
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-3 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              >
+                {verifying && <Loader2 className="h-4 w-4 animate-spin" />}
+                Verify and enable 2FA
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </form>
+          </section>
+        </>
       )}
 
       {step === "done" && (
-        <Card>
-          <CardContent className="pt-6 flex flex-col items-center text-center py-10">
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 border border-emerald-200">
-              <Shield className="h-6 w-6 text-emerald-600" />
-            </div>
-            <h2 className="font-heading font-semibold">Two-factor authentication active</h2>
-            <p className="mt-1 text-sm text-muted-foreground max-w-xs">
-              From now on, you&apos;ll need your authenticator app to sign in.
-            </p>
-            <div className="mt-6 flex gap-2">
-              <Link href="/settings/security" className={buttonVariants({ variant: "outline" })}>
-                Back to Security
-              </Link>
-              <Button onClick={() => { router.push("/deals"); router.refresh() }}>
-                Go to dashboard
-                <CheckCircle2 className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-7 md:p-9 flex flex-col items-center text-center">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 ring-1 ring-emerald-200">
+            <Shield className="h-6 w-6 text-emerald-600" />
+          </div>
+          <h2 className="font-heading font-bold text-lg text-[#0A2E22]">
+            Two-factor authentication active
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground max-w-xs">
+            From now on, you&apos;ll need your authenticator app to sign in.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-2 justify-center">
+            <Link
+              href="/settings/security"
+              className="inline-flex items-center gap-2 rounded-full ring-1 ring-foreground/15 hover:ring-foreground/30 hover:bg-foreground/5 px-4 py-2 text-[13px] font-medium transition-colors"
+            >
+              Back to Security
+            </Link>
+            <button
+              onClick={() => {
+                router.push("/deals")
+                router.refresh()
+              }}
+              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
+            >
+              Go to dashboard
+              <CheckCircle2 className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
       )}
     </div>
   )
