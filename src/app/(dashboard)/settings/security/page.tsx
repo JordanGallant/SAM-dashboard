@@ -2,25 +2,26 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Shield, Loader2, ShieldCheck, AlertTriangle } from "lucide-react"
+import { Shield, Loader2, ShieldCheck, AlertTriangle, KeyRound, CheckCircle2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useTier } from "@/lib/tier-context"
 import { SectionLabel } from "@/components/dashboard/section-label"
 
 export default function SecurityPage() {
-  const { tier, config } = useTier()
+  const { config } = useTier()
   const [mfaEnrolled, setMfaEnrolled] = useState<boolean | null>(null)
   const [disabling, setDisabling] = useState(false)
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [passwordLoading, setPasswordLoading] = useState(false)
-  const [passwordMessage, setPasswordMessage] = useState<{ type: "error" | "success"; text: string } | null>(null)
+  const [passwordMessage, setPasswordMessage] = useState<{
+    type: "error" | "success"
+    text: string
+  } | null>(null)
 
   useEffect(() => {
     refreshMfaState()
@@ -72,42 +73,77 @@ export default function SecurityPage() {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-7">
+      {/* Page header */}
+      <div>
+        <SectionLabel>Account · Security</SectionLabel>
+        <h1 className="mt-2 font-heading text-2xl font-bold tracking-[-0.01em] text-[#0A2E22]">
+          Security
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground max-w-md">
+          Two-factor authentication and password.
+        </p>
+      </div>
+
       {/* 2FA */}
-      <Card>
-        <CardHeader>
-          <SectionLabel>Two-factor authentication</SectionLabel>
-          <div className="mt-2 flex items-center gap-2">
-            <Shield className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">TOTP · authenticator app</span>
+      <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div className="flex items-start gap-3">
+            <div className="grid place-items-center h-10 w-10 rounded-xl bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/10 ring-1 ring-[#0F3D2E]/10 shrink-0">
+              <Shield className="h-5 w-5 text-[#0F3D2E]" />
+            </div>
+            <div>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+                Two-factor authentication
+              </p>
+              <h3 className="mt-1 font-heading text-[15px] font-bold leading-tight">
+                TOTP · authenticator app
+              </h3>
+              <p className="mt-1 text-[12.5px] text-muted-foreground max-w-md">
+                Adds a second factor to your sign-in. We support any standard TOTP app
+                (Authy, 1Password, Google Authenticator, …).
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
             {mfaEnrolled === true && (
-              <Badge className="bg-emerald-100 text-emerald-700 border-0">Enabled</Badge>
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 ring-1 ring-emerald-200 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold text-emerald-700">
+                <CheckCircle2 className="h-3 w-3" /> Enabled
+              </span>
             )}
             {mfaEnrolled === false && (
-              <Badge className="bg-primary/10 text-primary border border-primary/30">Not set up</Badge>
+              <span className="inline-flex items-center rounded-full bg-primary/10 ring-1 ring-primary/30 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold text-primary">
+                Not set up
+              </span>
             )}
             {config.twoFactorRequired && (
-              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 font-mono text-[10px]">
+              <span className="inline-flex items-center rounded-full bg-red-50 ring-1 ring-red-200 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold text-red-700">
                 Required on {config.label}
-              </Badge>
+              </span>
             )}
           </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
+        </div>
+
+        <div className="mt-5 space-y-3">
           {mfaEnrolled === false && config.twoFactorRequired && (
-            <div className="rounded-md bg-primary/10 border border-primary/30 p-3 flex gap-2 text-sm text-primary">
+            <div className="rounded-xl bg-primary/5 ring-1 ring-primary/30 p-3 flex gap-2 text-sm text-primary">
               <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-              <span>Your {config.label} plan requires 2FA. Set it up to keep dashboard access.</span>
+              <span>
+                Your {config.label} plan requires 2FA. Set it up to keep dashboard access.
+              </span>
             </div>
           )}
 
           {mfaEnrolled === null ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" /> Checking 2FA status...
+              <Loader2 className="h-4 w-4 animate-spin" /> Checking 2FA status…
             </div>
           ) : mfaEnrolled ? (
             <div className="flex flex-wrap gap-2">
-              <Link href="/settings/security/2fa" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              <Link
+                href="/settings/security/2fa"
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
                 <ShieldCheck className="mr-2 h-3.5 w-3.5" />
                 Reconfigure
               </Link>
@@ -121,47 +157,88 @@ export default function SecurityPage() {
           ) : (
             <Link
               href={`/settings/security/2fa${config.twoFactorRequired ? "?required=true" : ""}`}
-              className={buttonVariants({ size: "sm" })}
+              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
             >
-              <Shield className="mr-2 h-3.5 w-3.5" />
+              <Shield className="h-4 w-4" />
               Enable 2FA
             </Link>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {/* Password */}
-      <Card>
-        <CardHeader>
-          <SectionLabel>Password</SectionLabel>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={updatePassword} className="space-y-4">
-            {passwordMessage && (
-              <div className={`rounded-md p-3 text-sm ${passwordMessage.type === "error" ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-700"}`}>
-                {passwordMessage.text}
-              </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="current">Current password</Label>
-              <Input id="current" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
-              <p className="text-[11px] text-muted-foreground">Not required if you signed in with Google.</p>
+      <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
+        <div className="flex items-start gap-3 mb-5">
+          <div className="grid place-items-center h-10 w-10 rounded-xl bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/10 ring-1 ring-[#0F3D2E]/10 shrink-0">
+            <KeyRound className="h-5 w-5 text-[#0F3D2E]" />
+          </div>
+          <div>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+              Password
+            </p>
+            <h3 className="mt-1 font-heading text-[15px] font-bold leading-tight">
+              Change password
+            </h3>
+            <p className="mt-1 text-[12.5px] text-muted-foreground max-w-md">
+              Minimum 6 characters. Updates immediately — no re-confirmation email.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={updatePassword} className="space-y-4">
+          {passwordMessage && (
+            <div
+              className={`rounded-md p-3 text-sm ring-1 ${
+                passwordMessage.type === "error"
+                  ? "bg-red-50 text-red-700 ring-red-200"
+                  : "bg-emerald-50 text-emerald-700 ring-emerald-200"
+              }`}
+            >
+              {passwordMessage.text}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="new">New password</Label>
-              <Input id="new" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirm">Confirm new password</Label>
-              <Input id="confirm" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-            </div>
-            <Button type="submit" disabled={passwordLoading}>
-              {passwordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Update password
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          )}
+          <div className="space-y-1.5">
+            <Label htmlFor="current">Current password</Label>
+            <Input
+              id="current"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Not required if you signed in with Google.
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="new">New password</Label>
+            <Input
+              id="new"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="confirm">Confirm new password</Label>
+            <Input
+              id="confirm"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={passwordLoading}
+            className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {passwordLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+            Update password
+          </button>
+        </form>
+      </section>
     </div>
   )
 }
