@@ -6,7 +6,7 @@
 // row. The doc text becomes authoritative fund context for Flow 10.
 
 import { useEffect, useRef, useState } from "react"
-import { UploadCloud, FileText, AlertCircle, Loader2, X } from "lucide-react"
+import { UploadCloud, FileText, AlertCircle, Loader2, X, Sparkles } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { friendlyError, type FriendlyError } from "@/lib/errors"
 
@@ -23,12 +23,19 @@ type Status =
   | { kind: "uploading" }
   | { kind: "have"; filename: string; uploadedAt: string; words?: number }
 
-export function FundDocUploader() {
+export function FundDocUploader({
+  onUploaded,
+  onRemoved,
+}: {
+  onUploaded?: (info: { autoFilledFields?: string[] }) => void
+  onRemoved?: () => void
+} = {}) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [status, setStatus] = useState<Status>({ kind: "idle" })
   const [error, setError] = useState<FriendlyError | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [removing, setRemoving] = useState(false)
+  const [autoFilledNote, setAutoFilledNote] = useState<string | null>(null)
 
   // Hydrate state from the funds row so the component reflects the saved doc.
   useEffect(() => {
@@ -120,6 +127,25 @@ export function FundDocUploader() {
         uploadedAt: data.uploadedAt || new Date().toISOString(),
         words: data.wordsExtracted,
       })
+
+      const auto: string[] = Array.isArray(data.autoFilledFields) ? data.autoFilledFields : []
+      if (auto.length > 0) {
+        const labelMap: Record<string, string> = {
+          thesis: "thesis",
+          stageFocus: "stage focus",
+          sectorFocus: "sector focus",
+          geoFocus: "geography",
+          ticketSizeMin: "min ticket",
+          ticketSizeMax: "max ticket",
+          additional: "restrictions",
+        }
+        const labels = auto.map((k) => labelMap[k] ?? k)
+        setAutoFilledNote(`Filled in: ${labels.join(", ")}`)
+      } else {
+        setAutoFilledNote(null)
+      }
+
+      onUploaded?.({ autoFilledFields: auto })
     } catch (err) {
       setStatus({ kind: "idle" })
       setError(friendlyError(err, "upload"))
@@ -138,6 +164,8 @@ export function FundDocUploader() {
         throw new Error(data.error || "Could not remove the document")
       }
       setStatus({ kind: "idle" })
+      setAutoFilledNote(null)
+      onRemoved?.()
     } catch (err) {
       setError(friendlyError(err, "upload"))
     } finally {
@@ -252,6 +280,18 @@ export function FundDocUploader() {
               PDF only · Max 10 MB · Optional
             </div>
           )}
+        </div>
+      )}
+
+      {autoFilledNote && (
+        <div className="rounded-md bg-emerald-50 ring-1 ring-emerald-200 p-3 text-sm text-emerald-800 flex items-start gap-2">
+          <Sparkles className="h-4 w-4 shrink-0 mt-0.5 text-emerald-700" />
+          <div>
+            <p className="font-medium">SAM read your mandate</p>
+            <p className="mt-0.5 text-[12.5px] text-emerald-800/85">
+              {autoFilledNote}. Scroll down to review or edit.
+            </p>
+          </div>
         </div>
       )}
 

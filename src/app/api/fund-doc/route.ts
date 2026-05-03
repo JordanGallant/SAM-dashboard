@@ -10,7 +10,9 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { extractText, getDocumentProxy } from "unpdf"
+import OpenAI from "openai"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
+import { DEAL_STAGES, SECTORS, GEOS } from "@/lib/constants"
 
 const MAX_TEXT_CHARS = 24000 // ~6k tokens — generous enough for a multi-page mandate
 
@@ -19,6 +21,90 @@ async function extractAllPagesText(buffer: Buffer): Promise<string> {
   const { text } = await extractText(pdf, { mergePages: true })
   const joined = Array.isArray(text) ? text.join("\n") : String(text)
   return joined.slice(0, MAX_TEXT_CHARS).trim()
+}
+
+interface ExtractedFundFields {
+  thesis?: string
+  stageFocus?: string[]
+  sectorFocus?: string[]
+  geoFocus?: string[]
+  ticketSizeMin?: number
+  ticketSizeMax?: number
+  additional?: string
+}
+
+// Pull structured fund fields out of the mandate doc text using Azure OpenAI.
+// Same client pattern as /api/upload-deck. Returns null on any failure — the
+// upload flow continues even if extraction fails (the raw text is still saved
+// and Flow 10 will use it directly via the doc-as-authoritative prompt).
+async function extractFundFields(docText: string): Promise<ExtractedFundFields | null> {
+  const key = process.env.AZURE_AI_KEY
+  const endpoint = process.env.AZURE_AI_ENDPOINT
+  const model = process.env.AZURE_AI_MODEL || "gpt-4o"
+  if (!key || !endpoint) return null
+
+  const client = new OpenAI({ baseURL: endpoint, apiKey: key })
+
+  const systemPrompt = `Extract structured fund-profile fields from a fund mandate document. Return JSON only, no prose.
+
+Schema:
+{
+  "thesis": string — 1-3 sentences capturing the fund's investment thesis. Verbatim phrasing from the doc preferred. Empty string if not stated.
+  "stageFocus": string[] — pick zero or more from: ${DEAL_STAGES.join(", ")}. Only include stages the doc explicitly mentions.
+  "sectorFocus": string[] — pick zero or more from: ${SECTORS.join(", ")}. Map the doc's wording to these canonical buckets. "Other" if the fund's focus doesn't fit cleanly.
+  "geoFocus": string[] — pick zero or more from: ${GEOS.join(", ")}. EU-only mandates → ["Europe"]. EU+UK → ["Europe", "UK"].
+  "ticketSizeMin": integer EUR — first-cheque minimum, in raw euros (e.g. 500000 not "500K"). Null if not stated.
+  "ticketSizeMax": integer EUR — first-cheque maximum, in raw euros. Null if not stated.
+  "additional": string — capture all hard restrictions, exclusions, and binding LP constraints in one paragraph. Examples: "no defense, gambling, or non-EU companies; GDPR-by-design preferred; quarterly LP reviews".
+}
+
+Be conservative. Do not invent fields. Empty string / null / [] are valid when the doc is silent.`
+
+  try {
+    const completion = await client.chat.completions.create({
+      model,
+      temperature: 0,
+      max_tokens: 1200,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: docText },
+      ],
+    })
+    const raw = completion.choices[0]?.message?.content?.trim()
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+
+    // Defensive validation — only keep canonical values.
+    const stageAllowed = new Set<string>(DEAL_STAGES)
+    const sectorAllowed = new Set<string>(SECTORS)
+    const geoAllowed = new Set<string>(GEOS)
+
+    return {
+      thesis: typeof parsed.thesis === "string" ? parsed.thesis.trim() : undefined,
+      stageFocus: Array.isArray(parsed.stageFocus)
+        ? parsed.stageFocus.filter((s: unknown): s is string => typeof s === "string" && stageAllowed.has(s))
+        : undefined,
+      sectorFocus: Array.isArray(parsed.sectorFocus)
+        ? parsed.sectorFocus.filter((s: unknown): s is string => typeof s === "string" && sectorAllowed.has(s))
+        : undefined,
+      geoFocus: Array.isArray(parsed.geoFocus)
+        ? parsed.geoFocus.filter((s: unknown): s is string => typeof s === "string" && geoAllowed.has(s))
+        : undefined,
+      ticketSizeMin:
+        typeof parsed.ticketSizeMin === "number" && parsed.ticketSizeMin > 0
+          ? Math.round(parsed.ticketSizeMin)
+          : undefined,
+      ticketSizeMax:
+        typeof parsed.ticketSizeMax === "number" && parsed.ticketSizeMax > 0
+          ? Math.round(parsed.ticketSizeMax)
+          : undefined,
+      additional: typeof parsed.additional === "string" ? parsed.additional.trim() : undefined,
+    }
+  } catch (err) {
+    console.error("Fund field extraction failed:", err)
+    return null
+  }
 }
 
 export async function POST(request: Request) {
@@ -93,7 +179,9 @@ export async function POST(request: Request) {
     // Find or create the funds row, then attach the doc.
     const { data: existing } = await supabase
       .from("funds")
-      .select("id, one_pager_filename")
+      .select(
+        "id, name, thesis, stage_focus, sector_focus, geo_focus, ticket_size_min, ticket_size_max, additional, one_pager_filename"
+      )
       .eq("user_id", user.id)
       .maybeSingle()
 
@@ -109,11 +197,53 @@ export async function POST(request: Request) {
       }
     }
 
-    const patch = {
+    // LLM-extract structured fields from the doc.
+    const extracted = await extractFundFields(pdfText)
+
+    // Only fill EMPTY fields. We never overwrite values the user has already
+    // typed in by hand — their work wins. This keeps the upload-doc flow safe
+    // for returning users who've customised their fund profile.
+    const isEmptyStr = (v: unknown) => typeof v !== "string" || !v.trim()
+    const isEmptyArr = (v: unknown) => !Array.isArray(v) || v.length === 0
+    const isEmptyNum = (v: unknown) => typeof v !== "number" || !v
+
+    const patch: Record<string, unknown> = {
       one_pager_text: pdfText,
       one_pager_filename: filename,
       one_pager_uploaded_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+    }
+    const filled: string[] = []
+
+    if (extracted) {
+      if (extracted.thesis && isEmptyStr(existing?.thesis)) {
+        patch.thesis = extracted.thesis
+        filled.push("thesis")
+      }
+      if (extracted.stageFocus && extracted.stageFocus.length > 0 && isEmptyArr(existing?.stage_focus)) {
+        patch.stage_focus = extracted.stageFocus
+        filled.push("stageFocus")
+      }
+      if (extracted.sectorFocus && extracted.sectorFocus.length > 0 && isEmptyArr(existing?.sector_focus)) {
+        patch.sector_focus = extracted.sectorFocus
+        filled.push("sectorFocus")
+      }
+      if (extracted.geoFocus && extracted.geoFocus.length > 0 && isEmptyArr(existing?.geo_focus)) {
+        patch.geo_focus = extracted.geoFocus
+        filled.push("geoFocus")
+      }
+      if (extracted.ticketSizeMin && isEmptyNum(existing?.ticket_size_min)) {
+        patch.ticket_size_min = extracted.ticketSizeMin
+        filled.push("ticketSizeMin")
+      }
+      if (extracted.ticketSizeMax && isEmptyNum(existing?.ticket_size_max)) {
+        patch.ticket_size_max = extracted.ticketSizeMax
+        filled.push("ticketSizeMax")
+      }
+      if (extracted.additional && isEmptyStr(existing?.additional)) {
+        patch.additional = extracted.additional
+        filled.push("additional")
+      }
     }
 
     if (existing) {
@@ -125,14 +255,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     } else {
-      // No fund row yet — create a stub with just the doc + name placeholder.
-      const { error } = await supabase
-        .from("funds")
-        .insert({
-          user_id: user.id,
-          name: "(awaiting fund details)",
-          ...patch,
-        })
+      // No fund row yet — create one. Use extracted thesis/focus/etc directly,
+      // since there's nothing to preserve on a fresh row.
+      const { error } = await supabase.from("funds").insert({
+        user_id: user.id,
+        name: "(awaiting fund details)",
+        ...patch,
+      })
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
@@ -144,6 +273,7 @@ export async function POST(request: Request) {
       sizeBytes,
       wordsExtracted: Math.round(pdfText.split(/\s+/).filter(Boolean).length),
       uploadedAt: patch.one_pager_uploaded_at,
+      autoFilledFields: filled,
     })
   } catch (err) {
     console.error("Fund-doc upload error:", err)

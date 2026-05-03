@@ -20,6 +20,7 @@ export default function FundProfilePage() {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState("")
 
+  const [prefillKey, setPrefillKey] = useState(0)
   const [name, setName] = useState("")
   const [website, setWebsite] = useState("")
   const [thesis, setThesis] = useState("")
@@ -32,7 +33,11 @@ export default function FundProfilePage() {
 
   useEffect(() => {
     if (fund) {
-      setName(fund.name)
+      // Re-key on prefillKey so we re-pull from the fund row after a doc
+      // upload populates new fields server-side.
+      void prefillKey
+      const looksPlaceholder = fund.name === "(awaiting fund details)"
+      setName(looksPlaceholder ? "" : fund.name)
       setWebsite(fund.website ?? "")
       setThesis(fund.thesis ?? "")
       setStageFocus(fund.stageFocus ?? [])
@@ -42,7 +47,7 @@ export default function FundProfilePage() {
       setTicketMax(fund.ticketSizeMax ? String(fund.ticketSizeMax) : "")
       setAdditional(fund.additional ?? "")
     }
-  }, [fund])
+  }, [fund, prefillKey])
 
   function toggle(arr: string[], value: string, setter: (v: string[]) => void) {
     setter(arr.includes(value) ? arr.filter((x) => x !== value) : [...arr, value])
@@ -101,7 +106,15 @@ export default function FundProfilePage() {
           </p>
         </CardHeader>
         <CardContent>
-          <FundDocUploader />
+          <FundDocUploader
+            onUploaded={async () => {
+              await refetch()
+              setPrefillKey((k) => k + 1)
+            }}
+            onRemoved={async () => {
+              await refetch()
+            }}
+          />
         </CardContent>
       </Card>
 
