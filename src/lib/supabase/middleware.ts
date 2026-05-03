@@ -109,21 +109,46 @@ export async function updateSession(request: NextRequest) {
       .eq("id", user.id)
       .then(() => {})
 
-    // Fund tier requires 2FA. Check Assurance Level — aal2 means MFA verified.
-    if (profile?.tier === "fund") {
-      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-      const mfaRequired = aal?.nextLevel === "aal2"
-      const twoFactorPath =
-        pathname === "/settings/security" ||
-        pathname === "/settings/security/2fa" ||
-        pathname.startsWith("/settings/security/")
+    // MFA enforcement.
+    //
+    // Two cases to distinguish (using Supabase's Assurance Level):
+    //  - currentLevel = aal2: user has passed MFA in this session. Done.
+    //  - currentLevel = aal1, nextLevel = aal2: user has verified factors but
+    //    hasn't been challenged this session. Common with Google OAuth — the
+    //    /login page handles challenge for email/password, but /auth/callback
+    //    does not. Force these users through /auth/verify-mfa.
+    //  - nextLevel = aal1: user has no factors. Fund-tier users must enrol;
+    //    everyone else can proceed.
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    const currentLevel = aal?.currentLevel
+    const nextLevel = aal?.nextLevel
 
-      if (mfaRequired && !twoFactorPath) {
-        const url = request.nextUrl.clone()
-        url.pathname = "/settings/security/2fa"
-        url.searchParams.set("required", "true")
-        return NextResponse.redirect(url)
-      }
+    const onSecurityPath =
+      pathname.startsWith("/settings/security") ||
+      pathname === "/auth/verify-mfa"
+
+    // (1) User has verified factors but session is still aal1. Force challenge.
+    if (
+      nextLevel === "aal2" &&
+      currentLevel !== "aal2" &&
+      !onSecurityPath
+    ) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/auth/verify-mfa"
+      if (pathname && pathname !== "/") url.searchParams.set("next", pathname)
+      return NextResponse.redirect(url)
+    }
+
+    // (2) Fund-tier users must enrol if they don't have any factors yet.
+    if (
+      profile?.tier === "fund" &&
+      nextLevel === "aal1" &&
+      !onSecurityPath
+    ) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/settings/security/2fa"
+      url.searchParams.set("required", "true")
+      return NextResponse.redirect(url)
     }
 
     return supabaseResponse
