@@ -13,6 +13,7 @@ import { extractText, getDocumentProxy } from "unpdf"
 import OpenAI from "openai"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 import { DEAL_STAGES, SECTORS, GEOS } from "@/lib/constants"
+import { upsertHubspotContact } from "@/lib/hubspot"
 
 const MAX_TEXT_CHARS = 24000 // ~6k tokens — generous enough for a multi-page mandate
 
@@ -24,6 +25,8 @@ async function extractAllPagesText(buffer: Buffer): Promise<string> {
 }
 
 interface ExtractedFundFields {
+  name?: string
+  website?: string
   thesis?: string
   stageFocus?: string[]
   sectorFocus?: string[]
@@ -49,6 +52,8 @@ async function extractFundFields(docText: string): Promise<ExtractedFundFields |
 
 Schema:
 {
+  "name": string — the fund's name as stated in the doc (e.g. "Horizon Ventures II"). Drop boilerplate suffixes like ", L.P." or ", Fund SCSp". Empty string if no clear fund name.
+  "website": string — the fund's website if mentioned (https://… form). Empty string if not stated.
   "thesis": string — 1-3 sentences capturing the fund's investment thesis. Verbatim phrasing from the doc preferred. Empty string if not stated.
   "stageFocus": string[] — pick zero or more from: ${DEAL_STAGES.join(", ")}. Only include stages the doc explicitly mentions.
   "sectorFocus": string[] — pick zero or more from: ${SECTORS.join(", ")}. Map the doc's wording to these canonical buckets. "Other" if the fund's focus doesn't fit cleanly.
@@ -81,6 +86,8 @@ Be conservative. Do not invent fields. Empty string / null / [] are valid when t
     const geoAllowed = new Set<string>(GEOS)
 
     return {
+      name: typeof parsed.name === "string" ? parsed.name.trim() : undefined,
+      website: typeof parsed.website === "string" ? parsed.website.trim() : undefined,
       thesis: typeof parsed.thesis === "string" ? parsed.thesis.trim() : undefined,
       stageFocus: Array.isArray(parsed.stageFocus)
         ? parsed.stageFocus.filter((s: unknown): s is string => typeof s === "string" && stageAllowed.has(s))
@@ -180,7 +187,7 @@ export async function POST(request: Request) {
     const { data: existing } = await supabase
       .from("funds")
       .select(
-        "id, name, thesis, stage_focus, sector_focus, geo_focus, ticket_size_min, ticket_size_max, additional, one_pager_filename"
+        "id, name, website, thesis, stage_focus, sector_focus, geo_focus, ticket_size_min, ticket_size_max, additional, one_pager_filename"
       )
       .eq("user_id", user.id)
       .maybeSingle()
@@ -203,7 +210,10 @@ export async function POST(request: Request) {
     // Only fill EMPTY fields. We never overwrite values the user has already
     // typed in by hand — their work wins. This keeps the upload-doc flow safe
     // for returning users who've customised their fund profile.
-    const isEmptyStr = (v: unknown) => typeof v !== "string" || !v.trim()
+    // Exception: the "(awaiting fund details)" placeholder is treated as empty
+    // — that's a stub we wrote when a row was created without a real name yet.
+    const isEmptyStr = (v: unknown) =>
+      typeof v !== "string" || !v.trim() || v.trim() === "(awaiting fund details)"
     const isEmptyArr = (v: unknown) => !Array.isArray(v) || v.length === 0
     const isEmptyNum = (v: unknown) => typeof v !== "number" || !v
 
@@ -216,6 +226,14 @@ export async function POST(request: Request) {
     const filled: string[] = []
 
     if (extracted) {
+      if (extracted.name && isEmptyStr(existing?.name)) {
+        patch.name = extracted.name
+        filled.push("name")
+      }
+      if (extracted.website && isEmptyStr(existing?.website)) {
+        patch.website = extracted.website
+        filled.push("website")
+      }
       if (extracted.thesis && isEmptyStr(existing?.thesis)) {
         patch.thesis = extracted.thesis
         filled.push("thesis")
@@ -265,6 +283,48 @@ export async function POST(request: Request) {
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
+    }
+
+    // Sync the freshly-extracted fund context up to HubSpot. Fire-and-forget —
+    // upload success doesn't depend on the CRM round-trip. We push name +
+    // website to standard fields and pack thesis / stage / sector / geo /
+    // ticket size into the long-text `description` slot.
+    if (user.email) {
+      const eff = (k: keyof typeof patch, fallback: unknown) =>
+        (patch as Record<string, unknown>)[k] ??
+        (existing as Record<string, unknown> | null)?.[k] ??
+        fallback
+      const finalName =
+        (typeof eff("name", null) === "string" && eff("name", null) !== "(awaiting fund details)"
+          ? (eff("name", null) as string)
+          : null)
+      const finalWebsite = (eff("website", null) as string | null) || null
+      const thesis = (eff("thesis", null) as string | null) || ""
+      const stage = (eff("stage_focus", []) as string[]).join(", ")
+      const sector = (eff("sector_focus", []) as string[]).join(", ")
+      const geo = (eff("geo_focus", []) as string[]).join(", ")
+      const tMin = eff("ticket_size_min", null)
+      const tMax = eff("ticket_size_max", null)
+      const additional = (eff("additional", null) as string | null) || ""
+
+      const descParts: string[] = []
+      if (thesis) descParts.push(`Thesis: ${thesis}`)
+      if (stage) descParts.push(`Stage focus: ${stage}`)
+      if (sector) descParts.push(`Sector focus: ${sector}`)
+      if (geo) descParts.push(`Geography: ${geo}`)
+      if (tMin || tMax) {
+        descParts.push(
+          `Ticket size: EUR ${tMin || "?"} – ${tMax || "?"}`
+        )
+      }
+      if (additional) descParts.push(`Restrictions: ${additional}`)
+
+      void upsertHubspotContact(user.email, {
+        company: finalName ?? undefined,
+        website: finalWebsite ?? undefined,
+        description: descParts.join("\n\n") || undefined,
+        lifecyclestage: "marketingqualifiedlead",
+      }).catch(() => {})
     }
 
     return NextResponse.json({

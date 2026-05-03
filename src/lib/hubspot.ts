@@ -21,8 +21,12 @@ export type HubspotContactFields = Partial<{
   jobtitle: string
   company: string
   lifecyclestage: string
-  /** Free-text notes — overflow for fund-context fields HubSpot doesn't have a slot for. */
-  notes_last_contacted: string
+  website: string
+  /** Long-text summary — used to capture fund thesis + focus where there's no other slot. */
+  description: string
+  city: string
+  country: string
+  address: string
 }>
 
 // Keys we'll send to HubSpot. Anything else gets stripped before the call so a
@@ -36,6 +40,7 @@ const ALLOWED_HUBSPOT_PROPS: ReadonlySet<string> = new Set([
   "company",
   "lifecyclestage",
   "website",
+  "description",
   "address",
   "city",
   "country",

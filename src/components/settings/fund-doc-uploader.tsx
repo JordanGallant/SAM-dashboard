@@ -131,6 +131,8 @@ export function FundDocUploader({
       const auto: string[] = Array.isArray(data.autoFilledFields) ? data.autoFilledFields : []
       if (auto.length > 0) {
         const labelMap: Record<string, string> = {
+          name: "fund name",
+          website: "website",
           thesis: "thesis",
           stageFocus: "stage focus",
           sectorFocus: "sector focus",
