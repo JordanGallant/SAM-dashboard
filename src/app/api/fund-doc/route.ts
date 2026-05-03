@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     }
 
     // Defence in depth: ensure the path the client gave us actually belongs to this user.
-    if (!storagePath.startsWith(`fund-docs/${user.id}/`)) {
+    if (!storagePath.startsWith(`${user.id}/fund-docs/`)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
     // If they had a previous doc, remove the old file from storage so we
     // don't leak orphaned PDFs.
     if (existing?.one_pager_filename) {
-      const previousPath = `fund-docs/${user.id}/${existing.one_pager_filename}`
+      const previousPath = `${user.id}/fund-docs/${existing.one_pager_filename}`
       if (previousPath !== storagePath) {
         await supabase.storage
           .from("pitch-decks")
@@ -182,7 +182,7 @@ export async function DELETE(request: Request) {
     }
 
     if (existing.one_pager_filename) {
-      const path = `fund-docs/${user.id}/${existing.one_pager_filename}`
+      const path = `${user.id}/fund-docs/${existing.one_pager_filename}`
       await supabase.storage
         .from("pitch-decks")
         .remove([path])

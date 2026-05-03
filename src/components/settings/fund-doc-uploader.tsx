@@ -92,7 +92,7 @@ export function FundDocUploader() {
       if (!user) throw new Error("Not authenticated")
 
       const filename = `${Date.now()}_${safeName(file.name)}`
-      const storagePath = `fund-docs/${user.id}/${filename}`
+      const storagePath = `${user.id}/fund-docs/${filename}`
 
       const { error: upErr } = await supabase.storage
         .from("pitch-decks")
