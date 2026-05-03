@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label"
 import { Shield, Loader2, ShieldCheck, AlertTriangle, KeyRound, CheckCircle2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useTier } from "@/lib/tier-context"
-import { SectionLabel } from "@/components/dashboard/section-label"
 
 export default function SecurityPage() {
   const { config } = useTier()
@@ -74,17 +73,6 @@ export default function SecurityPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-7">
-      {/* Page header */}
-      <div>
-        <SectionLabel>Account · Security</SectionLabel>
-        <h1 className="mt-2 font-heading text-2xl font-bold tracking-[-0.01em] text-[#0A2E22]">
-          Security
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground max-w-md">
-          Two-factor authentication and password.
-        </p>
-      </div>
-
       {/* 2FA */}
       <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
         <div className="flex items-start justify-between gap-3 flex-wrap">

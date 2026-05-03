@@ -73,17 +73,6 @@ function BillingContent() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-7">
-      {/* Page header */}
-      <div>
-        <SectionLabel>Account · Billing</SectionLabel>
-        <h1 className="mt-2 font-heading text-2xl font-bold tracking-[-0.01em] text-[#0A2E22]">
-          Billing
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground max-w-md">
-          Subscription, plan changes, and promo codes.
-        </p>
-      </div>
-
       {/* Status banners */}
       {showExpired && (
         <div className="rounded-xl bg-primary/5 ring-1 ring-primary/30 p-4 flex gap-3">

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Building2, CreditCard, ShieldCheck } from "lucide-react"
+import { ArrowLeft, Building2, CreditCard, ShieldCheck } from "lucide-react"
 
 const tabs = [
   { href: "/settings/fund-profile", label: "Fund Profile", icon: Building2 },
@@ -16,7 +16,14 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Account</p>
+        <Link
+          href="/deals"
+          className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-3 w-3" />
+          Dealroom
+        </Link>
+        <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-primary">Account</p>
         <h1 className="mt-1 text-2xl font-bold font-heading">Settings</h1>
       </div>
       <nav className="border-b -mx-4 md:-mx-6 px-4 md:px-6">
