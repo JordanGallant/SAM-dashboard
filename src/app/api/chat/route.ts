@@ -34,7 +34,6 @@ function buildDealContext(deal: Deal): string {
 Stage: ${es.stage} · Sector: ${es.sector} · Geography: ${es.geography}
 Raising: ${es.raising || "not disclosed"} · MRR: ${es.mrr || "not disclosed"}
 Overall score: ${es.overallScore}/100 · Verdict: ${es.verdict} · Confidence: ${es.confidence}
-Data completeness: ${es.dataCompleteness}%
 
 SCORECARD:
 ${scorecard}
@@ -71,7 +70,7 @@ function buildTeamContext(deal: Deal): string {
   const redFlags = t.redFlags.map((r) => `  - [${r.severity}] ${r.text}`).join("\n")
 
   return `DEAL IN CONTEXT: ${deal.companyName} — TEAM TAB
-Team score: ${t.score}/100 · Verdict: ${t.verdict} · Data completeness: ${t.dataCompleteness}%
+Team score: ${t.score}/100 · Verdict: ${t.verdict}
 
 FOUNDERS:
 ${founders || "  (none)"}

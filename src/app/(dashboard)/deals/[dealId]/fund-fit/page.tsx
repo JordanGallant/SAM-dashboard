@@ -47,7 +47,6 @@ export default function FundFitPage() {
           title="Fund Fit"
           score={0}
           verdict="Insufficient Data"
-          dataCompleteness={0}
         />
         <div className="rounded-2xl ring-1 ring-primary/30 bg-gradient-to-br from-primary/5 via-primary/[0.02] to-transparent p-7 md:p-9">
           <div className="flex items-start gap-4 mb-5">
@@ -97,7 +96,7 @@ export default function FundFitPage() {
 
   return (
     <div className="space-y-7">
-      <SectionHeader title="Fund Fit" score={fit.score} verdict={fit.verdict} dataCompleteness={fit.dataCompleteness} />
+      <SectionHeader title="Fund Fit" score={fit.score} verdict={fit.verdict} />
 
       <EditorialCard
         label="Criteria match"

@@ -18,7 +18,7 @@ export default function ExitPage() {
 
   return (
     <div className="space-y-7">
-      <SectionHeader title="Exit Potential" score={exit.score} verdict={exit.verdict} dataCompleteness={exit.dataCompleteness} />
+      <SectionHeader title="Exit Potential" score={exit.score} verdict={exit.verdict} />
 
       {exit.comparableExits.length > 0 && (
         <EditorialCard label="Comparable exits" icon={<TrendingUp className="h-3.5 w-3.5" />}>

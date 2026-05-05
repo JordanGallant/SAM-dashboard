@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react"
 import { useParams } from "next/navigation"
-import { DataCompleteness } from "@/components/dashboard/data-completeness"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { EditorialCard } from "@/components/dashboard/editorial"
 import { useDeal } from "@/hooks/use-deal"
@@ -50,9 +49,6 @@ export default function MissingInfoPage() {
         <p className="mt-1 text-sm text-muted-foreground max-w-[60ch]">
           Data gaps identified in the materials provided. Use these as follow-up questions before the first call.
         </p>
-        <div className="mt-4">
-          <DataCompleteness percentage={missing.overallCompleteness} />
-        </div>
       </div>
 
       {isPending && (

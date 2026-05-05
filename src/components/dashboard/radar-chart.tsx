@@ -59,33 +59,9 @@ export function DomainRadarChart({ scorecard }: { scorecard: ScorecardRow[] }) {
                   style={{ width: `${row.score}%` }}
                 />
               </div>
-
-              {/* Data completeness indicator */}
-              <div className="flex items-center gap-2">
-                <div className="h-1 flex-1 rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-emerald-400 transition-all duration-500"
-                    style={{ width: `${row.dataCompleteness}%` }}
-                  />
-                </div>
-                <span className="text-[10px] tabular-nums text-muted-foreground w-20 text-right">
-                  {row.dataCompleteness}% data
-                  {row.dataCompleteness < 40 && <span className="text-primary"> !</span>}
-                </span>
-              </div>
             </div>
           )
         })}
-
-        {/* Legend */}
-        <div className="flex gap-4 pt-1 border-t text-[10px] text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <span className="inline-block h-2 w-4 rounded-full bg-red-500" /> Score
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="inline-block h-1 w-4 rounded-full bg-emerald-400" /> Data available
-          </span>
-        </div>
       </CardContent>
     </Card>
   )

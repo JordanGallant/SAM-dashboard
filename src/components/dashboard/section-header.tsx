@@ -1,4 +1,3 @@
-import { DataCompleteness } from "./data-completeness"
 import { DOMAIN_VERDICT_COLORS, getScoreColor } from "@/lib/constants"
 import type { DomainVerdict } from "@/lib/types/analysis"
 
@@ -6,17 +5,15 @@ export function SectionHeader({
   title,
   score,
   verdict,
-  dataCompleteness,
 }: {
   title: string
   score: number
   verdict: DomainVerdict
-  dataCompleteness: number
 }) {
   const verdictColor = DOMAIN_VERDICT_COLORS[verdict]
   const scoreColor = getScoreColor(score)
   return (
-    <div className="space-y-4 pb-5 border-b border-[#0F3D2E]/10">
+    <div className="pb-5 border-b border-[#0F3D2E]/10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <div>
@@ -40,7 +37,6 @@ export function SectionHeader({
           <span className="text-xs font-mono text-muted-foreground">/100</span>
         </div>
       </div>
-      <DataCompleteness percentage={dataCompleteness} />
     </div>
   )
 }

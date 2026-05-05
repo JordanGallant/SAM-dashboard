@@ -39,7 +39,22 @@ export function getCompletenessColor(pct: number) {
 
 export const PIPELINE_STAGES = ["New", "Reviewing", "First Call", "DD", "Passed", "Invested"] as const
 export const DEAL_STAGES = ["Pre-seed", "Seed", "Series A", "Series B+"] as const
-export const SECTORS = ["SaaS", "Fintech", "DeepTech", "HealthTech", "CleanTech", "PropTech", "EdTech", "Other"] as const
+export const SECTORS = [
+  "SaaS & Software",
+  "AI & Data Intelligence",
+  "FinTech & Financial Infrastructure",
+  "Marketplaces & Platforms",
+  "Consumer & D2C",
+  "Mobility & Logistics",
+  "Health & Wellbeing",
+  "Energy & Climate",
+  "PropTech (Real Estate)",
+  "EdTech",
+  "Cybersecurity",
+  "Developer Tools & Infrastructure",
+  "Industry, Hardware, Defense & DeepTech",
+  "Other",
+] as const
 export const GEOS = ["Netherlands", "DACH", "Nordics", "UK", "US", "Europe", "Global"] as const
 
 export const STAGE_BADGE_COLORS: Record<string, string> = {

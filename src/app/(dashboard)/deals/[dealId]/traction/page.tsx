@@ -23,7 +23,6 @@ export default function TractionPage() {
         title="Traction & Unit Economics"
         score={traction.score}
         verdict={traction.verdict}
-        dataCompleteness={traction.dataCompleteness}
       />
 
       <EditorialCard label="Revenue & growth" icon={<TrendingUp className="h-3.5 w-3.5" />}>

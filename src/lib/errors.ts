@@ -115,7 +115,7 @@ const PATTERNS: Array<{
     contexts: ["upload"],
     build: () => ({
       title: "File is too large to upload",
-      hint: "Max 50 MB. Compress the PDF and retry.",
+      hint: "Max 25 MB. Compress the PDF and retry.",
     }),
   },
 

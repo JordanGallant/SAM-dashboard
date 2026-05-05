@@ -1,13 +1,12 @@
 "use client"
 
-import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useDeal } from "@/hooks/use-deal"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
 import { InsightBlock, leadSplit } from "@/components/dashboard/editorial"
-import { Sparkles, AlertTriangle, Users, Handshake, MessageSquare, ArrowRight } from "lucide-react"
+import { Sparkles, AlertTriangle, Users, Handshake } from "lucide-react"
 import { DomainSources, type ExternalSource } from "@/components/dashboard/domain-sources"
 import type { FounderRow } from "@/lib/types/analysis"
 
@@ -75,7 +74,6 @@ export default function TeamPage() {
         title="Team Analysis"
         score={team.score}
         verdict={team.verdict}
-        dataCompleteness={team.dataCompleteness}
       />
 
       {/* Founders */}
@@ -127,19 +125,6 @@ export default function TeamPage() {
 
       {/* Red Flags */}
       <RedFlagsList items={team.redFlags} />
-
-      <Link
-        href={`/deals/${params.dealId}/ask?scope=team`}
-        className="group flex items-center justify-between gap-3 rounded-xl bg-[#F4FAF6]/60 ring-1 ring-[#0F3D2E]/10 px-4 py-3 hover:bg-[#F4FAF6] hover:ring-[#0F3D2E]/20 transition-colors"
-      >
-        <span className="flex items-center gap-2.5 min-w-0">
-          <MessageSquare className="h-3.5 w-3.5 text-primary shrink-0" />
-          <span className="text-[13px] text-foreground/80 group-hover:text-foreground">
-            Ask SAM about the team
-          </span>
-        </span>
-        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
-      </Link>
 
       <DomainSources
         documents={deal?.documents}

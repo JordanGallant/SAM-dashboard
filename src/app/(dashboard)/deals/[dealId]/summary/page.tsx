@@ -138,7 +138,7 @@ export default function SummaryPage() {
           <div className="flex flex-col items-center">
             <ScoreGauge score={es.overallScore} size={150} />
             <p className="mt-3 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
-              {es.confidence} confidence · Data {es.dataCompleteness}%
+              {es.confidence} confidence
             </p>
           </div>
         </div>
@@ -203,9 +203,6 @@ export default function SummaryPage() {
                     {row.score}
                     <span className="text-muted-foreground font-normal text-sm">/100</span>
                   </div>
-                  <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-                    Data {row.dataCompleteness}%
-                  </p>
                 </div>
               </div>
               {row.keyFinding && (

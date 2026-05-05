@@ -121,7 +121,7 @@ export async function generateExecutiveSummaryDocx(es: ExecutiveSummary): Promis
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: `Confidence: ${es.confidence}  |  Overall Score: ${es.overallScore}/100  |  Data Completeness: ${es.dataCompleteness}%`, size: 20, font: "Calibri", color: "555555" }),
+              new TextRun({ text: `Confidence: ${es.confidence}  |  Overall Score: ${es.overallScore}/100`, size: 20, font: "Calibri", color: "555555" }),
             ],
             spacing: { after: 300 },
           }),
@@ -239,11 +239,12 @@ function p(text: string | undefined, opts: { italic?: boolean; color?: string } 
   })
 }
 
-function domainHeader(label: string, score: number, verdict: string, completeness: number): Paragraph {
+function domainHeader(label: string, score: number, verdict: string): Paragraph {
+  void label
   return new Paragraph({
     children: [
       new TextRun({
-        text: `Score ${score}/100  ·  ${verdict}  ·  Data ${completeness}%`,
+        text: `Score ${score}/100  ·  ${verdict}`,
         size: 18,
         font: "Calibri",
         color: "666666",
@@ -286,7 +287,7 @@ function metricTable(rows: MetricRow[]): Table | Paragraph {
 function teamSection(team: TeamAnalysis): (Paragraph | Table)[] {
   const out: (Paragraph | Table)[] = [
     h1("Team"),
-    domainHeader("Team", team.score, team.verdict, team.dataCompleteness),
+    domainHeader("Team", team.score, team.verdict),
   ]
   if (team.founders && team.founders.length > 0) {
     out.push(h2("Founders"))
@@ -340,7 +341,7 @@ function teamSection(team: TeamAnalysis): (Paragraph | Table)[] {
 function marketSection(market: MarketAnalysis): (Paragraph | Table)[] {
   const out: (Paragraph | Table)[] = [
     h1("Market"),
-    domainHeader("Market", market.score, market.verdict, market.dataCompleteness),
+    domainHeader("Market", market.score, market.verdict),
   ]
   if (market.marketSize && market.marketSize.length > 0) {
     out.push(h2("Market size validation"))
@@ -403,7 +404,7 @@ function marketSection(market: MarketAnalysis): (Paragraph | Table)[] {
 function productSection(product: ProductAnalysis): (Paragraph | Table)[] {
   const out: (Paragraph | Table)[] = [
     h1("Product"),
-    domainHeader("Product", product.score, product.verdict, product.dataCompleteness),
+    domainHeader("Product", product.score, product.verdict),
     h2("Problem assessment"),
     p(`Problem type: ${product.problemType || "—"}  ·  Pain score: ${product.painScore || "—"}`),
   ]
@@ -457,7 +458,7 @@ function productSection(product: ProductAnalysis): (Paragraph | Table)[] {
 function tractionSection(traction: TractionAnalysis): (Paragraph | Table)[] {
   const out: (Paragraph | Table)[] = [
     h1("Traction"),
-    domainHeader("Traction", traction.score, traction.verdict, traction.dataCompleteness),
+    domainHeader("Traction", traction.score, traction.verdict),
   ]
   if (traction.revenueMetrics && traction.revenueMetrics.length > 0) {
     out.push(h2("Revenue & growth"))
@@ -480,7 +481,7 @@ function tractionSection(traction: TractionAnalysis): (Paragraph | Table)[] {
 function financeSection(finance: FinanceAnalysis): (Paragraph | Table)[] {
   const out: (Paragraph | Table)[] = [
     h1("Finance"),
-    domainHeader("Finance", finance.score, finance.verdict, finance.dataCompleteness),
+    domainHeader("Finance", finance.score, finance.verdict),
   ]
   if (finance.financialHealth && finance.financialHealth.length > 0) {
     out.push(h2("Financial health"))
@@ -526,7 +527,7 @@ function financeSection(finance: FinanceAnalysis): (Paragraph | Table)[] {
 function exitSection(exit: ExitAnalysis): (Paragraph | Table)[] {
   const out: (Paragraph | Table)[] = [
     h1("Exit Potential"),
-    domainHeader("Exit", exit.score, exit.verdict, exit.dataCompleteness),
+    domainHeader("Exit", exit.score, exit.verdict),
   ]
   if (exit.comparableExits && exit.comparableExits.length > 0) {
     out.push(h2("Comparable exits"))
@@ -553,7 +554,7 @@ function exitSection(exit: ExitAnalysis): (Paragraph | Table)[] {
 function fundFitSection(fit: FundFitAnalysis): (Paragraph | Table)[] {
   const out: (Paragraph | Table)[] = [
     h1("Fund Fit"),
-    domainHeader("Fund Fit", fit.score, fit.verdict, fit.dataCompleteness),
+    domainHeader("Fund Fit", fit.score, fit.verdict),
   ]
   if (fit.criteria && fit.criteria.length > 0) {
     out.push(h2("Criteria match"))
@@ -590,7 +591,6 @@ function fundFitSection(fit: FundFitAnalysis): (Paragraph | Table)[] {
 
 function missingInfoSection(missing: MissingInfoAnalysis): (Paragraph | Table)[] {
   const out: (Paragraph | Table)[] = [h1("Missing Information")]
-  out.push(p(`Overall completeness: ${missing.overallCompleteness}%`, { color: "666666" }))
   if (!missing.sections || missing.sections.length === 0) {
     out.push(p("No data gaps identified.", { italic: true, color: "888888" }))
     return out
@@ -672,7 +672,7 @@ export async function generateFullReportDocx(
       alignment: AlignmentType.CENTER,
       children: [
         new TextRun({
-          text: `Confidence: ${es.confidence}  |  Overall Score: ${es.overallScore}/100  |  Data Completeness: ${es.dataCompleteness}%`,
+          text: `Confidence: ${es.confidence}  |  Overall Score: ${es.overallScore}/100`,
           size: 20,
           font: "Calibri",
           color: "555555",

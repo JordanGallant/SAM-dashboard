@@ -39,7 +39,6 @@ export default function ProductPage() {
         title="Product Analysis"
         score={product.score}
         verdict={product.verdict}
-        dataCompleteness={product.dataCompleteness}
       />
 
       {/* Problem Assessment — compact stat row + prose block */}

@@ -10,10 +10,9 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { extractText, getDocumentProxy } from "unpdf"
-import OpenAI from "openai"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
-import { DEAL_STAGES, SECTORS, GEOS } from "@/lib/constants"
 import { upsertHubspotContact } from "@/lib/hubspot"
+import { extractFundFields, isEmptyStr, isEmptyArr, isEmptyNum } from "@/lib/fund-extract"
 
 const MAX_TEXT_CHARS = 24000 // ~6k tokens — generous enough for a multi-page mandate
 
@@ -22,96 +21,6 @@ async function extractAllPagesText(buffer: Buffer): Promise<string> {
   const { text } = await extractText(pdf, { mergePages: true })
   const joined = Array.isArray(text) ? text.join("\n") : String(text)
   return joined.slice(0, MAX_TEXT_CHARS).trim()
-}
-
-interface ExtractedFundFields {
-  name?: string
-  website?: string
-  thesis?: string
-  stageFocus?: string[]
-  sectorFocus?: string[]
-  geoFocus?: string[]
-  ticketSizeMin?: number
-  ticketSizeMax?: number
-  additional?: string
-}
-
-// Pull structured fund fields out of the mandate doc text using Azure OpenAI.
-// Same client pattern as /api/upload-deck. Returns null on any failure — the
-// upload flow continues even if extraction fails (the raw text is still saved
-// and Flow 10 will use it directly via the doc-as-authoritative prompt).
-async function extractFundFields(docText: string): Promise<ExtractedFundFields | null> {
-  const key = process.env.AZURE_AI_KEY
-  const endpoint = process.env.AZURE_AI_ENDPOINT
-  const model = process.env.AZURE_AI_MODEL || "gpt-4o"
-  if (!key || !endpoint) return null
-
-  const client = new OpenAI({ baseURL: endpoint, apiKey: key })
-
-  const systemPrompt = `Extract structured fund-profile fields from a fund mandate document. Return JSON only, no prose.
-
-Schema:
-{
-  "name": string — the fund's name as stated in the doc (e.g. "Horizon Ventures II"). Drop boilerplate suffixes like ", L.P." or ", Fund SCSp". Empty string if no clear fund name.
-  "website": string — the fund's website if mentioned (https://… form). Empty string if not stated.
-  "thesis": string — 1-3 sentences capturing the fund's investment thesis. Verbatim phrasing from the doc preferred. Empty string if not stated.
-  "stageFocus": string[] — pick zero or more from: ${DEAL_STAGES.join(", ")}. Only include stages the doc explicitly mentions.
-  "sectorFocus": string[] — pick zero or more from: ${SECTORS.join(", ")}. Map the doc's wording to these canonical buckets. "Other" if the fund's focus doesn't fit cleanly.
-  "geoFocus": string[] — pick zero or more from: ${GEOS.join(", ")}. EU-only mandates → ["Europe"]. EU+UK → ["Europe", "UK"].
-  "ticketSizeMin": integer EUR — first-cheque minimum, in raw euros (e.g. 500000 not "500K"). Null if not stated.
-  "ticketSizeMax": integer EUR — first-cheque maximum, in raw euros. Null if not stated.
-  "additional": string — capture all hard restrictions, exclusions, and binding LP constraints in one paragraph. Examples: "no defense, gambling, or non-EU companies; GDPR-by-design preferred; quarterly LP reviews".
-}
-
-Be conservative. Do not invent fields. Empty string / null / [] are valid when the doc is silent.`
-
-  try {
-    const completion = await client.chat.completions.create({
-      model,
-      temperature: 0,
-      max_tokens: 1200,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: docText },
-      ],
-    })
-    const raw = completion.choices[0]?.message?.content?.trim()
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-
-    // Defensive validation — only keep canonical values.
-    const stageAllowed = new Set<string>(DEAL_STAGES)
-    const sectorAllowed = new Set<string>(SECTORS)
-    const geoAllowed = new Set<string>(GEOS)
-
-    return {
-      name: typeof parsed.name === "string" ? parsed.name.trim() : undefined,
-      website: typeof parsed.website === "string" ? parsed.website.trim() : undefined,
-      thesis: typeof parsed.thesis === "string" ? parsed.thesis.trim() : undefined,
-      stageFocus: Array.isArray(parsed.stageFocus)
-        ? parsed.stageFocus.filter((s: unknown): s is string => typeof s === "string" && stageAllowed.has(s))
-        : undefined,
-      sectorFocus: Array.isArray(parsed.sectorFocus)
-        ? parsed.sectorFocus.filter((s: unknown): s is string => typeof s === "string" && sectorAllowed.has(s))
-        : undefined,
-      geoFocus: Array.isArray(parsed.geoFocus)
-        ? parsed.geoFocus.filter((s: unknown): s is string => typeof s === "string" && geoAllowed.has(s))
-        : undefined,
-      ticketSizeMin:
-        typeof parsed.ticketSizeMin === "number" && parsed.ticketSizeMin > 0
-          ? Math.round(parsed.ticketSizeMin)
-          : undefined,
-      ticketSizeMax:
-        typeof parsed.ticketSizeMax === "number" && parsed.ticketSizeMax > 0
-          ? Math.round(parsed.ticketSizeMax)
-          : undefined,
-      additional: typeof parsed.additional === "string" ? parsed.additional.trim() : undefined,
-    }
-  } catch (err) {
-    console.error("Fund field extraction failed:", err)
-    return null
-  }
 }
 
 export async function POST(request: Request) {
@@ -205,17 +114,15 @@ export async function POST(request: Request) {
     }
 
     // LLM-extract structured fields from the doc.
-    const extracted = await extractFundFields(pdfText)
+    const extracted = await extractFundFields(pdfText, "mandate-doc")
 
     // Only fill EMPTY fields. We never overwrite values the user has already
     // typed in by hand — their work wins. This keeps the upload-doc flow safe
     // for returning users who've customised their fund profile.
     // Exception: the "(awaiting fund details)" placeholder is treated as empty
     // — that's a stub we wrote when a row was created without a real name yet.
-    const isEmptyStr = (v: unknown) =>
-      typeof v !== "string" || !v.trim() || v.trim() === "(awaiting fund details)"
-    const isEmptyArr = (v: unknown) => !Array.isArray(v) || v.length === 0
-    const isEmptyNum = (v: unknown) => typeof v !== "number" || !v
+    // (Empty-check helpers live in @/lib/fund-extract — shared with the website
+    // scraper so both paths obey identical merge rules.)
 
     const patch: Record<string, unknown> = {
       one_pager_text: pdfText,

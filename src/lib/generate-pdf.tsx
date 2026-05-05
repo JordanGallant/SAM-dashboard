@@ -213,10 +213,10 @@ function Findings({ title, items }: { title: string; items: FindingItem[] }) {
   )
 }
 
-function DomainMeta({ score, verdict, dataCompleteness }: { score: number; verdict: string; dataCompleteness: number }) {
+function DomainMeta({ score, verdict }: { score: number; verdict: string }) {
   return (
     <Text style={styles.domainMeta}>
-      Score {score}/100  ·  {verdict}  ·  Data {dataCompleteness}%
+      Score {score}/100  ·  {verdict}
     </Text>
   )
 }
@@ -547,7 +547,6 @@ function MissingInfoPage({ missing }: { missing: MissingInfoAnalysis }) {
   return (
     <View>
       <Text style={styles.h1}>Missing Information</Text>
-      <Text style={styles.domainMeta}>Overall completeness: {missing.overallCompleteness}%</Text>
       {missing.sections.length === 0 ? (
         <Empty>No data gaps identified.</Empty>
       ) : (
@@ -599,7 +598,7 @@ function ReportDocument({ companyName, analysis }: { companyName: string; analys
           {verdictLabel(es.verdict).toUpperCase()}
         </Text>
         <Text style={styles.verdictMeta}>
-          Confidence: {es.confidence}  ·  Overall: {es.overallScore}/100  ·  Data: {es.dataCompleteness}%
+          Confidence: {es.confidence}  ·  Overall: {es.overallScore}/100
         </Text>
 
         <Text style={styles.h1}>Executive Summary</Text>

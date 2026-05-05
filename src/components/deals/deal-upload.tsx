@@ -11,7 +11,7 @@ import { friendlyError, type FriendlyError } from "@/lib/errors"
 import { cn } from "@/lib/utils"
 import type { DealDocument, DocType } from "@/lib/types/deal"
 
-const MAX_UPLOAD_BYTES = 50 * 1024 * 1024 // 50 MB cap to keep storage costs sane
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024 // 25 MB cap to keep storage costs sane
 const ACCEPTED = ".pdf"
 const ACCEPTED_MIME = "application/pdf"
 
@@ -56,7 +56,7 @@ export function DealUpload({
 
     if (file.size > MAX_UPLOAD_BYTES) {
       setError(friendlyError(
-        `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max 50 MB.`,
+        `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max 25 MB.`,
         "upload"
       ))
       return
@@ -138,9 +138,21 @@ export function DealUpload({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(docTypeLabels).map(([key, label]) => (
-                <SelectItem key={key} value={key}>{label}</SelectItem>
-              ))}
+              {Object.entries(docTypeLabels).map(([key, label]) => {
+                const isAvailable = key === "pitch-deck"
+                return (
+                  <SelectItem key={key} value={key} disabled={!isAvailable}>
+                    <span className="flex items-center gap-2">
+                      <span>{label}</span>
+                      {!isAvailable && (
+                        <span className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground/70">
+                          Soon
+                        </span>
+                      )}
+                    </span>
+                  </SelectItem>
+                )
+              })}
             </SelectContent>
           </Select>
         </div>
@@ -200,7 +212,7 @@ export function DealUpload({
           {uploading ? "Uploading…" : "Drop a file here, or click to browse"}
         </p>
         <p className="mt-1.5 text-[12px] md:text-[13px] text-muted-foreground max-w-md">
-          PDF only · Max 50&nbsp;MB
+          PDF only · Max 25&nbsp;MB
         </p>
         <Button
           variant="outline"

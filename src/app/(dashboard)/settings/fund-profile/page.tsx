@@ -8,11 +8,33 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Loader2, CheckCircle2, Sparkles } from "lucide-react"
+import { Loader2, CheckCircle2, Sparkles, Globe, AlertCircle } from "lucide-react"
 import { useFundProfile } from "@/hooks/use-fund-profile"
 import { upsertFund } from "@/app/actions/funds"
 import { DEAL_STAGES, SECTORS, GEOS } from "@/lib/constants"
 import { FundDocUploader } from "@/components/settings/fund-doc-uploader"
+
+// Cheap client-side check — server still validates. Lets us disable the
+// Scrape button until the user has typed something that looks URL-shaped,
+// without being so strict we reject "indexventures.com" (no scheme).
+function looksLikeUrl(s: string): boolean {
+  const t = s.trim()
+  if (t.length < 4) return false
+  // Allow bare domain or full URL.
+  return /^(https?:\/\/)?[^\s.]+\.[^\s]+/i.test(t)
+}
+
+const FIELD_LABELS: Record<string, string> = {
+  name: "fund name",
+  website: "website",
+  thesis: "thesis",
+  stageFocus: "stage focus",
+  sectorFocus: "sector focus",
+  geoFocus: "geography",
+  ticketSizeMin: "min ticket",
+  ticketSizeMax: "max ticket",
+  additional: "restrictions",
+}
 
 export default function FundProfilePage() {
   const { fund, loading, refetch } = useFundProfile()
@@ -30,6 +52,12 @@ export default function FundProfilePage() {
   const [ticketMin, setTicketMin] = useState("")
   const [ticketMax, setTicketMax] = useState("")
   const [additional, setAdditional] = useState("")
+
+  // Website-scrape state. Separate from the Save flow because scraping is a
+  // one-shot enrichment action, not a save.
+  const [scraping, setScraping] = useState(false)
+  const [scrapeNote, setScrapeNote] = useState<string | null>(null)
+  const [scrapeError, setScrapeError] = useState<string | null>(null)
 
   useEffect(() => {
     if (fund) {
@@ -77,6 +105,38 @@ export default function FundProfilePage() {
       setTimeout(() => setSaved(false), 2500)
     }
     setSaving(false)
+  }
+
+  async function handleScrape() {
+    if (!looksLikeUrl(website)) return
+    setScraping(true)
+    setScrapeError(null)
+    setScrapeNote(null)
+    try {
+      const res = await fetch("/api/fund-website", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: website.trim() }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || "Could not scrape that site")
+
+      const auto: string[] = Array.isArray(data.autoFilledFields) ? data.autoFilledFields : []
+      const additionalUpdated: boolean = Boolean(data.additionalUpdated)
+      // Pull the freshly-merged values back into the form. Re-keying
+      // prefillKey forces the useEffect to re-read fund state after refetch.
+      await refetch()
+      setPrefillKey((k) => k + 1)
+
+      const parts: string[] = []
+      if (auto.length) parts.push(`Auto-filled: ${auto.map((k) => FIELD_LABELS[k] ?? k).join(", ")}`)
+      if (additionalUpdated) parts.push("Added to additional info")
+      setScrapeNote(parts.join(" · ") || "Scraped — nothing new to fill in")
+    } catch (err) {
+      setScrapeError(err instanceof Error ? err.message : "Could not scrape that site")
+    } finally {
+      setScraping(false)
+    }
   }
 
   if (loading) return <p className="text-sm text-muted-foreground">Loading...</p>
@@ -128,7 +188,47 @@ export default function FundProfilePage() {
           </div>
           <div className="space-y-2">
             <Label>Website</Label>
-            <Input value={website} onChange={(e) => setWebsite(e.target.value)} />
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <Input
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                placeholder="https://yourfund.com"
+                className="flex-1"
+              />
+              <button
+                type="button"
+                onClick={handleScrape}
+                disabled={scraping || !looksLikeUrl(website)}
+                title={
+                  !looksLikeUrl(website)
+                    ? "Enter a valid URL first"
+                    : "Read your homepage and auto-fill the fields below"
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] px-4 py-2 text-[12.5px] font-medium text-white shadow-sm transition-all hover:-translate-y-px hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm sm:shrink-0"
+              >
+                {scraping ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Globe className="h-3.5 w-3.5" />
+                )}
+                {scraping ? "Scraping…" : "Scrape website"}
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              SAM will read your homepage and fill in any empty fields below — and add the page summary to Additional info so Fund Fit has the context.
+            </p>
+            {scrapeNote && (
+              <div className="rounded-md bg-emerald-50 ring-1 ring-emerald-200 p-2.5 text-[12.5px] text-emerald-800 flex items-start gap-2">
+                <Sparkles className="h-3.5 w-3.5 shrink-0 mt-0.5 text-emerald-700" />
+                <span>{scrapeNote}</span>
+              </div>
+            )}
+            {scrapeError && (
+              <div className="rounded-md bg-red-50 ring-1 ring-red-200 p-2.5 text-[12.5px] text-red-700 flex items-start gap-2">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                <span>{scrapeError}</span>
+              </div>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Investment Thesis</Label>

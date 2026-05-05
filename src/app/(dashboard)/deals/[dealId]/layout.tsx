@@ -21,6 +21,7 @@ import { updateDealStatus } from "@/app/actions/deals"
 import { friendlyError, type FriendlyError } from "@/lib/errors"
 import type { PipelineStatus } from "@/lib/types/deal"
 import { DealBottomSheet } from "@/components/layout/deal-bottom-sheet"
+import { AskSamInline } from "@/components/dashboard/asksam-inline"
 
 export default function DealDetailLayout({ children }: { children: React.ReactNode }) {
   const params = useParams()
@@ -46,7 +47,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   }
 
   const analysis = deal.analysis
-  const tabKeys = new Set(["summary", "team", "market", "product", "traction", "finance", "exit", "fund-fit", "missing-info", "ask"])
+  const tabKeys = new Set(["summary", "team", "market", "product", "traction", "finance", "exit", "fund-fit", "missing-info"])
   const activeTab = pathname.split("/").filter(Boolean).reverse().find((s) => tabKeys.has(s)) || "summary"
 
   const gatedTabs: Record<string, boolean> = {
@@ -127,7 +128,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <div className="space-y-6 pb-20 md:pb-0 mx-auto max-w-[1400px]">
+    <div className="space-y-6 pb-20 md:pb-0 mx-auto max-w-[1600px]">
       {/* Deal header — editorial, single line */}
       <div className="space-y-2">
         <Link href="/deals" className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
@@ -220,11 +221,8 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
         </div>
       )}
 
-      {/* Body: content on left · right sub-nav */}
+      {/* Body: left tab nav · main content · right copilot panel */}
       <div className="flex items-start gap-6">
-        {/* Content fills available width */}
-        <div className="flex-1 min-w-0">{children}</div>
-
         {analysis && (
           <nav className="w-56 shrink-0 hidden md:block sticky top-4 self-start">
             {NAV_GROUPS.map((group, groupIdx) => (
@@ -266,7 +264,7 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
                           </span>
                           {isGated && <Lock className="h-3 w-3 shrink-0 text-muted-foreground" />}
                           <span className="truncate">{label}</span>
-                          {!isGated && key !== "ask" && (
+                          {!isGated && (
                             <span className="ml-auto font-mono text-[11px] tabular-nums text-muted-foreground group-hover:text-foreground">
                               {score ?? "—"}
                             </span>
@@ -280,6 +278,11 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
             ))}
           </nav>
         )}
+
+        {/* Content fills available width */}
+        <div className="flex-1 min-w-0">{children}</div>
+
+        {analysis && <AskSamInline dealId={dealId} />}
       </div>
       <DealBottomSheet />
     </div>
@@ -312,5 +315,4 @@ const NAV_GROUPS: { label: string; items: { key: string; label: string }[] }[] =
       { key: "fund-fit", label: "Fund Fit" },
     ],
   },
-  { label: "Co-pilot", items: [{ key: "ask", label: "Ask SAM" }] },
 ]

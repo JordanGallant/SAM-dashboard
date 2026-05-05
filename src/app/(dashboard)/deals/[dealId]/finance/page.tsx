@@ -32,7 +32,6 @@ export default function FinancePage() {
         title="Financial Analysis"
         score={finance.score}
         verdict={finance.verdict}
-        dataCompleteness={finance.dataCompleteness}
       />
 
       {/* Financial health table */}

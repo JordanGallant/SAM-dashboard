@@ -38,7 +38,6 @@ export default function MarketPage() {
         title="Market Analysis"
         score={market.score}
         verdict={market.verdict}
-        dataCompleteness={market.dataCompleteness}
       />
 
       {/* Market Size — same chrome as Traction MetricTable, responsive on mobile */}

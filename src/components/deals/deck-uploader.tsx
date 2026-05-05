@@ -9,7 +9,7 @@ type Variant = "hero" | "compact"
 
 const ACCEPTED_MIME = "application/pdf"
 const ACCEPTED_EXT = ".pdf"
-const MAX_BYTES = 50 * 1024 * 1024
+const MAX_BYTES = 25 * 1024 * 1024
 
 export function DeckUploader({
   variant = "hero",
@@ -34,7 +34,7 @@ export function DeckUploader({
       return
     }
     if (file.size > MAX_BYTES) {
-      setError(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max 50 MB.`)
+      setError(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max 25 MB.`)
       return
     }
 
@@ -67,7 +67,7 @@ export function DeckUploader({
         />
         <button
           onClick={() => fileInputRef.current?.click()}
-          title="PDF only · Max 50 MB"
+          title="PDF only · Max 25 MB"
           className="group inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
         >
           <UploadCloud className="h-4 w-4" />
@@ -129,7 +129,7 @@ export function DeckUploader({
       </p>
       <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-3 py-1.5 text-[11px] font-mono uppercase tracking-widest text-[#0F3D2E] shadow-sm">
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
-        PDF only · Max 50 MB
+        PDF only · Max 25 MB
       </div>
 
       {error && (

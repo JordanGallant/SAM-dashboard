@@ -1,14 +1,15 @@
 "use client"
 
 /**
- * Mobile-only bottom bar: a Tabs pill (opens nav sheet) and an Ask SAM pill
- * that navigates to /deals/[id]/ask. Chat is its own page now — no overlay.
+ * Mobile-only bottom bar: a Tabs pill that opens the nav sheet for deal-detail
+ * tabs. The Ask SAM copilot is now a persistent right-rail panel (desktop) and
+ * a floating launcher with a bottom sheet (mobile) — see AskSamInline.
  */
 
 import Link from "next/link"
 import { useParams, usePathname } from "next/navigation"
 import { useState } from "react"
-import { List, MessageSquare, Lock } from "lucide-react"
+import { List, Lock } from "lucide-react"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { useDeal } from "@/hooks/use-deal"
 import { useTier } from "@/lib/tier-context"
@@ -34,7 +35,6 @@ const NAV_GROUPS: { label: string; items: { key: string; label: string }[] }[] =
       { key: "missing-info", label: "Missing Info" },
     ],
   },
-  { label: "Co-pilot", items: [{ key: "ask", label: "Ask SAM" }] },
 ]
 
 export function DealBottomSheet() {
@@ -49,7 +49,7 @@ export function DealBottomSheet() {
   if (!dealId || !deal?.analysis) return null
 
   const analysis = deal.analysis
-  const tabKeys = new Set(["summary", "team", "market", "product", "traction", "finance", "exit", "fund-fit", "missing-info", "ask"])
+  const tabKeys = new Set(["summary", "team", "market", "product", "traction", "finance", "exit", "fund-fit", "missing-info"])
   const activeTab = pathname.split("/").filter(Boolean).reverse().find((s) => tabKeys.has(s)) || "summary"
   const activeLabel = NAV_GROUPS.flatMap((g) => g.items).find((i) => i.key === activeTab)?.label ?? "Summary"
 
@@ -71,7 +71,7 @@ export function DealBottomSheet() {
 
   return (
     <>
-      {/* Persistent mobile bar */}
+      {/* Persistent mobile bar — tabs only; copilot has its own floating launcher */}
       <div
         className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur md:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
@@ -91,13 +91,6 @@ export function DealBottomSheet() {
               </p>
             </div>
           </button>
-          <Link
-            href={`/deals/${dealId}/ask`}
-            className="flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-2.5 active:opacity-90 transition-opacity"
-          >
-            <MessageSquare className="h-4 w-4 shrink-0" />
-            <span className="text-[12.5px] font-semibold">Ask SAM</span>
-          </Link>
         </div>
       </div>
 
@@ -180,7 +173,7 @@ function NavList({
                     </span>
                     {isGated && <Lock className="h-3 w-3 shrink-0 text-muted-foreground" />}
                     <span className="truncate">{label}</span>
-                    {!isGated && key !== "ask" && (
+                    {!isGated && (
                       <span className="ml-auto font-mono text-[12px] tabular-nums text-muted-foreground">
                         {score ?? "—"}
                       </span>
