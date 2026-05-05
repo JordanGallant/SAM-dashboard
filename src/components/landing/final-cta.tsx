@@ -41,12 +41,6 @@ export function FinalCTA() {
                 Analyse a deck
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              <Link
-                href="/sample"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur text-white px-7 py-3.5 text-sm font-semibold transition-all"
-              >
-                See a sample memo
-              </Link>
             </div>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-mono text-white/50 uppercase tracking-widest">

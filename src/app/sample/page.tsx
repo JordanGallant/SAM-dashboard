@@ -3,8 +3,7 @@ import { Navbar } from "@/components/landing/navbar"
 import { Footer } from "@/components/landing/footer"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { buttonVariants } from "@/components/ui/button"
-import { Shield, AlertTriangle, ArrowRight } from "lucide-react"
+import { Shield, AlertTriangle, ArrowRight, Quote } from "lucide-react"
 import { sampleAnalysis } from "@/lib/sample-analysis"
 import { VERDICT_COLORS, DOMAIN_VERDICT_COLORS } from "@/lib/constants"
 
@@ -16,16 +15,62 @@ export default function SamplePage() {
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">
-        {/* Page hero */}
-        <section className="py-16 border-b bg-slate-50/50">
-          <div className="mx-auto max-w-4xl px-4">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Sample memo</p>
-            <h1 className="mt-2 text-3xl md:text-4xl font-bold font-heading tracking-tight">
-              What a Sam analysis looks like.
-            </h1>
-            <p className="mt-3 text-muted-foreground max-w-2xl">
-              Below is an illustrative Sam memo for a fictional Seed-stage SaaS company. Every section follows the same structure Sam produces for any deck — executive summary, scored domain breakdown, thesis, strengths, risks, and recommended next steps.
-            </p>
+        {/* Page hero — copy + browser-chrome dashboard screenshot */}
+        <section className="relative overflow-hidden border-b bg-gradient-to-br from-[#050B15] via-[#0A1A14] to-[#0F3D2E] text-white">
+          <div className="absolute -top-40 -right-40 h-[32rem] w-[32rem] rounded-full bg-primary/20 blur-3xl pointer-events-none" />
+          <div className="absolute top-1/3 -left-32 h-80 w-80 rounded-full bg-[#D4FF6B]/10 blur-3xl pointer-events-none" />
+          <div
+            className="absolute inset-0 opacity-[0.04] pointer-events-none"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
+            }}
+          />
+          <div className="relative mx-auto max-w-6xl px-4 pt-16 pb-20 md:pt-20 md:pb-24">
+            <div className="grid lg:grid-cols-[1fr_1.15fr] gap-10 lg:gap-14 items-center">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">Sample memo</p>
+                <h1 className="mt-3 text-4xl md:text-5xl font-bold font-heading tracking-[-0.02em] leading-[1.05] text-white">
+                  What a Sam{" "}
+                  <span className="bg-gradient-to-r from-[#D4FF6B] via-[#C8F25F] to-[#7FD9AA] bg-clip-text text-transparent">
+                    analysis
+                  </span>{" "}
+                  looks like.
+                </h1>
+                <p className="mt-5 text-base md:text-lg text-white/70 max-w-xl leading-relaxed">
+                  Every memo is a structured document — executive summary, scorecard across five domains, thesis, strengths, risks, and recommended next steps. Read it as text, walk it tab-by-tab, or export to Word.
+                </p>
+                <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-mono text-white/50 uppercase tracking-widest">
+                  <span>5 domains</span>
+                  <span className="text-white/20">·</span>
+                  <span>scored 0 — 100</span>
+                  <span className="text-white/20">·</span>
+                  <span>IC-ready</span>
+                </div>
+              </div>
+
+              {/* Browser-chrome hero screenshot — same asset as landing */}
+              <div className="relative">
+                <div className="absolute -inset-8 -z-10 rounded-[2rem] bg-[radial-gradient(ellipse_at_center,rgba(212,255,107,0.18),transparent_60%)] blur-2xl" />
+                <div className="relative rounded-2xl bg-[#0F1B17]/80 ring-1 ring-white/10 shadow-2xl shadow-black/50 overflow-hidden backdrop-blur">
+                  <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1A14]/80 px-4 py-2.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+                    <span className="ml-3 flex-1 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] font-mono text-white/40 truncate">
+                      sam.ai/deals/vrey/summary
+                    </span>
+                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/design/hero-img-new.png"
+                    alt="Sam dashboard — VREY memo with overall score, radar chart, and domain breakdowns"
+                    className="block w-full h-auto"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -88,11 +133,13 @@ export default function SamplePage() {
               </figcaption>
             </figure>
 
-            {/* Supporting trio — uniform tiles, top-aligned crop so heights match */}
-            <div className="grid gap-5 md:gap-6 md:grid-cols-3">
+            {/* Supporting tiles — all five remaining domain tabs */}
+            <div className="grid gap-5 md:gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 { src: "/design/dashboard-team.png", slug: "team", label: "Team analysis", desc: "Founder cards with backgrounds, strengths, concerns, and red flags." },
                 { src: "/design/dashboard-market.png", slug: "market", label: "Market analysis", desc: "TAM / SAM / SOM validated, competitive landscape, market timing." },
+                { src: "/design/dashboard-product.png", slug: "product", label: "Product analysis", desc: "Problem fit, '10x better' test, PMF signals, moat assessment." },
+                { src: "/design/dashboard-traction.png", slug: "traction", label: "Traction analysis", desc: "Revenue, growth, unit economics, retention, engagement signals." },
                 { src: "/design/dashboard-finance.png", slug: "finance", label: "Financial analysis", desc: "Cash, burn, runway, valuation methods, investor signals." },
               ].map((m) => (
                 <figure key={m.src} className="group">
@@ -288,20 +335,120 @@ export default function SamplePage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-20 border-t bg-gradient-to-b from-slate-50 to-white">
-          <div className="mx-auto max-w-3xl px-4 text-center">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Your memo</p>
-            <h2 className="mt-3 text-2xl md:text-3xl font-bold font-heading tracking-tight">
-              Run the same analysis on your next deck.
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Upload a pitch deck and get a structured memo back. No onboarding, no integrations.
+        {/* Long-form prose — excerpt from a real Sam memo */}
+        <section className="py-20 border-t bg-gradient-to-b from-white to-slate-50/60">
+          <div className="mx-auto max-w-4xl px-4">
+            <div className="max-w-2xl">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-primary">From a real memo</p>
+              <h2 className="mt-2 text-3xl md:text-4xl font-bold font-heading tracking-tight">
+                Sam&rsquo;s writing voice.
+              </h2>
+              <p className="mt-3 text-muted-foreground">
+                Memos are written in the same disciplined style an analyst would use — direct, evidence-led, and unafraid to call a pass a pass. Below: excerpts from a real Sam memo on <span className="font-medium text-foreground">Canaaro</span>, a Seed-stage GTM productivity company that scored 24/100.
+              </p>
+            </div>
+
+            {/* Magazine-style pull quote */}
+            <figure className="relative mt-10 rounded-2xl bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#133F2E] text-white p-8 md:p-10 ring-1 ring-foreground/10 shadow-2xl shadow-[#0F3D2E]/20 overflow-hidden">
+              <div className="absolute -top-20 -right-20 h-56 w-56 rounded-full bg-[#D4FF6B]/10 blur-3xl pointer-events-none" />
+              <Quote className="h-8 w-8 text-[#D4FF6B]/70 mb-4" />
+              <blockquote className="relative text-lg md:text-2xl font-heading leading-snug tracking-tight text-white">
+                &ldquo;This is not investable in its current form — not necessarily because the opportunity is bad, but because there is virtually no information upon which to base an investment decision.&rdquo;
+              </blockquote>
+              <figcaption className="mt-6 flex items-center gap-3 text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">
+                <span>Investment thesis</span>
+                <span className="text-white/20">·</span>
+                <span>Canaaro · 24/100 · Pass</span>
+              </figcaption>
+            </figure>
+
+            {/* Prose excerpts — editorial cards */}
+            <div className="mt-8 grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader className="pb-2">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Team — founder-market fit</p>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm md:text-[15px] leading-relaxed text-foreground/85">
+                    &ldquo;Founder-market fit is the single most important signal at seed stage, and it is entirely unassessable here. The GTM productivity space requires founders with deep, lived experience inside Go-to-Market organizations — as SDRs, AEs, sales leaders, marketing ops professionals, or RevOps builders. There is zero evidence that either co-founder has any such experience. In a market this competitive, with billions deployed across well-funded incumbents, the burden of proof is on the founding team to demonstrate why they have a right to win — and that burden is entirely unmet.&rdquo;
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Market — &lsquo;Why Now?&rsquo;</p>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm md:text-[15px] leading-relaxed text-foreground/85">
+                    &ldquo;The most plausible timing catalyst is the explosion of generative AI capabilities creating a window for AI-native GTM tools. However, this timing argument cuts both ways: AI enables new entrants but also enables incumbents (Outreach, Salesloft, HubSpot, Salesforce) to rapidly add AI features to existing platforms with massive distribution advantages. The window for AI-native GTM startups may be narrowing, not widening. Every competitor in the space is citing the same AI tailwind. Without an explicit, differentiated timing thesis, Canaaro has no discernible timing edge.&rdquo;
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="mt-6">
+              <Card>
+                <CardHeader className="pb-2">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Traction verdict — score 12</p>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm md:text-[15px] leading-relaxed text-foreground/85">
+                    &ldquo;Traction scores 12/100 — Weak. This is the lowest-scoring domain, reflecting the complete absence of any traction signal. At seed stage, even pre-revenue, we expect some evidence of market pull: pilot customers, LOIs, a waitlist, design partners, or at minimum customer discovery insights. None is present. Combined with a hyper-competitive market and no articulated product differentiation, the traction picture provides zero basis for investment conviction.&rdquo;
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <p className="mt-8 text-xs text-muted-foreground max-w-2xl">
+              Excerpted from a Sam-generated memo. Company name retained with permission. Numbers and prose are produced by the same pipeline that runs on every deck you upload.
             </p>
-            <Link href="/register?tier=professional" className={buttonVariants({ size: "lg", className: "mt-6 text-base px-8" })}>
-              Analyse a deck
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="py-20 px-4 border-t bg-gradient-to-b from-slate-50 to-white">
+          <div className="mx-auto max-w-5xl">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#1A6B47] px-8 py-14 md:px-14 md:py-16 shadow-2xl shadow-[#0F3D2E]/30">
+              <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#00A86B]/20 blur-3xl pointer-events-none" />
+              <div
+                className="absolute inset-0 opacity-[0.04] pointer-events-none"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
+                  backgroundSize: "40px 40px",
+                }}
+              />
+              <div className="relative text-center">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B]/90">
+                  Your memo
+                </span>
+                <h2 className="mt-5 text-3xl md:text-4xl font-bold font-heading tracking-tight text-white">
+                  Run the same analysis on your{" "}
+                  <span className="bg-gradient-to-r from-[#7FD9AA] to-[#D4FF6B] bg-clip-text text-transparent">next deck.</span>
+                </h2>
+                <p className="mt-4 text-white/70 max-w-xl mx-auto">
+                  Upload a pitch deck and get a structured, scored memo back. No onboarding, no integrations.
+                </p>
+                <div className="mt-8 flex justify-center">
+                  <Link
+                    href="/register?tier=professional"
+                    className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#D4FF6B] hover:bg-[#E0FF80] text-[#0A2E22] px-7 py-3.5 text-sm font-semibold shadow-xl shadow-[#D4FF6B]/25 hover:shadow-2xl hover:shadow-[#D4FF6B]/40 transition-all hover:-translate-y-0.5"
+                  >
+                    Analyse a deck
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </div>
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-mono text-white/50 uppercase tracking-widest">
+                  <span>No credit card</span>
+                  <span className="text-white/20">·</span>
+                  <span>EU-hosted</span>
+                  <span className="text-white/20">·</span>
+                  <span>GDPR by design</span>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>

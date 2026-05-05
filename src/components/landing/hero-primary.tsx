@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
@@ -86,16 +85,6 @@ export function HeroPrimary() {
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </button>
             </motion.form>
-
-            <motion.div variants={item} className="mt-5">
-              <Link
-                href="/sample"
-                className="group inline-flex items-center gap-1.5 text-sm font-semibold text-white/70 hover:text-white transition-colors"
-              >
-                Explore a sample memo
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </motion.div>
           </div>
 
           {/* RIGHT — dashboard screenshot framed as a browser window */}
