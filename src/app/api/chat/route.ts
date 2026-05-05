@@ -155,7 +155,7 @@ export async function POST(req: Request) {
     )
   }
 
-  let body: { messages?: Msg[]; dealId?: string; scope?: Scope }
+  let body: { messages?: Msg[]; dealId?: string; scope?: Scope; threadId?: string }
   try {
     body = await req.json()
   } catch {
@@ -187,7 +187,61 @@ export async function POST(req: Request) {
       ],
     })
     const reply = completion.choices[0]?.message?.content ?? ""
-    return NextResponse.json({ reply })
+
+    // Thread persistence — only when chatting in deal-scope (we don't persist
+    // pipeline-level chats since there's no per-tab "ask sam" surface for it).
+    let threadId = body.threadId
+    let title: string | undefined
+    if (body.dealId && body.scope) {
+      const lastUserMsg = [...messages].reverse().find((m) => m.role === "user")?.content?.trim() ?? ""
+
+      if (!threadId) {
+        // First turn — create the thread. Title = first 60 chars of first user
+        // message; cheap, instant, readable enough for the switcher.
+        const draftTitle = lastUserMsg.slice(0, 60).trim() || "New chat"
+        const { data: newThread, error: tErr } = await supabase
+          .from("chat_threads")
+          .insert({
+            user_id: user.id,
+            deal_id: body.dealId,
+            scope: body.scope,
+            title: draftTitle,
+          })
+          .select("id, title")
+          .single()
+        if (tErr || !newThread) {
+          console.error("[chat] thread create failed:", tErr)
+        } else {
+          threadId = newThread.id
+          title = newThread.title
+          // Persist all messages from the new thread (typically just the first
+          // user message) plus the assistant reply.
+          const rows = [
+            ...messages.map((m) => ({ thread_id: threadId, role: m.role, content: m.content })),
+            { thread_id: threadId, role: "assistant", content: reply },
+          ]
+          await supabase.from("chat_messages").insert(rows)
+        }
+      } else {
+        // Existing thread — only persist the new turn (last user msg + reply).
+        // Bump updated_at so the switcher sorts this thread to the top.
+        const { error: updErr } = await supabase
+          .from("chat_threads")
+          .update({ updated_at: new Date().toISOString() })
+          .eq("id", threadId)
+          .eq("user_id", user.id)
+        if (updErr) {
+          console.error("[chat] thread update failed:", updErr)
+        } else {
+          await supabase.from("chat_messages").insert([
+            { thread_id: threadId, role: "user", content: lastUserMsg },
+            { thread_id: threadId, role: "assistant", content: reply },
+          ])
+        }
+      }
+    }
+
+    return NextResponse.json({ reply, threadId, title })
   } catch (err) {
     const message = err instanceof Error ? err.message : "Inference failed"
     console.error("[chat] Azure AI error:", message)

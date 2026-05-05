@@ -9,14 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useDeals } from "@/hooks/use-deals"
 import {
   getScoreColor,
-  VERDICT_COLORS,
   PIPELINE_STAGES,
   DEAL_STAGES,
   STATUS_BADGE_COLORS,
   STAGE_BADGE_COLORS,
 } from "@/lib/constants"
 import { deleteDeal } from "@/app/actions/deals"
-import { verdictLabel } from "@/lib/verdict-label"
 import type { Deal, DealStage, PipelineStatus } from "@/lib/types/deal"
 
 type ScoreBucket = "all" | "high" | "mid" | "low"
@@ -456,11 +454,6 @@ function DealRow({
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/5 px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest text-primary ring-1 ring-primary/20">
               <Loader2 className="h-3 w-3 animate-spin" />
               Analysing
-            </span>
-          )}
-          {verdict && (
-            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest ring-1 ring-black/5 ${VERDICT_COLORS[verdict].bg} ${VERDICT_COLORS[verdict].text}`}>
-              {verdictLabel(verdict)}
             </span>
           )}
           {score !== undefined && scoreColor && (
