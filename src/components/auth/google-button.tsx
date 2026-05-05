@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import type { Tier } from "@/lib/types/user"
@@ -41,20 +40,19 @@ export function GoogleButton({ label = "Continue with Google", tier, disabled }:
   }
 
   return (
-    <Button
+    <button
       type="button"
-      variant="outline"
-      className="w-full"
       onClick={handleClick}
       disabled={disabled || loading}
+      className="inline-flex w-full items-center justify-center gap-2 rounded-full ring-1 ring-foreground/15 hover:ring-foreground/30 hover:bg-foreground/5 px-4 py-3 text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
     >
       {loading ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <GoogleIcon className="mr-2 h-4 w-4" />
+        <GoogleIcon className="h-4 w-4" />
       )}
       {label}
-    </Button>
+    </button>
   )
 }
 

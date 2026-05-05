@@ -2,12 +2,10 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Loader2, CheckCircle2, KeyRound, ArrowRight, ArrowLeft } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, CheckCircle2 } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState("")
@@ -37,45 +35,78 @@ export default function ResetPasswordPage() {
 
   if (sent) {
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
-            <CheckCircle2 className="h-5 w-5" />
-          </div>
-          <CardTitle>Check your email</CardTitle>
-          <CardDescription>We sent a password reset link to {email}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Link href="/login" className="block text-center text-sm font-medium hover:underline">Back to sign in</Link>
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-7 md:p-8 shadow-sm">
+        <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white shadow-md shadow-primary/20">
+          <CheckCircle2 className="h-5 w-5" />
+        </div>
+        <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+          Email sent
+        </p>
+        <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0A2E22]">
+          Check your email
+        </h1>
+        <p className="mt-1.5 text-center text-sm text-muted-foreground">
+          We sent a password reset link to{" "}
+          <span className="font-medium text-foreground">{email}</span>
+        </p>
+        <div className="mt-7">
+          <Link
+            href="/login"
+            className="inline-flex w-full items-center justify-center gap-1 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Back to sign in
+          </Link>
+        </div>
+      </div>
     )
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle>Reset Password</CardTitle>
-        <CardDescription>Enter your email to receive a reset link</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="you@fund.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+    <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-7 md:p-8 shadow-sm">
+      <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white shadow-md shadow-primary/20">
+        <KeyRound className="h-5 w-5" />
+      </div>
+      <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+        Reset password
+      </p>
+      <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0A2E22]">
+        Forgot your password?
+      </h1>
+      <p className="mt-1.5 text-center text-sm text-muted-foreground">
+        Enter your email and we&apos;ll send you a reset link.
+      </p>
+
+      <form onSubmit={handleSubmit} className="mt-7 space-y-4">
+        {error && (
+          <div className="rounded-xl bg-red-50 ring-1 ring-red-200 px-3 py-2 text-[13px] text-red-700">
+            {error}
           </div>
-          <Button className="w-full" type="submit" disabled={loading}>
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Send Reset Link
-          </Button>
-        </form>
-        <p className="mt-4 text-center text-sm text-muted-foreground">
-          <Link href="/login" className="font-medium text-foreground hover:underline">Back to sign in</Link>
-        </p>
-      </CardContent>
-    </Card>
+        )}
+        <div className="space-y-1.5">
+          <Label htmlFor="email" className="text-sm">Email</Label>
+          <Input id="email" type="email" placeholder="you@fund.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-3 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+        >
+          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+          Send reset link
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+        </button>
+      </form>
+
+      <div className="mt-6">
+        <Link
+          href="/login"
+          className="inline-flex w-full items-center justify-center gap-1 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-3 w-3" />
+          Back to sign in
+        </Link>
+      </div>
+    </div>
   )
 }
