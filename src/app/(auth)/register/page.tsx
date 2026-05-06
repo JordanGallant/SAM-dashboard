@@ -74,7 +74,7 @@ function RegisterContent() {
           {tier.label}
         </span>
         <span className="text-[12px] font-mono tabular-nums text-muted-foreground">
-          EUR {tier.price}/mo
+          {tier.price === 0 ? "Custom pricing" : `EUR ${tier.price}/mo`}
         </span>
       </div>
 

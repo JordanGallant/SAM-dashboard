@@ -167,7 +167,7 @@ function BillingContent() {
                   {config.label}
                 </h3>
                 <p className="font-mono text-[13px] text-muted-foreground tabular-nums">
-                  EUR {config.price} / month
+                  {config.price === 0 ? "Custom pricing" : `EUR ${config.price} / month`}
                 </p>
                 {isTrialing && (
                   <span className="inline-flex items-center rounded-full bg-primary/10 ring-1 ring-primary/30 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold text-primary">
@@ -190,8 +190,8 @@ function BillingContent() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-foreground/10 rounded-xl overflow-hidden ring-1 ring-foreground/10">
             {[
-              ["Memos / mo", config.dealsPerMonth === -1 ? "Unlimited" : String(config.dealsPerMonth)],
-              ["Docs / deal", config.docsPerDeal === -1 ? "Unlimited" : String(config.docsPerDeal)],
+              ["Analyses / mo", config.dealsPerMonth === -1 ? "Custom" : String(config.dealsPerMonth)],
+              ["Docs / deal", config.docsPerDeal === -1 ? "Custom" : String(config.docsPerDeal)],
               ["Word export", config.wordExport ? "Yes" : "No"],
               ["Fund Fit", config.fundFit ? "Yes" : "No"],
             ].map(([label, value]) => (
@@ -300,19 +300,28 @@ function BillingContent() {
                   )}
                 </div>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="font-mono text-[12px] text-muted-foreground">EUR</span>
-                  <span className="font-heading font-bold text-2xl tabular-nums">{tc.price}</span>
-                  <span className="text-xs text-muted-foreground">/mo</span>
+                  {tc.price === 0 ? (
+                    <span className="font-heading font-bold text-2xl">Custom</span>
+                  ) : (
+                    <>
+                      <span className="font-mono text-[12px] text-muted-foreground">EUR</span>
+                      <span className="font-heading font-bold text-2xl tabular-nums">{tc.price}</span>
+                      <span className="text-xs text-muted-foreground">/mo</span>
+                    </>
+                  )}
                 </div>
 
                 <ul className="mt-4 space-y-1.5 text-[12.5px] flex-1">
                   <FeatureRow
                     on={true}
-                    label={`${tc.dealsPerMonth === -1 ? "Unlimited" : tc.dealsPerMonth} memos / month`}
+                    label={`${tc.dealsPerMonth === -1 ? "Custom volume" : tc.dealsPerMonth} pitch deck analyses / month`}
                   />
-                  <FeatureRow on={true} label={`${tc.users} user${tc.users > 1 ? "s" : ""}`} />
+                  <FeatureRow
+                    on={true}
+                    label={`${tc.users === -1 ? "Custom" : tc.users} ${tc.users === 1 ? "seat" : "seats"}`}
+                  />
                   <FeatureRow on={tc.wordExport} label="Word export" />
-                  <FeatureRow on={tc.fundFit} label="Fund Fit scoring" />
+                  <FeatureRow on={tc.fundFit} label="Full fund-fit scoring" />
                   <FeatureRow on={tc.priorityProcessing} label="Priority processing" />
                 </ul>
 

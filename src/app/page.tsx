@@ -1,40 +1,8 @@
-import { Navbar } from "@/components/landing/navbar"
-import { HeroPrimary } from "@/components/landing/hero-primary"
-import { Hero } from "@/components/landing/hero"
-import { Partners } from "@/components/landing/partners"
-import { StatsBand } from "@/components/landing/stats-band"
-import { Problem } from "@/components/landing/problem"
-import { Framework } from "@/components/landing/framework"
-import { Comparison } from "@/components/landing/comparison"
-import { Audiences } from "@/components/landing/audiences"
-import { Reviews } from "@/components/landing/reviews"
-import { Trust } from "@/components/landing/trust"
-import { Pricing } from "@/components/landing/pricing"
-import { FAQ } from "@/components/landing/faq"
-import { FinalCTA } from "@/components/landing/final-cta"
-import { Footer } from "@/components/landing/footer"
-import { CookieBanner } from "@/components/landing/cookie-banner"
+// Home page renders the mockup4 layout — promoted to `/` after design
+// alignment with client briefing v4. The /mockup4 route remains as an alias
+// for in-progress comparison.
+import Mockup4 from "./mockup4/page"
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <main className="flex-1">
-        <HeroPrimary />
-        <Hero />
-        <Partners />
-        <Problem />
-        <Framework />
-        <Comparison />
-        <Audiences />
-        <Reviews />
-        <Trust />
-        <Pricing />
-        <FAQ />
-        <FinalCTA />
-      </main>
-      <Footer />
-      <CookieBanner />
-    </div>
-  )
+  return <Mockup4 />
 }

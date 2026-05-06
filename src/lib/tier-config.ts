@@ -13,40 +13,45 @@ export interface TierLimits {
   twoFactorRequired: boolean
 }
 
+// Pricing aligned to client design briefing v4 (May 2026):
+//   Angel €149 / 10 analyses / 1 seat
+//   Pro   €299 / 30 analyses / 3 seats
+//   Fund  Custom / custom volume / custom seats
+// `price: 0` on Fund signals custom-priced; UI renders "Custom".
 export const TIER_CONFIG: Record<Tier, TierLimits> = {
   starter: {
-    label: "Starter",
-    price: 49,
-    dealsPerMonth: 5,
-    docsPerDeal: 1,
+    label: "Angel",
+    price: 149,
+    dealsPerMonth: 10,
+    docsPerDeal: 3,
     fundFit: false,
-    wordExport: false,
-    emailSummary: 3,
+    wordExport: true,
+    emailSummary: -1,
     users: 1,
     priorityProcessing: false,
     twoFactorRequired: false,
   },
   professional: {
-    label: "Professional",
-    price: 149,
-    dealsPerMonth: 25,
+    label: "Pro",
+    price: 299,
+    dealsPerMonth: 30,
     docsPerDeal: 6,
     fundFit: true,
     wordExport: true,
     emailSummary: -1,
-    users: 1,
+    users: 3,
     priorityProcessing: false,
-    twoFactorRequired: false,
+    twoFactorRequired: true,
   },
   fund: {
     label: "Fund",
-    price: 399,
+    price: 0,
     dealsPerMonth: -1,
     docsPerDeal: -1,
     fundFit: true,
     wordExport: true,
     emailSummary: -1,
-    users: 5,
+    users: -1,
     priorityProcessing: true,
     twoFactorRequired: true,
   },

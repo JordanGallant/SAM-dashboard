@@ -56,11 +56,14 @@ export default function Mockup4() {
         <LogoBand />
         <OnePlatform />
         <Framework />
+        <DarkAI />
+        <SourceAttribution />
+        <MissingInfo />
+        <AskSamSection />
         <FeatureCards />
         <Audiences />
         <Quotes />
         <Trust />
-        <DarkAI />
         <Pricing />
         <FAQ />
         <ClosingCTA />
@@ -137,7 +140,7 @@ function Hero() {
             transition={{ duration: 0.5, ease: EASE }}
             className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.2em] text-[#0A0A0A]/55"
           >
-            <span>European VC funds running on Sam</span>
+            <span>Structured first-screening for investors</span>
           </motion.div>
 
           <motion.h1
@@ -147,20 +150,45 @@ function Hero() {
             className="mt-6 font-bold leading-[0.96] tracking-[-0.04em]"
             style={{ fontSize: "clamp(44px, 7.5vw, 100px)" }}
           >
-            Time is judgment.
-            <br />
+            From deck{" "}
             <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
-              Spend it well.
+              to decision.
             </span>
           </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE, delay: 0.15 }}
+            className="mt-7 mx-auto max-w-[640px] text-[16px] md:text-[17px] leading-[1.55]"
+            style={{ color: SUBINK }}
+          >
+            Sam turns pitch decks into structured, source-aware investment
+            assessments — so every deal is reviewed with the same discipline,
+            before you spend partner time.
+          </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: EASE, delay: 0.18 }}
-            className="mt-9 flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto"
+            transition={{ duration: 0.6, ease: EASE, delay: 0.22 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-3"
           >
-            <EmailCapture />
+            <Link
+              href="/register?tier=professional"
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition hover:scale-[1.02]"
+              style={{ background: INK, color: "#FFF" }}
+            >
+              Analyse a deck
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            <Link
+              href="/sample"
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold border-[1.5px] hover:bg-foreground/[0.04] transition"
+              style={{ borderColor: RULE, color: INK }}
+            >
+              View sample assessment
+            </Link>
           </motion.div>
         </div>
 
@@ -1119,9 +1147,15 @@ function AfterOrder() {
 }
 
 // ============================================================
-// dark AI banner — only intense color contrast on the page
+// "Not a prompt wrapper" banner — design briefing Section 8 / Homepage step 6
 // ============================================================
 function DarkAI() {
+  const proofs = [
+    { label: "Fixed framework", body: "Six investment domains, scored the same way every deck. Comparable across the pipeline." },
+    { label: "Fund-specific context", body: "Your mandate, thesis and ticket window inform every assessment — not the model." },
+    { label: "Knowledge-backed", body: "Curated startup knowledge, sector benchmarks and market data — not what a generic LLM remembers." },
+    { label: "Source-aware outputs", body: "Every claim is tagged: pitch-deck, external source, knowledge base, or generated inference. Unverified claims are flagged." },
+  ]
   return (
     <section className="relative overflow-hidden" style={{ background: INK, color: "#FFF" }}>
       <div
@@ -1129,25 +1163,43 @@ function DarkAI() {
         className="absolute inset-0 -z-0"
         style={{ background: `radial-gradient(ellipse 60% 40% at 30% 30%, rgba(0,168,107,0.18), transparent 70%)` }}
       />
-      <div className="relative mx-auto max-w-[1240px] px-6 py-24 md:py-32 grid lg:grid-cols-[1.1fr_1fr] gap-16 items-center">
-        <div>
+      <div className="relative mx-auto max-w-[1240px] px-6 py-24 md:py-32">
+        <div className="max-w-2xl">
           <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: LIME }}>
-            Built for the AI era of venture
+            Not a prompt wrapper
           </p>
-          <h2 className="mt-4 font-bold tracking-[-0.03em] leading-[0.98]"
-              style={{ fontSize: "clamp(40px, 6.4vw, 88px)" }}>
-            An analyst that
-            <br />
+          <h2
+            className="mt-4 font-bold tracking-[-0.03em] leading-[1.02]"
+            style={{ fontSize: "clamp(36px, 5vw, 64px)" }}
+          >
+            The model is not the product.{" "}
             <span className="font-serif italic font-normal" style={{ color: LIME }}>
-              never gets tired.
+              The investment framework is.
             </span>
           </h2>
-          <p className="mt-7 max-w-xl text-[16px] leading-[1.6] text-white/65">
-            Sam reads the deck, fact-checks the founders, validates the market, and drafts the
-            memo. You spend your judgment where it matters — the partner call.
+          <p className="mt-7 text-[16px] leading-[1.6] text-white/65">
+            Generic AI summarises. Sam assesses — using a fixed framework, your fund context,
+            curated startup knowledge, and source-aware logic that flags what still needs verification.
           </p>
         </div>
-        <AgentStream />
+        <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {proofs.map((p, i) => (
+            <motion.div
+              key={p.label}
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+              transition={{ duration: 0.45, ease: EASE, delay: 0.05 * i }}
+              className="rounded-2xl p-6"
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
+            >
+              <p className="text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: LIME }}>
+                {p.label}
+              </p>
+              <p className="mt-3 text-[14px] leading-[1.55] text-white/80">{p.body}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   )
@@ -1218,46 +1270,54 @@ function AgentStream() {
 // pricing
 // ============================================================
 function Pricing() {
+  // Tier names + pricing aligned to client design briefing v4 (May 2026).
   const tiers = [
     {
-      name: "Starter",
-      price: "€49",
-      blurb: "For solo angels and emerging GPs piloting their first memos.",
+      name: "Angel",
+      price: "€149",
+      blurb: "For active angel investors reviewing decks individually.",
       features: [
-        "5 memos / month",
-        "1 doc per deal",
-        "Email summaries",
-        "Single user",
+        "10 pitch deck analyses / month",
+        "1 seat",
+        "Six-domain investment assessment",
+        "Source attribution & confidence tagging",
+        "Missing info checklist + founder questions",
+        "Word + PDF export",
       ],
-      cta: "Start free",
+      ctaLabel: "Start free trial",
+      ctaHref: "/register?tier=starter",
       highlighted: false,
     },
     {
-      name: "Professional",
-      price: "€149",
-      blurb: "The default for funds running a real deal flow with Fund Fit and exports.",
+      name: "Pro",
+      price: "€299",
+      blurb: "For syndicates, family offices and small investment teams.",
       features: [
-        "25 memos / month",
-        "6 docs per deal",
-        "Fund Fit scoring",
-        "Word + PDF export",
-        "Unlimited email summaries",
+        "30 pitch deck analyses / month",
+        "3 seats",
+        "Everything in Angel",
+        "Shared workspace + deal comparison",
+        "2-factor authentication",
+        "Light fund-fit scoring",
       ],
-      cta: "Start free",
+      ctaLabel: "Start free trial",
+      ctaHref: "/register?tier=professional",
       highlighted: true,
     },
     {
       name: "Fund",
-      price: "€399",
-      blurb: "For partnerships of 5+ that need priority processing and SSO.",
+      price: "Custom",
+      blurb: "For VC funds and professional investment teams.",
       features: [
-        "Unlimited memos",
-        "Unlimited docs per deal",
-        "5 seats included",
-        "Priority processing",
-        "2FA · SOC 2 · SSO",
+        "Custom analysis volume",
+        "Custom seats",
+        "Everything in Pro",
+        "Full fund-fit scoring + portfolio conflict",
+        "Shared memo library + tailored knowledge base",
+        "CRM connections + dedicated support",
       ],
-      cta: "Talk to sales",
+      ctaLabel: "Book a walkthrough",
+      ctaHref: "/register?tier=fund",
       highlighted: false,
     },
   ]
@@ -1272,12 +1332,15 @@ function Pricing() {
             className="mt-3 font-bold tracking-[-0.025em] leading-[1.04]"
             style={{ fontSize: "clamp(40px, 5.4vw, 72px)" }}
           >
-            One memo, every plan.
-            <br />
+            Pricing that scales{" "}
             <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
-              Pick your volume.
+              with your dealflow.
             </span>
           </h2>
+          <p className="mt-5 text-[15.5px] leading-[1.55]" style={{ color: SUBINK }}>
+            Start with structured deck assessments. Upgrade when you need full
+            fund-fit scoring, shared workflows and higher volume.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[1080px] mx-auto">
@@ -1349,7 +1412,7 @@ function Pricing() {
                 ))}
               </ul>
               <Link
-                href={t.name === "Fund" ? "mailto:hello@sam.ai" : "/register"}
+                href={t.ctaHref}
                 className={`mt-7 inline-flex items-center justify-center rounded-full px-5 py-2.5 text-[13.5px] font-semibold transition hover:scale-[1.02] ${
                   t.highlighted ? "" : "border"
                 }`}
@@ -1359,7 +1422,7 @@ function Pricing() {
                     : { borderColor: RULE, color: INK, background: "transparent" }
                 }
               >
-                {t.cta}
+                {t.ctaLabel}
                 <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
               </Link>
             </motion.div>
@@ -1379,12 +1442,32 @@ function ClosingCTA() {
       <div className="mx-auto max-w-[1000px] px-6 text-center">
         <h2 className="font-bold tracking-[-0.04em] leading-[0.95] mx-auto"
             style={{ fontSize: "clamp(44px, 7vw, 96px)" }}>
-          Read your next deck
-          <br />
-          <span className="font-serif italic font-normal">in five minutes.</span>
+          Make every first screen{" "}
+          <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
+            sharper.
+          </span>
         </h2>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3 max-w-md mx-auto">
-          <EmailCapture />
+        <p className="mt-6 mx-auto max-w-xl text-[16px] leading-[1.55]" style={{ color: SUBINK }}>
+          Upload a pitch deck. Receive a structured, source-aware investment assessment across
+          six domains, fund-fit scoring and a missing-info checklist — before you spend partner
+          time.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/register?tier=professional"
+            className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition hover:scale-[1.02]"
+            style={{ background: INK, color: "#FFF" }}
+          >
+            Analyse a deck
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+          <Link
+            href="/sample"
+            className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold border-[1.5px] hover:bg-foreground/[0.04] transition"
+            style={{ borderColor: RULE, color: INK }}
+          >
+            View sample assessment
+          </Link>
         </div>
       </div>
     </section>
@@ -1514,7 +1597,7 @@ function Problem() {
 }
 
 // ============================================================
-// Framework — five-domain explainer
+// Framework — six-domain explainer (per design briefing)
 // ============================================================
 function Framework() {
   const domains = [
@@ -1522,7 +1605,8 @@ function Framework() {
     { name: "Market", focus: "TAM / SAM / SOM validation, competitors, why now" },
     { name: "Product", focus: "10× test, PMF signals, moat" },
     { name: "Traction", focus: "Revenue, retention, capital efficiency" },
-    { name: "Financials", focus: "Valuation, deal terms, investor signals" },
+    { name: "Finance", focus: "Valuation, deal terms, investor signals" },
+    { name: "Exit", focus: "Exit range, timeline, acquirer landscape" },
   ]
   return (
     <section className="py-24 md:py-28 border-t" style={{ borderColor: RULE }}>
@@ -1533,7 +1617,7 @@ function Framework() {
           </p>
           <h2 className="mt-3 font-bold tracking-[-0.025em] leading-[1.05]"
               style={{ fontSize: "clamp(36px, 5vw, 64px)" }}>
-            Five domains.
+            Six domains.
             <br />
             <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
               Same framework, every deck.
@@ -1543,7 +1627,7 @@ function Framework() {
             Stage-aware scoring, fixed rubric, comparable across the pipeline. The model is just the engine — the framework is the product.
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {domains.map((d, i) => (
             <motion.div
               key={d.name}
@@ -1839,30 +1923,33 @@ function Trust() {
 // FAQ
 // ============================================================
 function FAQ() {
+  // FAQ topics aligned to design briefing: not investment advice, no public
+  // model training, fund mandate upload, not replacing analysts, PDF export,
+  // source attribution explained.
   const items = [
     {
       q: "How is Sam different from using generic AI to analyse a pitch deck?",
-      a: "Sam applies a fixed five-domain evaluation framework to every deck — same structure, scoring rubric, and severity classifications every time. Generic AI returns whatever comes out of a prompt, so the output varies, can't be compared across deals, and lacks a defensible methodology. Sam's framework is the product; the model is just the engine.",
+      a: "Sam applies a fixed six-domain investment framework to every deck — same structure, scoring rubric, and severity classifications every time. Generic AI returns whatever comes out of a prompt, so the output varies, can't be compared across deals, and lacks a defensible methodology. Sam's framework is the product; the model is just the engine.",
+    },
+    {
+      q: "Does Sam give investment advice or replace partners?",
+      a: "No. Sam is decision support, not investment advice. It handles the repetitive first-screening layer — structure, scoring, red flags, follow-up questions — so partners and analysts spend their time on the deals worth deeper work and the calls only humans can run.",
+    },
+    {
+      q: "What does source attribution actually mean?",
+      a: "Every claim in a Sam assessment is tagged: Pitch Deck — UNVALIDATED, Source: LinkedIn, Source: Knowledge Base, Source: Future Market Insights 2025, Generated inference. Unvalidated claims are flagged explicitly so you always know what's a confirmed fact versus a founder claim. External references are still yours to verify before an investment decision.",
     },
     {
       q: "Is my pitch deck data secure and confidential?",
-      a: "Yes. Sam runs on European servers only. Your deck is processed, analysed, and stored within the EU. No submitted material is used to train any model, and data is deleted on your retention schedule.",
+      a: "Yes. Sam runs on European servers only. Your deck is processed, analysed, and stored within the EU. Submitted decks are never used to train public models, and data is deleted on your retention schedule.",
     },
     {
-      q: "What does a Sam investment memo actually include?",
-      a: "Executive summary, overall score and confidence, per-domain verdicts across Team, Market, Product, Traction, and Financials, investment thesis, red flags, due diligence questionnaire, and IC-ready next steps. Structured the same way every time.",
+      q: "How does fund-fit work? What can I upload?",
+      a: "Upload your fund 1-pager, or fill in thesis, stage focus, sector focus, geography and ticket size. Sam matches every deck against your mandate and produces a fund-fit score with per-criterion match indicators. Full fund-fit scoring is included on the Fund tier; lighter fund-fit is available on Pro.",
     },
     {
-      q: "Can Sam replace a human analyst or associate?",
-      a: "No. Sam handles the repetitive first-screening layer — consistent structure, scoring, red flags — so your analyst can focus on the deals worth deeper work. It is infrastructure, not a substitute for judgment.",
-    },
-    {
-      q: "What stages and sectors does Sam support?",
-      a: "Pre-seed through Series A across most sectors. The framework is stage-aware — pre-seed weights team and market signal more, Series A weights traction and unit economics more. Deeply regulated verticals work, but sector-specific diligence still belongs with the human.",
-    },
-    {
-      q: "Can I export memos to my CRM, Notion, or Word?",
-      a: "Yes. Memos export as a Word document and as a shareable link. CRM-native pushes (Affinity, Hubspot) are on the roadmap.",
+      q: "Can I export the assessment?",
+      a: "Yes. Every assessment exports as a Word or PDF decision record so you can preserve why a deal was advanced, parked or passed. CRM-native pushes (Affinity, Hubspot) are on the roadmap.",
     },
   ]
   const [open, setOpen] = useState<number | null>(0)
@@ -1952,5 +2039,225 @@ function MarqueeStyles() {
         100% { transform: translateX(-33.33%); }
       }
     `}</style>
+  )
+}
+
+// ============================================================
+// Source attribution callout — design briefing Section 8 #2
+// ============================================================
+function SourceAttribution() {
+  const tags = [
+    { label: "Pitch Deck — UNVALIDATED", tone: "warn" as const, claim: "Founder claim: €4M ARR, 32% MoM growth (Q1 2026)." },
+    { label: "Source: LinkedIn", tone: "ok" as const, claim: "CEO: 8 yrs at Adyen, prior exit (Bunq, 2019). Confirmed." },
+    { label: "Source: Future Market Insights, 2025", tone: "ok" as const, claim: "EU SMB payments TAM €38B, 12.4% CAGR through 2030." },
+    { label: "Generated inference", tone: "neutral" as const, claim: "Stage-implied valuation range €18–24M based on Series A medians." },
+  ]
+  return (
+    <section className="py-24 md:py-28 border-t" style={{ borderColor: RULE, background: SOFT_FIELD }}>
+      <div className="mx-auto max-w-[1240px] px-6">
+        <div className="max-w-2xl mb-12">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
+            Source attribution
+          </p>
+          <h2
+            className="mt-3 font-bold tracking-[-0.025em] leading-[1.04]"
+            style={{ fontSize: "clamp(36px, 5vw, 60px)" }}
+          >
+            Every insight is{" "}
+            <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
+              source-tagged.
+            </span>
+          </h2>
+          <p className="mt-5 text-[16px] leading-[1.55]" style={{ color: SUBINK }}>
+            Sam shows you exactly where it got the information — and flags what still needs to be
+            verified. Pitch-deck claims are marked UNVALIDATED. External sources are cited. You
+            always know what is a confirmed fact versus a founder claim.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {tags.map((t, i) => {
+            const palette =
+              t.tone === "warn"
+                ? { bg: "rgba(217, 119, 6, 0.10)", fg: "#92400e", ring: "rgba(217,119,6,0.35)" }
+                : t.tone === "ok"
+                ? { bg: "rgba(0,168,107,0.10)", fg: "#065f46", ring: "rgba(0,168,107,0.35)" }
+                : { bg: "rgba(10,10,10,0.04)", fg: "rgba(10,10,10,0.62)", ring: RULE }
+            return (
+              <motion.div
+                key={t.label}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+                transition={{ duration: 0.45, ease: EASE, delay: 0.05 * i }}
+                className="rounded-2xl bg-white p-5 border"
+                style={{ borderColor: RULE }}
+              >
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10.5px] font-mono uppercase tracking-[0.18em] font-bold ring-1"
+                  style={{ background: palette.bg, color: palette.fg, borderColor: "transparent", boxShadow: `inset 0 0 0 1px ${palette.ring}` }}
+                >
+                  {t.label}
+                </span>
+                <p className="mt-3 text-[14px] leading-[1.55]">{t.claim}</p>
+              </motion.div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ============================================================
+// Missing information callout — design briefing Section 8 #3
+// ============================================================
+function MissingInfo() {
+  const gaps = [
+    { domain: "Team", question: "Who owns customer success today, and at what tenure?" },
+    { domain: "Market", question: "What's the SAM (not TAM) — addressable customers in EU only?" },
+    { domain: "Traction", question: "Net revenue retention for the last 4 quarters?" },
+    { domain: "Finance", question: "Burn multiple and runway after this round closes?" },
+  ]
+  return (
+    <section className="py-24 md:py-28 border-t" style={{ borderColor: RULE }}>
+      <div className="mx-auto max-w-[1240px] px-6 grid lg:grid-cols-[1fr_1fr] gap-12 items-center">
+        <div>
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
+            Missing information
+          </p>
+          <h2
+            className="mt-3 font-bold tracking-[-0.025em] leading-[1.04]"
+            style={{ fontSize: "clamp(36px, 5vw, 60px)" }}
+          >
+            Know exactly what you still need{" "}
+            <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
+              to ask.
+            </span>
+          </h2>
+          <p className="mt-5 text-[16px] leading-[1.55]" style={{ color: SUBINK }}>
+            Sam identifies every data gap in the pitch deck and generates ready-to-use follow-up
+            questions per domain — the kind your associates would write before a first call.
+          </p>
+          <p className="mt-4 inline-flex items-center gap-2 text-[12.5px] font-mono uppercase tracking-[0.18em] rounded-full px-3 py-1.5"
+             style={{ background: "rgba(15,61,46,0.06)", color: ACCENT }}>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: ACCENT_HI }} />
+            Missing info never reduces the score
+          </p>
+        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+          transition={{ duration: 0.55, ease: EASE }}
+          className="rounded-3xl bg-white border p-6 md:p-7"
+          style={{ borderColor: RULE }}
+        >
+          <div className="flex items-center gap-2 pb-4 mb-4 border-b" style={{ borderColor: RULE }}>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: ACCENT_HI }} />
+            <p className="text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
+              Suggested founder follow-ups · 4 domains
+            </p>
+          </div>
+          <ul className="space-y-3.5">
+            {gaps.map((g, i) => (
+              <motion.li
+                key={g.question}
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.35, delay: 0.06 * i }}
+                className="flex items-start gap-3"
+              >
+                <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md text-[9.5px] font-mono uppercase tracking-[0.2em] font-bold mt-0.5" style={{ background: SOFT_FIELD, color: ACCENT, border: `1px solid ${RULE}` }}>
+                  {g.domain}
+                </span>
+                <span className="text-[14px] leading-[1.5]">{g.question}</span>
+              </motion.li>
+            ))}
+          </ul>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+// ============================================================
+// Ask Sam / Co-Pilot section — design briefing Section 8 #1
+// ============================================================
+function AskSamSection() {
+  const prompts = [
+    "Why did this company score the way it did?",
+    "What are the biggest risks?",
+    "Draft a founder follow-up email",
+    "Which fund-fit dimension is weakest?",
+  ]
+  return (
+    <section className="py-24 md:py-28 border-t" style={{ borderColor: RULE, background: BONE }}>
+      <div className="mx-auto max-w-[1240px] px-6 grid lg:grid-cols-[1fr_1fr] gap-12 items-center">
+        <div>
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
+            Ask Sam · co-pilot
+          </p>
+          <h2
+            className="mt-3 font-bold tracking-[-0.025em] leading-[1.04]"
+            style={{ fontSize: "clamp(36px, 5vw, 60px)" }}
+          >
+            Ask Sam anything —{" "}
+            <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
+              in the context of the deal you just analysed.
+            </span>
+          </h2>
+          <p className="mt-5 text-[16px] leading-[1.55]" style={{ color: SUBINK }}>
+            The co-pilot panel is always open alongside your analysis. It knows which deal you&apos;re
+            viewing and which domain you&apos;re in. Ask about scores, red flags, fund fit, or get a
+            draft founder email — without leaving the assessment.
+          </p>
+        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+          transition={{ duration: 0.6, ease: EASE }}
+          className="rounded-3xl bg-white border overflow-hidden"
+          style={{ borderColor: RULE }}
+        >
+          <div className="flex items-center gap-2 px-5 py-3 border-b" style={{ borderColor: RULE }}>
+            <span className="grid place-items-center h-7 w-7 rounded-lg" style={{ background: ACCENT, color: LIME }}>
+              <Sparkles className="h-3.5 w-3.5" />
+            </span>
+            <p className="text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
+              Ask Sam · Team analysis · VREY
+            </p>
+          </div>
+          <div className="p-5 space-y-3">
+            <div className="rounded-xl px-4 py-3 text-[14px] leading-[1.5]" style={{ background: SOFT_FIELD }}>
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] block mb-1.5" style={{ color: SUBINK }}>You</span>
+              Why does the founder-market fit score sit at 76?
+            </div>
+            <div className="rounded-xl px-4 py-3 text-[14px] leading-[1.5] border" style={{ borderColor: RULE }}>
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] block mb-1.5" style={{ color: ACCENT }}>Sam</span>
+              Strong domain expertise (8 yrs at Adyen) + prior exit. Two flags pull the score: no
+              prior B2B SaaS experience, and the technical co-founder joined 4 months pre-launch.
+            </div>
+          </div>
+          <div className="px-5 pb-5">
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] mb-2" style={{ color: SUBINK }}>
+              Suggested
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {prompts.map((p) => (
+                <span
+                  key={p}
+                  className="inline-flex items-center rounded-full px-3 py-1.5 text-[12px] border"
+                  style={{ borderColor: RULE, background: SOFT_FIELD, color: INK }}
+                >
+                  {p}
+                </span>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   )
 }

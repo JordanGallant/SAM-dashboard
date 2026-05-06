@@ -114,57 +114,87 @@ export default function SummaryPage() {
 
   return (
     <div className="space-y-6">
-    <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-      {/* Left rail — sticky company card + gauge + radar + scorecard list */}
-      <aside className="lg:sticky lg:top-4 self-start space-y-5">
-        <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5">
-          <div className="flex items-center gap-2.5">
-            <div className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-primary/10 ring-1 ring-primary/30">
-              <Building2 className="h-4 w-4 text-primary" />
-            </div>
-            <h1 className="font-heading text-lg font-bold leading-tight truncate">
-              {es.companyName}
-            </h1>
+    {/* Pilot #26: top hero is a 12-col grid — Company (left, narrow),
+        Investment thesis (center, dominant), Confidence + performance
+        overview as two graphs side by side (right). Domain sub-scores +
+        cards drop underneath. */}
+    <div className="grid gap-5 lg:grid-cols-12">
+      {/* 1. Company details */}
+      <div className="lg:col-span-3 rounded-2xl bg-card ring-1 ring-foreground/10 p-5">
+        <div className="flex items-center gap-2.5">
+          <div className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-primary/10 ring-1 ring-primary/30">
+            <Building2 className="h-4 w-4 text-primary" />
           </div>
-          <p className="mt-2.5 text-[11px] font-mono uppercase tracking-wider text-muted-foreground leading-relaxed">
-            {es.stage} · {es.sector}
-            <br />
-            {es.geography}
-            {es.raising && <> · Raising {es.raising}</>}
-          </p>
+          <h1 className="font-heading text-lg font-bold leading-tight truncate">
+            {es.companyName}
+          </h1>
         </div>
+        <dl className="mt-4 space-y-2 text-[12.5px]">
+          {[
+            ["Stage", es.stage],
+            ["Sector", es.sector],
+            ["Geography", es.geography],
+            ["Raising", es.raising || null],
+            ["MRR", es.mrr || null],
+          ]
+            .filter(([, v]) => Boolean(v))
+            .map(([label, value]) => (
+              <div key={label as string} className="flex items-baseline justify-between gap-3">
+                <dt className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground shrink-0">
+                  {label}
+                </dt>
+                <dd className="text-right text-foreground/85 truncate" title={String(value)}>
+                  {value}
+                </dd>
+              </div>
+            ))}
+        </dl>
+      </div>
 
-        <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5">
+      {/* 2. Investment thesis — dominant column */}
+      <div className="lg:col-span-5">
+        <ThesisCard thesis={es.thesis} />
+      </div>
+
+      {/* 3. Confidence + performance overview — two graphs side by side */}
+      <div className="lg:col-span-4 rounded-2xl bg-card ring-1 ring-foreground/10 p-5">
+        <SectionLabel className="mb-3">Confidence &amp; performance</SectionLabel>
+        <div className="grid grid-cols-2 gap-3 items-center">
           <div className="flex flex-col items-center">
-            <ScoreGauge score={es.overallScore} size={150} />
-            <p className="mt-3 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+            <ScoreGauge score={es.overallScore} size={120} />
+            <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground text-center">
               {es.confidence} confidence
             </p>
           </div>
-        </div>
-
-        <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5">
-          <SectionLabel>Performance Overview</SectionLabel>
-          <div className="mt-2">
-            <DomainRadar scorecard={es.scorecard} height={220} />
+          <div>
+            <DomainRadar scorecard={es.scorecard} height={130} />
           </div>
-          <ul className="mt-3 space-y-1.5 text-[12px]">
-            {es.scorecard.map((row) => (
-              <li key={row.domain} className="flex items-center justify-between">
-                <span className="text-muted-foreground">{row.domain}</span>
-                <span className={`font-mono font-bold tabular-nums ${scoreText(row.score)}`}>
-                  {row.score}
-                  <span className="text-muted-foreground font-normal">/100</span>
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
-      </aside>
+      </div>
+    </div>
 
-      {/* Right pane — thesis prose, then domain cards, then callouts */}
-      <div className="space-y-5">
-        <ThesisCard thesis={es.thesis} />
+    {/* Domain sub-scores strip — compact row, full width under hero */}
+    <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-4">
+      <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        {es.scorecard.map((row) => (
+          <li
+            key={row.domain}
+            className="flex items-baseline justify-between gap-2 px-2 py-1 rounded-lg hover:bg-muted/40 transition-colors"
+          >
+            <span className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+              {row.domain}
+            </span>
+            <span className={`font-mono font-bold tabular-nums text-[14px] ${scoreText(row.score)}`}>
+              {row.score}
+              <span className="text-muted-foreground font-normal text-[11px]">/100</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    {/* Domain breakdowns — full width below hero */}
+    <div className="space-y-5">
 
 
         {/* Domain cards — one per scorecard row */}
@@ -307,7 +337,6 @@ export default function SummaryPage() {
             </ol>
           </section>
         )}
-      </div>
     </div>
     <DomainSources documents={deal.documents} externalLinks={founderLinks} generatedAt={deal.analysis.createdAt} />
     </div>

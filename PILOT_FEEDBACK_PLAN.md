@@ -1,194 +1,239 @@
-# SAM Pilot Feedback — Plan
+# SAM Pilot Feedback + Design Doc — Master Plan
 
-Source: pilot-feedback session (2026-05-06), 29 items across 12 areas. This plan covers
-the more functional client; the second session is parked until shared. Implementation
-waits on design hand-off from the user.
+Source: pilot session 2026-05-06 (29 items, 12 areas) + client design briefing
+`design_doc.docx` (Sam Website Launch Briefing v4 — May 2026).
 
-## Severity legend
+This plan supersedes the previous one. Everything still open from the pilot is
+listed alongside design tasks so we have one place to track readiness.
 
-- **P0 — pilot blocker.** Customer can't complete a core flow, or the output is wrong
-  in a way that breaks trust (mis-scored, ghost verdicts, silent failure).
-- **P1 — pilot-critical.** Degrades quality or trust, must ship before broader rollout.
-- **P2 — polish.** UX papercuts, naming, layout.
-- **P3 — new product flow.** Genuine new behaviour, not a fix.
+---
 
-Effort key: XS <30 min · S <2 h · M 2–6 h · L >6 h.
+## STATUS — pilot batch (22/29 shipped pre-design)
 
-## Triage table
+Shipped: #1 #2 #3 #4 #5 #6 #7 #8 #9 #10 #11 #13 #14 #16 #17 #18 #21 #22 #23 #24
+#25 #27 #28 #29.
+Still open and addressed by this plan: #12 #15 #19 #20 #26.
 
-| # | Area | Item (short) | Sev | Effort |
-|---|---|---|---|---|
-| 1 | Registration | Tier picker — can't pick higher tiers, top always shows "walkthrough" | P0 | M |
-| 3 | Registration | Wizard regression — info entered then thrown back to init | P0 | M |
-| 6 | General | No error surfaced after 60 min stuck flow | P0 | L |
-| 7 | General | Reanalyse button doesn't work | P0 | S |
-| 15 | Team | LinkedIn search broken (SALVIO case) | P0 | L |
-| 17 | Billing | Could only select 1st tier; later showed middle, couldn't upgrade | P0 | M |
-| 21 | Fund fit | Score inconsistency: 50/100 vs 70 overall | P0 | S |
-| 22 | Ask Sam | Doesn't read fund profile context | P0 | M |
-| 28 | Export | Download still has "Conditional pass" / "Pass" verdict | P0 | S |
-| 8 | General | Deck still sent by email — disable | P1 | XS |
-| 9 | General | Sources still include pitch deck despite prompt | P1 | M |
-| 10 | Upload | Name extraction sometimes fails — need manual override | P1 | M |
-| 11 | Upload | Premature stage label at upload, before analysis | P1 | S |
-| 12 | Upload | Sevvy deck rejected (used to work in test accounts) | P1 | M |
-| 13 | Exec summary | Rubric meta-text leaks into copy ("Weighting applied…") | P1 | S |
-| 14 | Exec summary | Status labels need colour (New, Reviewing, …) | P1 | XS |
-| 16 | Team | LinkedIn logo missing from team cards (Google shows) | P1 | XS |
-| 18 | Billing | No memo usage meter on Current Plan; no upgrade alert | P1 | M |
-| 20 | Billing | Tier prices need to align with target | P1 | XS |
-| 25 | Ask Sam | Dead `+` button in chat UI | P1 | XS |
-| 27 | Market | Variance text-box overflows validated info | P1 | XS |
-| 29 | Export | Email-with-file path — disable | P1 | XS |
-| 2 | Registration | Fund-website scraper not offered during onboarding | P2 | M |
-| 4 | Fund fit | No back-nav from completed details to About You | P2 | S |
-| 5 | Fund fit | All Fund Fit details should be mandatory | P2 | S |
-| 23 | Ask Sam | Rename "Go pilot" → "Ask Sam" | P2 | XS |
-| 24 | Ask Sam | Surface model name in chat UI | P2 | XS |
-| 26 | Dashboard | Exec summary layout: 3rd column too narrow, reorganise | P2 | M |
-| 19 | Billing | First-deck-free trial mechanic | P3 | L |
+---
 
-## Sequencing
+## STATUS — what design forces us to change beyond the pilot
 
-### Wave 1 — investigations (parallel, before fixes)
+The design briefing is materially bigger than the pilot punch list. Three big
+positioning shifts:
 
-These are items where root cause is unknown. We need a confirmed cause before we can
-write a real fix. Five threads, all independent:
+1. **6-domain framework**, not 5. SAM analysis types already include
+   `exitPotential`, but landing copy + framework grid still talk about 5
+   domains (Team / Market / Product / Traction / Financials). All copy gets
+   updated to 6 (… + Exit).
+2. **"Structured first-screening layer for investors"** as the primary
+   positioning. "AI investment associate" demoted to supporting language.
+   "Time is judgment / spend it well" hero replaced by **"From deck to decision."**
+3. **Naming**: tiers become **Angel / Pro / Fund**, not Starter / Professional /
+   Fund. Quota field becomes **"Pitch deck analyses per month"** rather than
+   "memos" / "signals".
 
-- **#6 error notifier audit.** Confirm whether the 60 min stuck flow actually threw an
-  error (which should have fired our Sam-Error-Notifier → SAM dashboard callback) or
-  *hung* (Wait node, LLM timeout, missing webhook response). If it hung, no error
-  fires by design — we need a status-sweep cron, not a notifier patch.
-- **#7 reanalyse trace.** Locate the reanalyse handler, capture the failure mode.
-- **#12 Sevvy upload.** Get the file from the client, repro locally, check whether it's
-  PDF parsing, MIME, RLS, size, or the new direct-to-Supabase path.
-- **#15 SALVIO LinkedIn.** Trace the search path; identify whether it's the search
-  source, the parse, or the gating heuristic.
-- **#21 score inconsistency.** Find both render sites in Fund Fit, identify which calc
-  feeds each, decide on canonical.
+---
 
-### Wave 2 — quick wins (one bundled PR)
+## PHASE A — pilot close-out (today)
 
-XS / S items with no investigation needed. Bundle to keep PR overhead low:
+### #20 Tier prices alignment (was #61)
+Design table:
 
-- #8 disable deck-by-email send
-- #14 status-label colours (use chip palette already in dropdown)
-- #16 LinkedIn logo asset on team cards
-- #20 tier-price values aligned with target
-- #23 rename Go pilot → Ask Sam (string + nav)
-- #24 surface model name (`claude-opus-4-7` or whatever's live) under composer
-- #25 remove or wire dead `+` button
-- #27 Market variance overflow — CSS clamp / overflow-hidden
-- #28 strip verdict labels from DOCX/PDF export template
-- #29 disable email-with-file path
+| Tier  | Price       | Analyses/mo | Seats  |
+|-------|-------------|-------------|--------|
+| Angel | €149/month  | 10          | 1      |
+| Pro   | €299/month  | 30          | 3      |
+| Fund  | Custom      | Custom      | Custom |
 
-### Wave 3 — medium fixes (parallel, one PR each)
+Current `tier-config.ts`:
+- starter (€49, 5/mo, 1 seat) → must become **Angel €149, 10/mo, 1 seat**
+- professional (€149, 25/mo, 1 seat) → must become **Pro €299, 30/mo, 3 seats**
+- fund (€399, unlimited, 5 seats) → keep `price=null` for Custom; seats unlimited
 
-Each isolated, can be picked up in any order after Wave 1 confirms causes:
+Files: `src/lib/tier-config.ts`, plus any usage that prints "Starter"/"Professional".
 
-- **#1 / #17 Stripe tier flow.** One consolidated PR. Fix tier picker on registration
-  + settings/billing. The "needs walkthrough" dialog is currently gating *all* tiers
-  instead of only Fund — likely a bad conditional. Verify `/api/stripe/switch` (we
-  shipped today) handles all transitions, including starter→professional.
-- **#3 Registration regression.** Reproduce on a fresh signup, check whether middleware
-  bounces back to init based on a profile state, or whether wizard step doesn't
-  advance after submit.
-- **#4 / #5 Fund Fit nav + mandatory.** Add a back-link from details to About You.
-  Mark every Fund Fit field required, validate before submit.
-- **#9 Sources filter.** Pitch deck is leaking into Sources despite prompt. Either
-  (a) prompt needs a hard guard ("never include the deck itself"), or (b) we
-  post-filter — strip any source whose `kind === 'pitch_deck'` from the rendered list.
-  Prefer (b) — prompts are unreliable.
-- **#10 Manual name override.** Add an editable name field on the upload card. Existing
-  extractor stays as the default, user can overwrite. (Praetori_Pitch_Deck (1).pdf
-  case — extractor probably skipped because filename has parens / numbers.)
-- **#11 Defer stage label.** Stage tag should not appear until Flow 0 returns the
-  classification. Currently being set at upload — find the source, gate on analysis
-  result.
-- **#13 Strip rubric meta-text.** "Weighting applied (per stage rubric…) yields a
-  computed…" is leaking into the summary string. Either prompt-level (instruct LLM
-  not to narrate the rubric) or post-process regex strip on the executive_summary
-  field. Recommend both.
-- **#22 Inject fund profile into Ask Sam.** Fetch fund profile + thesis + recent
-  preferences in `/api/chat`, prepend to system prompt. Single-file plumbing if the
-  scope param work from Phase 4 already routes context.
-- **#26 Exec summary layout.** Restructure the 3-column block:
-  1. Company details
-  2. Investment thesis (wider)
-  3. Confidence score + performance overview (two graphs side by side)
-  Then domains row underneath.
+### #26 Exec summary layout (was #68)
+Pilot's preferred layout (validated by design's "investment thesis text, score
+donut, performance radar, domain sub-scores"):
+1. Company details (left, narrow column)
+2. Investment thesis (center, wide)
+3. Confidence score + performance overview (right, two graphs side by side)
+   Then: domain sub-scores row underneath.
 
-### Wave 4 — larger work
+Files: `src/app/(dashboard)/deals/[dealId]/summary/page.tsx`.
 
-- **#2 Bring scraper into onboarding.** The fund-website scraper exists at settings
-  level (we shipped it). Surface it as a step in the onboarding wizard so new users
-  don't have to backfill from settings.
-- **#15 LinkedIn search rebuild.** Existing pending task. Pair with #16 (logo).
-- **#18 Memo usage meter.** Add usage count + cap visualisation on `/settings/billing`.
-  Hook to `analyses` count for the period. Add an alert banner when ≥80% of cap.
-  Buy-more-memos flow optional, post-MVP.
-- **#6 status-sweep cron** (depends on Wave 1 audit). If audit confirms hang vs error,
-  add `/api/cron/sweep-stuck-analyses`: select rows in `analysing` older than 15
-  min, mark `failed` with `error = 'timeout'`. Existing Realtime subscription on
-  `useDeals` already propagates to UI.
+### #19 First-deck-free trial (was #69) — DROP
+Design: "Use launch discounts in outreach campaigns, not as the permanent
+headline on the pricing page." No free-tier mechanism. Mark task as
+intentionally not-shipping — replaced by an early-access discount strategy
+that lives in marketing copy, not in code.
 
-### Wave 5 — product
+### #12 Sevvy upload — REPORT-ONLY
+Sevvy isn't in Juriaan's `pitch-decks/` storage tree (only 14 other decks
+present). The upload failed before write, so we cannot repro without the file.
+Findings remain as written in Wave 1: top suspect is the unpdf swap (commit
+`5c5f436`) when the deck is image-heavy. **Action:** mark task blocked, ask
+client for the actual PDF, then a 5-min repro + fix.
 
-- **#19 First-deck-free.** New trial mechanic. Likely:
-  - new `tier = 'free'` profile state, capped to 1 analysis ever
-  - registration wizard offers "analyse one deck free" CTA in addition to tier picker
-  - on first analysis completion, prompt to subscribe to a paid tier
-  - Stripe coupon path can stay as-is (used by promo codes); free tier is a separate
-    pre-Stripe state
-  - billing page handles the upgrade transition into a paid tier
+### #15 SALVIO LinkedIn — INVESTIGATE
+Found Juriaan's deal: company name extracted as **"Salfio"** (mis-extraction
+from "SALVIO"); deal id `e2652b85-b929-4842-9ed8-fed63fab51cd`; file
+`Salfio_Pitch_Deck.pdf` in storage at
+`3fba34b2…/uploads/a2f0e78b…/Salfio_Pitch_Deck.pdf`. Pull the matching n8n
+Flow 3 execution, see which of the three failure modes (single-name match /
+empty `organic_results[0]` / non-de/ch locale) hit, then fix.
 
-## Files-likely-touched (rough)
+---
 
-| Wave | Item | Files |
-|---|---|---|
-| 1 | #6 | n8n flow audit; new `/api/cron/sweep-stuck-analyses/route.ts`; `vercel.json` cron config |
-| 1 | #7 | locate reanalyse handler (`grep -r reanalyse src/app/api`) |
-| 1 | #12 | upload UI + upload API + Sevvy file repro |
-| 1 | #15 | n8n flow that runs LinkedIn search; or Supabase fn if local |
-| 1 | #21 | Fund Fit page render + score calc lib |
-| 2 | #8/#29 | n8n flow (Gmail send node) + any backend email path |
-| 2 | #14 | status chip styles |
-| 2 | #16 | team-card component |
-| 2 | #20 | pricing config (`pricing.ts` or env) |
-| 2 | #23 | global rename — `Go pilot` strings, route names |
-| 2 | #24 | chat composer footer |
-| 2 | #25 | chat header / composer |
-| 2 | #27 | Market dynamics styles |
-| 2 | #28 | `/api/export/word/route.ts`, `/api/export/pdf/route.ts` (if exists) |
-| 3 | #1/#17 | tier picker + `/api/stripe/checkout`, `/api/stripe/switch`, billing page |
-| 3 | #3 | onboarding wizard + middleware |
-| 3 | #4/#5 | Fund Fit wizard pages |
-| 3 | #9 | sources filter (UI post-filter) + analysis prompt |
-| 3 | #10 | upload card UI |
-| 3 | #11 | stage label assignment site |
-| 3 | #13 | exec summary prompt + post-process |
-| 3 | #22 | `/api/chat` system-prompt builder |
-| 3 | #26 | exec summary tab |
-| 4 | #2 | onboarding wizard (add scraper step) |
-| 4 | #15 | LinkedIn search worker |
-| 4 | #18 | billing page + usage query hook |
-| 5 | #19 | profile schema + tier mapper + onboarding + billing |
+## PHASE B — design Phase 1 (homepage + pricing + sample assessment)
 
-## Open questions for the design
+Design says Phase 1 = "Homepage + Sample Assessment + Pricing + Analyse a
+deck".
 
-When the design lands, we'll need answers on these specifically:
+**Decision (per user, this session):** use **`/mockup4`** as the design base
+rather than the existing landing components. Mockup4 already has the
+ramp-style structure, framer-motion animations, lime marquee, bone band, and
+two-tone editorial typography that match the design's "private-capital
+software" feel. We update mockup4's copy + sections to match the briefing,
+then promote it to `/` (replace `src/app/page.tsx`).
 
-1. **#26 Exec summary** — confirm new column proportions and whether confidence + performance
-   are two graphs or one combined.
-2. **#14 Status colours** — match the dropdown chip palette exactly, or refresh palette?
-3. **#19 Free trial** — does free deck get the full memo or a redacted preview?
-4. **#18 Usage meter** — design wants alert banner, top-of-billing card, or both?
-5. **#28 Export** — is the entire conclusion section coming out, or just the verdict label
-   line? (different from the UI strip we already shipped)
-6. **#23 / #24 Ask Sam** — does the model name belong as a small footnote, in the header,
-   or in a settings/info button?
+### B1 — Visual tokens
+Update theme tokens to design spec:
+- Off-white background `#F9F8F6`
+- Deep green primary `#1A5C3A`
+- Card radius `12px`
+- Border `#E5E7EB`
+- Typeface `Inter` (already loaded — verify usage)
 
-## Out-of-scope reminders
+Files: `tailwind.config.ts` / `src/app/globals.css`. Audit current uses of
+custom colours `#0F3D2E`, `#0A2E22`, `#00A86B` — keep brand recognisable but
+re-anchor primary to `#1A5C3A`.
 
-Per active focus memory: this plan does not touch testnet chains, off-platform agent
-services, or anything outside SAM. SAM-only.
+### B2 — Hero rewrite
+- Headline: **"From deck to decision."**
+- Subheadline: "Sam turns pitch decks into structured, source-aware investment
+  assessments — so every deal is reviewed with the same discipline, before you
+  spend partner time."
+- Bullets: six-domain investment analysis · fund-fit scoring · missing
+  information and founder follow-up questions · Ask Sam / Co-Pilot · EU-hosted
+  confidential workflows.
+- CTAs: **Analyse a deck** (primary) / **View sample assessment** (secondary).
+
+Files: `src/components/landing/hero.tsx` + `src/components/landing/hero-primary.tsx`.
+
+### B3 — Founder narrative section
+New section (or repurpose Problem section): "Built from real investor workflows."
+Copy lifted directly from design para 11–14.
+
+Files: new `src/components/landing/founder-narrative.tsx`.
+
+### B4 — Six-domain framework
+Update from 5 to 6 domains. Add **Exit**.
+
+Files: `src/components/landing/framework.tsx`.
+
+### B5 — Not a prompt wrapper
+New section: "The model is not the product. The investment framework is."
+Four proof cards: fixed framework / fund-specific context / knowledge-backed
+analysis / source-aware outputs.
+
+Files: new `src/components/landing/not-a-wrapper.tsx`.
+
+### B6 — Source attribution callout
+New section. Show a sample claim with `[Source: LinkedIn]` /
+`[Source: Pitch Deck — UNVALIDATED]` tags. Headline: "Every insight is
+source-tagged."
+
+Files: new `src/components/landing/source-attribution.tsx`.
+
+### B7 — Missing information section
+New. Headline: "Know exactly what still needs to be asked." Note that
+missing info does NOT reduce score — flagged separately.
+
+Files: new `src/components/landing/missing-info.tsx`.
+
+### B8 — Ask Sam / Co-Pilot section
+New. Headline: "Ask Sam anything — in the context of the deal you just
+analysed." Show example prompt pills (4 from design para 147).
+
+Files: new `src/components/landing/ask-sam.tsx`.
+
+### B9 — Pricing page rewrite
+- Update `src/components/landing/pricing.tsx` tier copy
+- Tier names Angel/Pro/Fund, prices €149/€299/Custom
+- "Pitch deck analyses per month" naming
+- Feature comparison table aligned with design Table 3
+- FAQ block updated per design (not investment advice / no public model
+  training / fund mandate upload / not replacing analysts / PDF export /
+  source attribution explained)
+
+### B10 — Conversion page (Analyse a deck)
+Existing `/register?tier=…` flow already serves this. Verify the headline +
+copy match design's "Analyse your next pitch deck with Sam". Adjust if
+needed.
+
+### B11 — Section order in `src/app/page.tsx`
+Per design Phase 1 spec:
+1. Hero
+2. Founder narrative (B3)
+3. Problem (existing)
+4. Product snapshot (existing — repurpose)
+5. Six-domain framework (B4)
+6. Not a prompt wrapper (B5)
+7. Source attribution (B6)
+8. Missing info (B7)
+9. Ask Sam / Co-Pilot (B8)
+10. Fund fit (existing — keep)
+11. Security trust strip (existing — keep, drop SOC2 if unconfirmed)
+12. Pricing (existing)
+13. Final CTA (existing)
+14. Footer
+
+Drop: Partners (move to lower-priority page), Reviews (kept but de-emphasised
+or moved off homepage).
+
+---
+
+## PHASE C — design Phase 2 (Product page rebuild)
+
+Design Section 5 has a copy/paste prompt for the Product page. Restructure
+existing `/product` (or create if missing) per Section 9 (screenshot mapping)
+and Section 5 prompt. Defer until Phase B is done.
+
+---
+
+## PHASE D — design Phase 3 (Use Cases + Security)
+
+Existing `/for-angels`, `/for-vc-funds`, `/how-it-works` pages need to be
+consolidated into a single `/use-cases` page per design. Security page is
+new.
+
+---
+
+## DROPPED / SKIPPED
+
+- **#19 First-deck-free** — design says no.
+- **"AI investment associate"** as primary positioning — design demotes it.
+- **Phases C and D** (separate Product / Use Cases / Security pages) —
+  defer until Phase A + B ship and the client has reviewed.
+
+---
+
+## CRON_SECRET
+
+Generated for `/api/cron/sweep-stuck-analyses` — paste into Vercel project
+env (Production + Preview):
+
+```
+80bb2fd6480ec2c1575df02aed52d7ad43c3cb310641ad9ce4db605b0984a19e
+```
+
+---
+
+## EXECUTION ORDER
+
+1. Phase A (pilot close-out) — ~2 hours.
+2. Phase B1 (visual tokens) — 30 min, drives everything else.
+3. Phase B2–B11 (homepage + pricing rewrites) — bulk of the work.
+4. Test build + restart sam-test + commit + push.
+5. Hand off Phase C / D after sign-off.
