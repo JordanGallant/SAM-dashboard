@@ -223,12 +223,24 @@ function Hero() {
                 sam.ai/deals/vrey/summary
               </span>
             </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/design/dashboard-summary.png"
-              alt="Sam dashboard — VREY executive summary with score, scorecard and Ask Sam co-pilot"
-              className="block w-full h-auto"
-            />
+            {/* 2:1 viewport — matches the previous PreviewCard's intrinsic
+                height (~540px at 1080px wide). Top-aligned so the executive
+                summary header is what lands above the fold. */}
+            <div className="relative aspect-[2/1] overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/design/dashboard-summary.png"
+                alt="Sam dashboard — VREY executive summary with score, scorecard and Ask Sam co-pilot"
+                className="absolute inset-0 w-full h-auto object-cover object-top"
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
+                style={{
+                  background: "linear-gradient(to top, rgba(255,255,255,0.95), transparent)",
+                }}
+              />
+            </div>
           </div>
         </motion.div>
       </div>
