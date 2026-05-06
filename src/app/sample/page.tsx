@@ -30,21 +30,21 @@ export default function SamplePage() {
           <div className="relative mx-auto max-w-6xl px-4 pt-16 pb-20 md:pt-20 md:pb-24">
             <div className="grid lg:grid-cols-[1fr_1.15fr] gap-10 lg:gap-14 items-center">
               <div>
-                <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">Sample memo</p>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">Sample assessment</p>
                 <h1 className="mt-3 text-4xl md:text-5xl font-bold font-heading tracking-[-0.02em] leading-[1.05] text-white">
-                  What a Sam{" "}
+                  See what Sam creates{" "}
                   <span className="bg-gradient-to-r from-[#D4FF6B] via-[#C8F25F] to-[#7FD9AA] bg-clip-text text-transparent">
-                    analysis
-                  </span>{" "}
-                  looks like.
+                    from a pitch deck.
+                  </span>
                 </h1>
                 <p className="mt-5 text-base md:text-lg text-white/70 max-w-xl leading-relaxed">
-                  Every memo is a structured document — executive summary, scorecard across five domains, thesis, strengths, risks, and recommended next steps. Read it as text, walk it tab-by-tab, or export to Word.
+                  A structured investment assessment with scores, red flags, missing information,
+                  fund fit and an in-context co-pilot — across six investment domains, every deck.
                 </p>
                 <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-mono text-white/50 uppercase tracking-widest">
-                  <span>5 domains</span>
+                  <span>6 domains</span>
                   <span className="text-white/20">·</span>
-                  <span>scored 0 — 100</span>
+                  <span>source-tagged</span>
                   <span className="text-white/20">·</span>
                   <span>IC-ready</span>
                 </div>
