@@ -287,15 +287,24 @@ export default function FundProfilePage() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Additional</Label>
+            <Label>
+              Additional mandate detail
+              <span className="ml-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                used in fund-fit + Ask Sam
+              </span>
+            </Label>
             <p className="text-xs text-muted-foreground">
-              Restrictions, side-letter constraints, or anything else SAM should weigh when scoring fund fit (e.g. &quot;no defense or gambling&quot;, &quot;must be GDPR-ready&quot;, &quot;EU-only LPs&quot;).
+              Restrictions, side-letter constraints, conviction notes — anything outside the
+              standard fields. Sam sends this verbatim into Fund Fit scoring (Flow 10) and the
+              Ask Sam co-pilot context, so it directly influences the assessment.
+              Examples: &quot;no defense or gambling&quot;, &quot;must be GDPR-ready&quot;,
+              &quot;EU-only LPs&quot;, &quot;avoid B2C marketplaces&quot;.
             </p>
             <Textarea
               value={additional}
               onChange={(e) => setAdditional(e.target.value)}
               rows={4}
-              placeholder="Anything outside the standard fields…"
+              placeholder="e.g. No defense, no gambling. EU-only LPs. Open to deeptech with clear regulatory pathway. Pass on anything pre-product."
             />
           </div>
         </CardContent>

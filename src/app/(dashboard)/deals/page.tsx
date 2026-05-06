@@ -2,7 +2,7 @@
 
 import { useState, Suspense, useMemo } from "react"
 import Link from "next/link"
-import { ArrowRight, Briefcase, Search, Trash2, X, Loader2, RefreshCw, AlertCircle } from "lucide-react"
+import { ArrowRight, Briefcase, Search, Trash2, X, Loader2, RefreshCw, AlertCircle, List, Layers } from "lucide-react"
 import { DeckUploader } from "@/components/deals/deck-uploader"
 import { FundProfileBanner } from "@/components/dashboard/fund-profile-banner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -26,6 +26,8 @@ function DealsContent() {
   const [stageFilter, setStageFilter] = useState<DealStage | "all">("all")
   const [statusFilter, setStatusFilter] = useState<PipelineStatus | "all">("all")
   const [scoreBucket, setScoreBucket] = useState<ScoreBucket>("all")
+  // Pilot #34: alternative phase-grouped view. Toggle in the filter bar.
+  const [viewMode, setViewMode] = useState<"list" | "phase">("list")
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [retryingId, setRetryingId] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<Deal | null>(null)
@@ -137,6 +139,26 @@ function DealsContent() {
     const analyzed = deals.filter((d) => d.analysis).length
     return { analyzed, awaiting: deals.length - analyzed }
   }, [deals])
+
+  // Pilot #34: bucket the filtered deals by pipeline status for the phase view.
+  // Uses PIPELINE_STAGES order so the columns/sections render New → Invested.
+  const phaseGroups = useMemo(() => {
+    const sorted = [...filtered].sort((a, b) => {
+      const ta = new Date(a.createdAt).getTime()
+      const tb = new Date(b.createdAt).getTime()
+      return tb - ta
+    })
+    const map = new Map<PipelineStatus, Deal[]>()
+    for (const stage of PIPELINE_STAGES) map.set(stage, [])
+    for (const d of sorted) {
+      const list = map.get(d.status as PipelineStatus)
+      if (list) list.push(d)
+    }
+    return PIPELINE_STAGES.map((stage) => ({
+      stage: stage as PipelineStatus,
+      deals: map.get(stage as PipelineStatus) ?? [],
+    }))
+  }, [filtered])
 
   const hasFilters =
     search.length > 0 || stageFilter !== "all" || statusFilter !== "all" || scoreBucket !== "all"
@@ -281,6 +303,37 @@ function DealsContent() {
                 <span aria-hidden />
               )}
             </div>
+
+            {/* Pilot #34: list ↔ phase view toggle */}
+            <div className="mt-3 pt-3 border-t border-[#0F3D2E]/5 flex items-center gap-2">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">View</span>
+              <div className="inline-flex items-center rounded-full bg-[#F4FAF6]/60 ring-1 ring-[#0F3D2E]/10 p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("list")}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11.5px] font-medium transition-colors ${
+                    viewMode === "list"
+                      ? "bg-white shadow-sm text-foreground ring-1 ring-[#0F3D2E]/10"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <List className="h-3 w-3" />
+                  List
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("phase")}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11.5px] font-medium transition-colors ${
+                    viewMode === "phase"
+                      ? "bg-white shadow-sm text-foreground ring-1 ring-[#0F3D2E]/10"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Layers className="h-3 w-3" />
+                  By phase
+                </button>
+              </div>
+            </div>
           </div>
 
           {needsAttention.length === 0 && analysed.length === 0 ? (
@@ -292,6 +345,47 @@ function DealsContent() {
               >
                 Clear filters
               </button>
+            </div>
+          ) : viewMode === "phase" ? (
+            // Pilot #34: phase view — one section per pipeline status, in order.
+            // Empty stages render with a subtle "0 deals" placeholder so the
+            // pipeline shape stays visible even when sparse.
+            <div className="space-y-6">
+              {phaseGroups.map(({ stage, deals: stageDeals }) => (
+                <section key={stage}>
+                  <div className="flex items-baseline gap-3 mb-2 px-1">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-widest ${
+                        STATUS_BADGE_COLORS[stage] ?? "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {stage}
+                    </span>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground tabular-nums">
+                      {stageDeals.length === 1 ? "1 deal" : `${stageDeals.length} deals`}
+                    </span>
+                    <div className="flex-1 h-px bg-[#0F3D2E]/10" />
+                  </div>
+                  {stageDeals.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-[#0F3D2E]/10 bg-[#F4FAF6]/30 px-4 py-3 text-[12px] text-muted-foreground">
+                      No deals in this phase.
+                    </div>
+                  ) : (
+                    <ul className="overflow-hidden rounded-2xl border border-[#0F3D2E]/10 bg-white divide-y divide-[#0F3D2E]/5">
+                      {stageDeals.map((deal) => (
+                        <DealRow
+                          key={deal.id}
+                          deal={deal}
+                          retryingId={retryingId}
+                          deletingId={deletingId}
+                          onRetry={handleRetry}
+                          onDelete={requestDelete}
+                        />
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              ))}
             </div>
           ) : (
             <div className="space-y-6">
