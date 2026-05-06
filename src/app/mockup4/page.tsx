@@ -60,13 +60,11 @@ export default function Mockup4() {
         <SourceAttribution />
         <MissingInfo />
         <AskSamSection />
-        <FeatureCards />
         <Audiences />
         <Quotes />
         <Trust />
         <Pricing />
         <FAQ />
-        <ClosingCTA />
       </main>
       <Footer />
       <MarqueeStyles />
@@ -94,26 +92,27 @@ function Nav() {
       }}
     >
       <div className="mx-auto max-w-[1240px] px-6 h-14 flex items-center justify-between">
-        <Link href="/mockup4" className="flex items-center gap-1.5 font-bold text-[16px] tracking-tight">
+        <Link href="/" className="flex items-center gap-1.5 font-bold text-[16px] tracking-tight">
           sam<span className="opacity-50">/</span>
         </Link>
         <nav className="hidden md:flex items-center gap-7 text-[14px]">
-          {["Product", "Solutions", "Customers", "Resources", "Pricing"].map((l) => (
-            <button key={l} className="relative group inline-flex items-center gap-1">
-              <span className="hover:opacity-60 transition">{l}</span>
-            </button>
-          ))}
+          <Link href="/how-it-works" className="hover:opacity-60 transition">How it works</Link>
+          <Link href="/for-angels" className="hover:opacity-60 transition">For angels</Link>
+          <Link href="/for-vc-funds" className="hover:opacity-60 transition">For VC funds</Link>
+          <Link href="/sample" className="hover:opacity-60 transition">Sample</Link>
+          <Link href="/#pricing" className="hover:opacity-60 transition">Pricing</Link>
         </nav>
         <div className="flex items-center gap-4">
           <Link href="/login" className="hidden sm:inline-flex text-[14px] hover:opacity-70 transition">
             Sign in
           </Link>
           <Link
-            href="/register"
-            className="inline-flex items-center rounded-full px-4 py-2 text-[13.5px] font-semibold text-[#0A0A0A] hover:scale-[1.02] transition"
-            style={{ background: LIME }}
+            href="/register?tier=professional"
+            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13.5px] font-semibold transition hover:scale-[1.02]"
+            style={{ background: INK, color: "#FFF" }}
           >
-            See a demo
+            Analyse a deck
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>
@@ -192,7 +191,7 @@ function Hero() {
           </motion.div>
         </div>
 
-        {/* Big rounded preview card — SAM UI inside */}
+        {/* Real SAM dashboard screenshot — replaces the previous animated mock */}
         <motion.div
           style={{ y: cardY }}
           initial={{ opacity: 0, y: 40 }}
@@ -200,7 +199,37 @@ function Hero() {
           transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
           className="relative mt-16 mx-auto max-w-[1080px]"
         >
-          <PreviewCard />
+          {/* soft halo behind the screenshot */}
+          <div
+            aria-hidden
+            className="absolute -inset-8 -z-10 rounded-[2rem] blur-2xl"
+            style={{ background: "radial-gradient(ellipse at center, rgba(15,61,46,0.10), transparent 60%)" }}
+          />
+          <div
+            className="relative rounded-2xl bg-white shadow-2xl overflow-hidden"
+            style={{ border: `1px solid ${RULE}` }}
+          >
+            <div
+              className="flex items-center gap-2 px-4 py-2.5"
+              style={{ borderBottom: `1px solid ${RULE}`, background: SOFT_FIELD }}
+            >
+              <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+              <span
+                className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate"
+                style={{ background: "#FFF", border: `1px solid ${RULE}`, color: SUBINK }}
+              >
+                sam.ai/deals/vrey/summary
+              </span>
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/design/dashboard-summary.png"
+              alt="Sam dashboard — VREY executive summary with score, scorecard and Ask Sam co-pilot"
+              className="block w-full h-auto"
+            />
+          </div>
         </motion.div>
       </div>
     </section>
@@ -422,7 +451,7 @@ function RowTicker() {
 function TickerBar() {
   const pillars = [
     "Five domains scored",
-    "Memo in five minutes",
+    "Assessment in 10–17 minutes",
     "EU-resident",
     "GDPR · SOC 2",
   ]
@@ -452,7 +481,7 @@ function LimeMarquee() {
     "Spend it well",
     "5 domains",
     "Scored 0 — 100",
-    "12 min · deck → memo",
+    "10–17 min · deck → assessment",
     "EU-hosted",
     "GDPR by design",
     "1,000+ memos generated",
@@ -2043,19 +2072,28 @@ function MarqueeStyles() {
 }
 
 // ============================================================
-// Source attribution callout — design briefing Section 8 #2
+// Source attribution callout — design briefing Section 8 #2.
+// Two-column: editorial copy + four sources strip on the left, real
+// dashboard team-analysis screenshot on the right showing the live source
+// tags in product. This replaces the previous abstract claim-chip grid.
 // ============================================================
 function SourceAttribution() {
-  const tags = [
-    { label: "Pitch Deck — UNVALIDATED", tone: "warn" as const, claim: "Founder claim: €4M ARR, 32% MoM growth (Q1 2026)." },
-    { label: "Source: LinkedIn", tone: "ok" as const, claim: "CEO: 8 yrs at Adyen, prior exit (Bunq, 2019). Confirmed." },
-    { label: "Source: Future Market Insights, 2025", tone: "ok" as const, claim: "EU SMB payments TAM €38B, 12.4% CAGR through 2030." },
-    { label: "Generated inference", tone: "neutral" as const, claim: "Stage-implied valuation range €18–24M based on Series A medians." },
+  const sources = [
+    { tag: "Pitch Deck — UNVALIDATED", tone: "warn" as const },
+    { tag: "Source: LinkedIn", tone: "ok" as const },
+    { tag: "Source: McKinsey 2024", tone: "ok" as const },
+    { tag: "Generated inference", tone: "neutral" as const },
   ]
+  const palette = {
+    warn: { bg: "rgba(217, 119, 6, 0.10)", fg: "#92400e", ring: "rgba(217,119,6,0.35)" },
+    ok: { bg: "rgba(0,168,107,0.10)", fg: "#065f46", ring: "rgba(0,168,107,0.35)" },
+    neutral: { bg: "rgba(10,10,10,0.04)", fg: "rgba(10,10,10,0.62)", ring: RULE },
+  }
   return (
     <section className="py-24 md:py-28 border-t" style={{ borderColor: RULE, background: SOFT_FIELD }}>
-      <div className="mx-auto max-w-[1240px] px-6">
-        <div className="max-w-2xl mb-12">
+      <div className="mx-auto max-w-[1240px] px-6 grid lg:grid-cols-[1fr_1.15fr] gap-12 items-center">
+        {/* Editorial column */}
+        <div>
           <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
             Source attribution
           </p>
@@ -2068,41 +2106,70 @@ function SourceAttribution() {
               source-tagged.
             </span>
           </h2>
-          <p className="mt-5 text-[16px] leading-[1.55]" style={{ color: SUBINK }}>
-            Sam shows you exactly where it got the information — and flags what still needs to be
-            verified. Pitch-deck claims are marked UNVALIDATED. External sources are cited. You
+          <p className="mt-5 text-[16px] leading-[1.6]" style={{ color: SUBINK }}>
+            Sam shows you exactly where it got the information — and flags what still needs to
+            be verified. Founder claims are marked UNVALIDATED. External sources are cited. You
             always know what is a confirmed fact versus a founder claim.
           </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {tags.map((t, i) => {
-            const palette =
-              t.tone === "warn"
-                ? { bg: "rgba(217, 119, 6, 0.10)", fg: "#92400e", ring: "rgba(217,119,6,0.35)" }
-                : t.tone === "ok"
-                ? { bg: "rgba(0,168,107,0.10)", fg: "#065f46", ring: "rgba(0,168,107,0.35)" }
-                : { bg: "rgba(10,10,10,0.04)", fg: "rgba(10,10,10,0.62)", ring: RULE }
-            return (
-              <motion.div
-                key={t.label}
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-                transition={{ duration: 0.45, ease: EASE, delay: 0.05 * i }}
-                className="rounded-2xl bg-white p-5 border"
-                style={{ borderColor: RULE }}
-              >
+          <div className="mt-7 flex flex-wrap gap-2">
+            {sources.map((s) => {
+              const p = palette[s.tone]
+              return (
                 <span
-                  className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10.5px] font-mono uppercase tracking-[0.18em] font-bold ring-1"
-                  style={{ background: palette.bg, color: palette.fg, borderColor: "transparent", boxShadow: `inset 0 0 0 1px ${palette.ring}` }}
+                  key={s.tag}
+                  className="inline-flex items-center rounded-full px-2.5 py-1 text-[10.5px] font-mono uppercase tracking-[0.18em] font-bold"
+                  style={{ background: p.bg, color: p.fg, boxShadow: `inset 0 0 0 1px ${p.ring}` }}
                 >
-                  {t.label}
+                  {s.tag}
                 </span>
-                <p className="mt-3 text-[14px] leading-[1.55]">{t.claim}</p>
-              </motion.div>
-            )
-          })}
+              )
+            })}
+          </div>
+          <p className="mt-5 text-[13px] leading-[1.55]" style={{ color: SUBINK }}>
+            Tags appear on every claim Sam writes — in the executive summary, in domain
+            breakdowns, in fund-fit, and in Ask Sam responses.
+          </p>
         </div>
+
+        {/* Real screenshot of the Team analysis tab — has visible source tags */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+          transition={{ duration: 0.6, ease: EASE }}
+          className="relative"
+        >
+          <div
+            aria-hidden
+            className="absolute -inset-6 -z-10 rounded-[2rem] blur-2xl"
+            style={{ background: "radial-gradient(ellipse at center, rgba(15,61,46,0.08), transparent 65%)" }}
+          />
+          <div
+            className="relative rounded-2xl bg-white shadow-2xl overflow-hidden"
+            style={{ border: `1px solid ${RULE}` }}
+          >
+            <div
+              className="flex items-center gap-2 px-4 py-2.5"
+              style={{ borderBottom: `1px solid ${RULE}`, background: SOFT_FIELD }}
+            >
+              <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+              <span
+                className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate"
+                style={{ background: "#FFF", border: `1px solid ${RULE}`, color: SUBINK }}
+              >
+                sam.ai/deals/vrey/team
+              </span>
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/design/dashboard-team.png"
+              alt="Sam Team analysis tab — founder cards with [Source: LinkedIn] and [Source: Pitch Deck — UNVALIDATED] tags"
+              className="block w-full h-auto"
+            />
+          </div>
+        </motion.div>
       </div>
     </section>
   )
