@@ -15,50 +15,48 @@ export default function SamplePage() {
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">
-        {/* Page hero — copy + browser-chrome dashboard screenshot */}
-        <section className="relative overflow-hidden border-b bg-gradient-to-br from-[#050B15] via-[#0A1A14] to-[#0F3D2E] text-white">
-          <div className="absolute -top-40 -right-40 h-[32rem] w-[32rem] rounded-full bg-primary/20 blur-3xl pointer-events-none" />
-          <div className="absolute top-1/3 -left-32 h-80 w-80 rounded-full bg-[#D4FF6B]/10 blur-3xl pointer-events-none" />
-          <div
-            className="absolute inset-0 opacity-[0.04] pointer-events-none"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-              backgroundSize: "48px 48px",
-            }}
-          />
-          <div className="relative mx-auto max-w-6xl px-4 pt-16 pb-20 md:pt-20 md:pb-24">
+        {/* Page hero — light field, design-aligned */}
+        <section className="relative pt-16 md:pt-24 pb-16 md:pb-20" style={{ background: "#FFFFFF" }}>
+          <div className="relative mx-auto max-w-[1240px] px-6">
             <div className="grid lg:grid-cols-[1fr_1.15fr] gap-10 lg:gap-14 items-center">
               <div>
-                <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">Sample assessment</p>
-                <h1 className="mt-3 text-4xl md:text-5xl font-bold font-heading tracking-[-0.02em] leading-[1.05] text-white">
+                <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: "rgba(10,10,10,0.62)" }}>
+                  Sample assessment
+                </p>
+                <h1
+                  className="mt-5 font-bold leading-[0.96] tracking-[-0.04em]"
+                  style={{ fontSize: "clamp(36px, 5.5vw, 68px)", color: "#0A0A0A" }}
+                >
                   See what Sam creates{" "}
-                  <span className="bg-gradient-to-r from-[#D4FF6B] via-[#C8F25F] to-[#7FD9AA] bg-clip-text text-transparent">
+                  <span className="font-serif italic font-normal" style={{ color: "#0F3D2E" }}>
                     from a pitch deck.
                   </span>
                 </h1>
-                <p className="mt-5 text-base md:text-lg text-white/70 max-w-xl leading-relaxed">
+                <p className="mt-6 max-w-xl text-[16px] md:text-[17px] leading-[1.6]" style={{ color: "rgba(10,10,10,0.62)" }}>
                   A structured investment assessment with scores, red flags, missing information,
                   fund fit and an in-context co-pilot — across six investment domains, every deck.
                 </p>
-                <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-mono text-white/50 uppercase tracking-widest">
+                <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: "rgba(10,10,10,0.55)" }}>
                   <span>6 domains</span>
-                  <span className="text-white/20">·</span>
+                  <span style={{ color: "rgba(10,10,10,0.18)" }}>·</span>
                   <span>source-tagged</span>
-                  <span className="text-white/20">·</span>
+                  <span style={{ color: "rgba(10,10,10,0.18)" }}>·</span>
                   <span>IC-ready</span>
                 </div>
               </div>
 
-              {/* Browser-chrome hero screenshot — same asset as landing */}
+              {/* Browser-chrome hero screenshot */}
               <div className="relative">
-                <div className="absolute -inset-8 -z-10 rounded-[2rem] bg-[radial-gradient(ellipse_at_center,rgba(212,255,107,0.18),transparent_60%)] blur-2xl" />
-                <div className="relative rounded-2xl bg-[#0F1B17]/80 ring-1 ring-white/10 shadow-2xl shadow-black/50 overflow-hidden backdrop-blur">
-                  <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1A14]/80 px-4 py-2.5">
+                <div className="absolute -inset-8 -z-10 rounded-[2rem] bg-[radial-gradient(ellipse_at_center,rgba(15,61,46,0.10),transparent_60%)] blur-2xl" />
+                <div
+                  className="relative rounded-2xl bg-white shadow-2xl overflow-hidden"
+                  style={{ border: "1px solid rgba(10,10,10,0.10)" }}
+                >
+                  <div className="flex items-center gap-2 px-4 py-2.5" style={{ borderBottom: "1px solid rgba(10,10,10,0.10)", background: "#F7F7F2" }}>
                     <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
                     <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
-                    <span className="ml-3 flex-1 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] font-mono text-white/40 truncate">
+                    <span className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate" style={{ background: "#FFF", border: "1px solid rgba(10,10,10,0.10)", color: "rgba(10,10,10,0.55)" }}>
                       sam.ai/deals/vrey/summary
                     </span>
                   </div>
@@ -75,28 +73,27 @@ export default function SamplePage() {
         </section>
 
         {/* Live dashboard mockups — what investors actually see in product */}
-        <section className="relative py-20 md:py-24 border-b overflow-hidden bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#133F2E] text-white">
-          <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[#D4FF6B]/10 blur-3xl pointer-events-none" />
-          <div
-            className="absolute inset-0 opacity-[0.04] pointer-events-none"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-              backgroundSize: "48px 48px",
-            }}
-          />
-          <div className="relative mx-auto max-w-6xl px-4">
+        <section
+          className="relative py-24 md:py-28 border-y"
+          style={{ borderColor: "rgba(10,10,10,0.10)", background: "#F7F7F2" }}
+        >
+          <div className="relative mx-auto max-w-[1240px] px-6">
             <div className="max-w-3xl mb-10 md:mb-14">
-              <p className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">In the dashboard</p>
-              <h2 className="mt-2 text-3xl md:text-4xl font-bold font-heading tracking-[-0.025em] leading-tight text-white">
-                The same memo,{" "}
-                <span className="bg-gradient-to-r from-[#D4FF6B] via-[#C8F25F] to-[#7FD9AA] bg-clip-text text-transparent">
+              <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: "rgba(10,10,10,0.62)" }}>
+                In the dashboard
+              </p>
+              <h2
+                className="mt-3 font-bold tracking-[-0.025em] leading-[1.04]"
+                style={{ fontSize: "clamp(32px, 4.5vw, 56px)", color: "#0A0A0A" }}
+              >
+                The same assessment,{" "}
+                <span className="font-serif italic font-normal" style={{ color: "#0F3D2E" }}>
                   rendered in product.
                 </span>
               </h2>
-              <p className="mt-4 text-base text-white/70 leading-relaxed">
-                Every memo is a structured document. You can read it as text, export it to Word, or work through each domain in the dashboard.
+              <p className="mt-5 max-w-2xl text-[15.5px] leading-[1.6]" style={{ color: "rgba(10,10,10,0.62)" }}>
+                Every assessment is a structured document. Read it as text, export to Word, or
+                work through each domain in the dashboard.
               </p>
             </div>
 
@@ -349,15 +346,30 @@ export default function SamplePage() {
             </div>
 
             {/* Magazine-style pull quote */}
-            <figure className="relative mt-10 rounded-2xl bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#133F2E] text-white p-8 md:p-10 ring-1 ring-foreground/10 shadow-2xl shadow-[#0F3D2E]/20 overflow-hidden">
-              <div className="absolute -top-20 -right-20 h-56 w-56 rounded-full bg-[#D4FF6B]/10 blur-3xl pointer-events-none" />
-              <Quote className="h-8 w-8 text-[#D4FF6B]/70 mb-4" />
-              <blockquote className="relative text-lg md:text-2xl font-heading leading-snug tracking-tight text-white">
-                &ldquo;This is not investable in its current form — not necessarily because the opportunity is bad, but because there is virtually no information upon which to base an investment decision.&rdquo;
+            <figure
+              className="relative mt-10 rounded-3xl text-white p-8 md:p-10 overflow-hidden"
+              style={{ background: "#0A0A0A" }}
+            >
+              <div
+                aria-hidden
+                className="absolute -top-20 -right-20 h-56 w-56 rounded-full opacity-25 pointer-events-none"
+                style={{ background: "radial-gradient(closest-side, #D7FE3F, transparent 70%)" }}
+              />
+              <Quote className="h-8 w-8 mb-4" style={{ color: "#D7FE3F", opacity: 0.7 }} />
+              <blockquote
+                className="relative text-lg md:text-2xl leading-snug tracking-tight font-medium"
+                style={{ color: "#FFF" }}
+              >
+                &ldquo;This is not investable in its current form — not necessarily because the
+                opportunity is bad, but because there is virtually{" "}
+                <span className="font-serif italic font-normal" style={{ color: "#D7FE3F" }}>
+                  no information
+                </span>{" "}
+                upon which to base an investment decision.&rdquo;
               </blockquote>
-              <figcaption className="mt-6 flex items-center gap-3 text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">
+              <figcaption className="mt-6 flex items-center gap-3 text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: "rgba(215,254,63,0.85)" }}>
                 <span>Investment thesis</span>
-                <span className="text-white/20">·</span>
+                <span style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
                 <span>Canaaro · 24/100 · Pass</span>
               </figcaption>
             </figure>
@@ -406,41 +418,46 @@ export default function SamplePage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-20 px-4 border-t bg-gradient-to-b from-slate-50 to-white">
-          <div className="mx-auto max-w-5xl">
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#1A6B47] px-8 py-14 md:px-14 md:py-16 shadow-2xl shadow-[#0F3D2E]/30">
-              <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#00A86B]/20 blur-3xl pointer-events-none" />
+        {/* CTA — INK card on light field */}
+        <section className="py-24 md:py-28 border-t" style={{ borderColor: "rgba(10,10,10,0.10)" }}>
+          <div className="mx-auto max-w-[1100px] px-6">
+            <div
+              className="relative overflow-hidden rounded-3xl px-8 py-14 md:px-14 md:py-16"
+              style={{ background: "#0A0A0A", color: "#FFF" }}
+            >
               <div
-                className="absolute inset-0 opacity-[0.04] pointer-events-none"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-                  backgroundSize: "40px 40px",
-                }}
+                aria-hidden
+                className="absolute inset-0 opacity-25 pointer-events-none"
+                style={{ background: "radial-gradient(ellipse 60% 40% at 30% 30%, rgba(0,168,107,0.35), transparent 70%)" }}
               />
               <div className="relative text-center">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B]/90">
-                  Your memo
-                </span>
-                <h2 className="mt-5 text-3xl md:text-4xl font-bold font-heading tracking-tight text-white">
-                  Run the same analysis on your{" "}
-                  <span className="bg-gradient-to-r from-[#7FD9AA] to-[#D4FF6B] bg-clip-text text-transparent">next deck.</span>
-                </h2>
-                <p className="mt-4 text-white/70 max-w-xl mx-auto">
-                  Upload a pitch deck and get a structured, scored memo back. No onboarding, no integrations.
+                <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: "#D7FE3F" }}>
+                  Your assessment
                 </p>
-                <div className="mt-8 flex justify-center">
+                <h2
+                  className="mt-4 font-bold tracking-[-0.025em] leading-[1.04]"
+                  style={{ fontSize: "clamp(32px, 4.5vw, 56px)" }}
+                >
+                  Run the same analysis on{" "}
+                  <span className="font-serif italic font-normal" style={{ color: "#D7FE3F" }}>
+                    your next deck.
+                  </span>
+                </h2>
+                <p className="mt-5 mx-auto max-w-xl text-[15.5px] leading-[1.55] text-white/70">
+                  Upload a pitch deck and get a structured, scored assessment back. No onboarding,
+                  no integrations.
+                </p>
+                <div className="mt-9 flex justify-center">
                   <Link
                     href="/register?tier=professional"
-                    className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#D4FF6B] hover:bg-[#E0FF80] text-[#0A2E22] px-7 py-3.5 text-sm font-semibold shadow-xl shadow-[#D4FF6B]/25 hover:shadow-2xl hover:shadow-[#D4FF6B]/40 transition-all hover:-translate-y-0.5"
+                    className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-[14px] font-semibold transition hover:scale-[1.02]"
+                    style={{ background: "#D7FE3F", color: "#0A0A0A" }}
                   >
                     Analyse a deck
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-mono text-white/50 uppercase tracking-widest">
+                <div className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[10.5px] font-mono uppercase tracking-[0.2em] text-white/55">
                   <span>No credit card</span>
                   <span className="text-white/20">·</span>
                   <span>EU-hosted</span>

@@ -1,138 +1,150 @@
 import Link from "next/link"
 import { Navbar } from "@/components/landing/navbar"
 import { Footer } from "@/components/landing/footer"
-import { Upload, Gauge, FileText, Scale, ArrowRight, Users, Globe2, Package, TrendingUp, Landmark, Sparkles, Workflow } from "lucide-react"
+import {
+  Upload, Gauge, FileText, Scale,
+  ArrowRight, Users, Globe2, Package, TrendingUp, Landmark, Building2,
+} from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal"
+
+// Light-field aesthetic aligned to mockup4 + design briefing v4 (May 2026):
+// off-white field, INK headlines with serif-italic accents, hairline borders,
+// Geist sans, BONE band for the framework section.
+const FIELD = "#FFFFFF"
+const SOFT_FIELD = "#F7F7F2"
+const BONE = "#DDD8C8"
+const INK = "#0A0A0A"
+const SUBINK = "rgba(10,10,10,0.62)"
+const RULE = "rgba(10,10,10,0.10)"
+const ACCENT = "#0F3D2E"
+const LIME = "#D7FE3F"
 
 const steps = [
   {
     icon: Upload,
     title: "Submit the deck",
-    body: "Upload a PDF, or forward the deck to your Sam intake address — based on your tier. Supporting documents — founder memos, data-room exports, financial models — can be attached alongside.",
+    body: "Upload a PDF, or forward the deck to your Sam intake address. Supporting documents — founder memos, data-room exports, financial models — can be attached alongside.",
   },
   {
     icon: Gauge,
-    title: "Framework analysis across five domains",
-    body: "Sam evaluates the deck across Team, Market, Product, Traction, and Financials. Each domain applies the same scoring rubric with stage-aware weights, so a pre-seed deck is judged on pre-seed criteria.",
+    title: "Six-domain assessment runs",
+    body: "Sam evaluates the deck across Team, Market, Product, Traction, Finance, and Exit. Each domain applies the same scoring rubric with stage-aware weights, so a pre-seed deck is judged on pre-seed criteria.",
   },
   {
     icon: FileText,
-    title: "Structured memo delivered",
-    body: "The memo arrives in your account — executive summary on page one, full analysis below. PDF export is available. Shareable link if your team works across accounts.",
+    title: "Structured assessment delivered",
+    body: "The assessment arrives in your account — executive summary on top, six-domain breakdown below, source-tagged claims, missing-info checklist and Ask Sam co-pilot in context. Word + PDF export available.",
   },
   {
     icon: Scale,
-    title: "Compare, Track and prepare your next decision",
-    body: "Every memo follows the same structure. Compare deal twelve to deal two. Reference the thesis you wrote six months ago. Walk into your IC with evidence, not impressions.",
+    title: "Compare, track and decide",
+    body: "Every assessment follows the same structure. Compare deal twelve to deal two. Reference the thesis you wrote six months ago. Walk into your IC with evidence, not impressions.",
   },
 ]
 
 const domains = [
-  {
-    icon: Users,
-    name: "Team",
-    body: "Sam evaluates founder backgrounds, complementarity, domain expertise, and execution signals. It can enrich with LinkedIn and public sources for prior roles, identifies gaps in team composition, and flags founder-market fit with specifics — not \"strong team\", but \"two-thirds of the team has domain tenure, the commercial lead does not.\"",
-  },
-  {
-    icon: Globe2,
-    name: "Market",
-    body: "TAM, SAM, and SOM are validated against independent sources — not accepted as stated. Sam identifies the competitive landscape, maps direct and adjacent players, and assesses market timing. The output includes a \"why now\" verdict, flagged if the thesis depends on a trend that may have already passed.",
-  },
-  {
-    icon: Package,
-    name: "Product",
-    body: "Sam runs the 10x test: is this a meaningful improvement on the current state, or a marginal one? Product-market fit signals are weighted — early revenue, retention curves, pilot-to-paid conversion. Moat assessment looks for defensibility: network effects, data advantage, technical depth, or distribution.",
-  },
-  {
-    icon: TrendingUp,
-    name: "Traction",
-    body: "Revenue figures are cross-checked against deck claims. Unit economics — CAC, LTV, payback — are calculated where data is available. Retention and capital efficiency are evaluated against stage-appropriate benchmarks. If the numbers don't reconcile, Sam flags it.",
-  },
-  {
-    icon: Landmark,
-    name: "Financials",
-    body: "Sam reviews the financial narrative behind the company: business model, revenue quality, burn, runway, valuation, funding need and use of funds — highlighting what is clear, what is missing, and what needs further diligence.",
-  },
+  { icon: Users, name: "Team", body: "Founder backgrounds, complementarity, domain expertise and execution signals. Enriched with LinkedIn and public sources where available, with founder-market fit flagged at specifics — not \"strong team\" but \"two-thirds of the team has domain tenure, the commercial lead does not.\"" },
+  { icon: Globe2, name: "Market", body: "TAM / SAM / SOM validated against independent sources, not accepted as stated. Competitive landscape mapped, market timing assessed, with a \"why now\" verdict — flagged if the thesis depends on a trend that may have already passed." },
+  { icon: Package, name: "Product", body: "Sam runs the 10× test — meaningful improvement or marginal? PMF signals weighted (early revenue, retention curves, pilot-to-paid). Moat assessment looks for defensibility: network effects, data advantage, technical depth, distribution." },
+  { icon: TrendingUp, name: "Traction", body: "Revenue figures cross-checked against deck claims. Unit economics — CAC, LTV, payback — calculated where data is available. Retention and capital efficiency evaluated against stage benchmarks. If numbers don't reconcile, Sam flags it." },
+  { icon: Landmark, name: "Finance", body: "Business model, revenue quality, burn, runway, valuation, funding need and use of funds — highlighting what is clear, what is missing, and what needs further diligence." },
+  { icon: Building2, name: "Exit", body: "Exit range, timeline, acquirer landscape and exit red flags. Benchmarked against public comparables and recent precedent transactions in the sector and stage." },
 ]
 
 export default function HowItWorksPage() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col" style={{ background: FIELD, color: INK }}>
       <Navbar />
       <main className="flex-1">
-        {/* Hero — dark forest */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#133F2E] text-white">
-          <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-primary/25 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[#D4FF6B]/15 blur-3xl pointer-events-none" />
-          <div
-            className="absolute inset-0 opacity-[0.04] pointer-events-none"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-              backgroundSize: "48px 48px",
-            }}
-          />
-
-          <div className="relative mx-auto max-w-4xl px-4 py-24 md:py-28 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#D4FF6B]/30 bg-[#D4FF6B]/10 backdrop-blur px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B]">
-              <Workflow className="h-3 w-3" />
+        {/* Hero — light field with serif-italic accent */}
+        <section className="relative pt-16 md:pt-24 pb-20">
+          <div className="mx-auto max-w-[1100px] px-6 text-center">
+            <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
               How it works
-            </div>
-            <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-white">
-              From deck to decision,
-              <br />
-              <span className="bg-gradient-to-r from-[#D4FF6B] via-[#C8F25F] to-[#7FD9AA] bg-clip-text text-transparent">
+            </p>
+            <h1
+              className="mt-5 font-bold leading-[0.96] tracking-[-0.04em]"
+              style={{ fontSize: "clamp(40px, 7vw, 88px)" }}
+            >
+              From deck to decision,{" "}
+              <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
                 in four steps.
               </span>
             </h1>
-            <p className="mt-6 text-base md:text-lg text-white/65 max-w-2xl mx-auto leading-relaxed">
-              Sam processes pitch decks through a fixed evaluation pipeline. Every deck follows the same path. Every memo has the same structure.
+            <p className="mt-6 mx-auto max-w-2xl text-[16px] md:text-[17px] leading-[1.55]" style={{ color: SUBINK }}>
+              Sam processes pitch decks through a fixed evaluation pipeline. Every deck follows the
+              same path. Every assessment has the same structure.
             </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/register?tier=professional"
+                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition hover:scale-[1.02]"
+                style={{ background: INK, color: "#FFF" }}
+              >
+                Analyse a deck
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+              <Link
+                href="/sample"
+                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold border-[1.5px] hover:bg-foreground/[0.04] transition"
+                style={{ borderColor: RULE, color: INK }}
+              >
+                View sample assessment
+              </Link>
+            </div>
           </div>
         </section>
 
-        {/* 4 steps */}
-        <section className="relative py-24 md:py-28 border-t bg-gradient-to-b from-white via-[#F4FAF6] to-white">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_50%_40%_at_20%_40%,rgba(15,61,46,0.06),transparent_70%)]" />
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_50%_40%_at_80%_60%,rgba(212,255,107,0.10),transparent_70%)]" />
-
-          <div className="relative mx-auto max-w-5xl px-4">
-            <Reveal className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-[#0F3D2E] shadow-sm">
+        {/* 4-step pipeline — light cards on soft field */}
+        <section
+          className="relative py-24 md:py-28 border-t"
+          style={{ borderColor: RULE, background: SOFT_FIELD }}
+        >
+          <div className="relative mx-auto max-w-[1100px] px-6">
+            <Reveal className="max-w-2xl mb-14">
+              <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
                 The pipeline
-              </div>
-              <h2 className="mt-5 text-3xl md:text-4xl lg:text-5xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0A2E22]">
-                Four steps,
-                <br />
-                <span className="bg-gradient-to-r from-[#0F3D2E] via-[#1A6B47] to-[#00A86B] bg-clip-text text-transparent">
+              </p>
+              <h2
+                className="mt-3 font-bold tracking-[-0.025em] leading-[1.04]"
+                style={{ fontSize: "clamp(36px, 5vw, 60px)" }}
+              >
+                Four steps,{" "}
+                <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
                   every deck.
                 </span>
               </h2>
             </Reveal>
 
-            <RevealGroup className="space-y-4 md:space-y-5" stagger={0.08}>
+            <RevealGroup className="space-y-4" stagger={0.08}>
               {steps.map((s, i) => {
                 const Icon = s.icon
                 return (
                   <RevealItem key={s.title}>
-                    <div className="group relative rounded-3xl border border-[#0F3D2E]/10 bg-white p-6 md:p-8 shadow-sm hover:border-primary/30 hover:shadow-xl transition-all">
+                    <div
+                      className="group relative rounded-3xl bg-white p-6 md:p-8 transition hover:-translate-y-0.5"
+                      style={{ border: `1px solid ${RULE}` }}
+                    >
                       <div className="flex gap-5 md:gap-6">
                         <div className="flex flex-col items-center gap-3 shrink-0">
-                          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                          <span className="text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
                             0{i + 1}
                           </span>
-                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/5 ring-1 ring-[#0F3D2E]/10 group-hover:from-[#0F3D2E]/10 group-hover:to-[#00A86B]/15 group-hover:ring-primary/30 transition-all">
-                            <Icon className="h-5 w-5 text-[#0F3D2E]" />
+                          <div
+                            className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                            style={{ background: SOFT_FIELD, border: `1px solid ${RULE}` }}
+                          >
+                            <Icon className="h-5 w-5" style={{ color: ACCENT }} />
                           </div>
                           {i < steps.length - 1 && (
-                            <span className="flex-1 w-px bg-gradient-to-b from-[#0F3D2E]/20 via-[#0F3D2E]/10 to-transparent min-h-[1.5rem]" />
+                            <span className="flex-1 w-px min-h-[1.5rem]" style={{ background: RULE }} />
                           )}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-heading font-bold text-lg md:text-xl text-[#0A2E22] tracking-tight">
+                          <h3 className="font-bold text-[18px] md:text-[20px] tracking-[-0.01em]">
                             {s.title}
                           </h3>
-                          <p className="mt-2 text-[14px] md:text-[15px] text-muted-foreground leading-relaxed">
+                          <p className="mt-2 text-[14.5px] leading-[1.6]" style={{ color: SUBINK }}>
                             {s.body}
                           </p>
                         </div>
@@ -145,87 +157,98 @@ export default function HowItWorksPage() {
           </div>
         </section>
 
-        {/* "Framework is the product" — dark forest */}
-        <section className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#133F2E] text-white">
-          <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-[#D4FF6B]/10 blur-3xl pointer-events-none" />
-          <div
-            className="absolute inset-0 opacity-[0.04] pointer-events-none"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-              backgroundSize: "48px 48px",
-            }}
-          />
-
-          <div className="relative mx-auto max-w-3xl px-4">
-            <Reveal className="text-center">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#D4FF6B]/30 bg-[#D4FF6B]/10 backdrop-blur px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B]">
+        {/* Framework "is the product" — BONE band */}
+        <section
+          className="relative py-24 md:py-28 border-y"
+          style={{ borderColor: RULE, background: BONE }}
+        >
+          <div className="mx-auto max-w-[900px] px-6 text-center">
+            <Reveal>
+              <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
                 The framework
-              </div>
-              <h2 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-white">
-                The framework
-                <br />
-                <span className="bg-gradient-to-r from-[#D4FF6B] via-[#C8F25F] to-[#7FD9AA] bg-clip-text text-transparent">
-                  is the product.
+              </p>
+              <h2
+                className="mt-4 font-bold tracking-[-0.025em] leading-[1.04]"
+                style={{ fontSize: "clamp(40px, 6vw, 76px)" }}
+              >
+                The model is not the product.{" "}
+                <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
+                  The investment framework is.
                 </span>
               </h2>
             </Reveal>
-            <Reveal className="mt-10 space-y-5 text-base md:text-lg text-white/75 leading-relaxed">
-              <p>
-                Sam&apos;s output quality is not a function of the model. It is a function of the framework applied to the model. The framework itself draws from academic research in founder-market fit, early-stage venture returns, and unit economics at each investment stage.
-              </p>
-              <p>
-                Each domain has a weighted scoring rubric that adjusts for stage — a pre-seed deck is not judged against Series A traction standards. Red flags are classified by severity, not volume. The output would remain consistent even if the underlying model changed.
-              </p>
-              <p className="font-semibold text-white text-lg md:text-xl">
-                That is the point: the framework stays constant, so your memos stay comparable.
-              </p>
+            <Reveal className="mt-10">
+              <div
+                className="space-y-5 text-[15.5px] md:text-[16.5px] leading-[1.65]"
+                style={{ color: "rgba(10,10,10,0.78)" }}
+              >
+                <p>
+                  Sam&apos;s output quality is not a function of the model. It is a function of the
+                  framework applied to the model. The framework draws from academic research in
+                  founder-market fit, early-stage venture returns, and unit economics at each stage.
+                </p>
+                <p>
+                  Each domain has a weighted scoring rubric that adjusts for stage — a pre-seed
+                  deck is not judged against Series A traction standards. Red flags are classified
+                  by severity, not volume. The output remains consistent even if the underlying
+                  model changes.
+                </p>
+                <p className="font-semibold" style={{ fontSize: "clamp(17px, 2.2vw, 22px)" }}>
+                  That is the point: the framework stays constant, so your assessments stay
+                  comparable.
+                </p>
+              </div>
             </Reveal>
           </div>
         </section>
 
-        {/* Domain deep-dives */}
-        <section className="relative py-24 md:py-28 border-t bg-gradient-to-b from-[#F4FAF6] via-white to-[#F4FAF6]">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(0,168,107,0.10),transparent_70%)]" />
-
-          <div className="relative mx-auto max-w-5xl px-4">
-            <Reveal className="text-center max-w-2xl mx-auto mb-14">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-[#0F3D2E] shadow-sm">
+        {/* Domain deep-dives — six cards (added Exit per design) */}
+        <section className="relative py-24 md:py-28 border-t" style={{ borderColor: RULE }}>
+          <div className="relative mx-auto max-w-[1100px] px-6">
+            <Reveal className="max-w-2xl mb-14">
+              <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
                 Domain deep-dives
-              </div>
-              <h2 className="mt-5 text-3xl md:text-4xl lg:text-5xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0A2E22]">
-                Five domains,
-                <br />
-                <span className="bg-gradient-to-r from-[#0F3D2E] via-[#1A6B47] to-[#00A86B] bg-clip-text text-transparent">
+              </p>
+              <h2
+                className="mt-3 font-bold tracking-[-0.025em] leading-[1.04]"
+                style={{ fontSize: "clamp(36px, 5vw, 60px)" }}
+              >
+                Six domains,{" "}
+                <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
                   scored 0 — 100.
                 </span>
               </h2>
-              <p className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
+              <p className="mt-5 text-[15.5px] leading-[1.55] max-w-xl" style={{ color: SUBINK }}>
                 What Sam looks at in each part of your deck.
               </p>
             </Reveal>
 
-            <RevealGroup className="grid gap-4 md:gap-5 md:grid-cols-2" stagger={0.08}>
+            <RevealGroup className="grid gap-4 md:grid-cols-2" stagger={0.06}>
               {domains.map((d, i) => {
                 const Icon = d.icon
                 return (
                   <RevealItem key={d.name}>
-                    <div className="group relative h-full rounded-3xl border border-[#0F3D2E]/10 bg-white p-6 md:p-7 shadow-sm hover:border-primary/30 hover:shadow-xl hover:-translate-y-1 transition-all">
+                    <div
+                      className="group relative h-full rounded-3xl bg-white p-6 md:p-7 transition hover:-translate-y-1"
+                      style={{ border: `1px solid ${RULE}` }}
+                    >
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/5 ring-1 ring-[#0F3D2E]/10 group-hover:ring-primary/30 transition-all">
-                          <Icon className="h-5 w-5 text-[#0F3D2E]" />
+                        <div
+                          className="flex h-11 w-11 items-center justify-center rounded-2xl"
+                          style={{ background: SOFT_FIELD, border: `1px solid ${RULE}` }}
+                        >
+                          <Icon className="h-5 w-5" style={{ color: ACCENT }} />
                         </div>
                         <div className="flex items-baseline gap-2">
-                          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                          <span className="text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
                             0{i + 1}
                           </span>
-                          <h3 className="font-heading font-bold text-lg md:text-xl text-[#0A2E22] tracking-tight">
+                          <h3 className="font-bold text-[18px] md:text-[20px] tracking-[-0.01em]">
                             {d.name}
                           </h3>
                         </div>
                       </div>
-                      <p className="text-[14px] text-muted-foreground leading-relaxed">
+                      <p className="text-[14px] leading-[1.6]" style={{ color: SUBINK }}>
                         {d.body}
                       </p>
                     </div>
@@ -236,47 +259,51 @@ export default function HowItWorksPage() {
           </div>
         </section>
 
-        {/* CTA — dark forest block */}
-        <section className="py-24 md:py-28 px-4 border-t bg-gradient-to-b from-white to-[#F4FAF6]">
-          <Reveal className="mx-auto max-w-5xl">
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#1A6B47] px-8 py-16 md:px-16 md:py-20 shadow-2xl shadow-[#0F3D2E]/30">
-              <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl" />
-              <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#00A86B]/20 blur-3xl" />
+        {/* CTA — INK card on light */}
+        <section className="py-24 md:py-32 border-t" style={{ borderColor: RULE }}>
+          <Reveal className="mx-auto max-w-[1100px] px-6">
+            <div
+              className="relative overflow-hidden rounded-3xl px-8 py-16 md:px-16 md:py-20"
+              style={{ background: INK, color: "#FFF" }}
+            >
               <div
-                className="absolute inset-0 opacity-[0.04]"
+                aria-hidden
+                className="absolute inset-0 opacity-25"
                 style={{
-                  backgroundImage:
-                    "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-                  backgroundSize: "40px 40px",
+                  background: `radial-gradient(ellipse 60% 40% at 30% 30%, rgba(0,168,107,0.35), transparent 70%)`,
                 }}
               />
-
               <div className="relative text-center">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B]">
-                  <Sparkles className="h-3 w-3" />
+                <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: LIME }}>
                   Try Sam
-                </span>
-                <h2 className="mt-5 text-3xl md:text-4xl lg:text-5xl font-bold font-heading tracking-tight text-white">
-                  See what a Sam memo
-                  <br />
-                  looks like.
-                </h2>
-                <p className="mt-4 text-white/65 max-w-xl mx-auto">
-                  Upload a deck, get a memo. No onboarding call required.
                 </p>
-                <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <h2
+                  className="mt-4 font-bold tracking-[-0.025em] leading-[1.02]"
+                  style={{ fontSize: "clamp(32px, 5vw, 56px)" }}
+                >
+                  See what a Sam{" "}
+                  <span className="font-serif italic font-normal" style={{ color: LIME }}>
+                    assessment looks like.
+                  </span>
+                </h2>
+                <p className="mt-5 mx-auto max-w-xl text-[15.5px] leading-[1.55] text-white/70">
+                  Upload a deck, get a structured assessment. No onboarding call required.
+                </p>
+                <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link
                     href="/register?tier=professional"
-                    className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#D4FF6B] hover:bg-[#E0FF80] text-[#0A2E22] px-7 py-3.5 text-sm font-semibold shadow-xl shadow-[#D4FF6B]/25 hover:shadow-2xl hover:shadow-[#D4FF6B]/40 transition-all hover:-translate-y-0.5"
+                    className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-[14px] font-semibold transition hover:scale-[1.02]"
+                    style={{ background: LIME, color: INK }}
                   >
                     Analyse a deck
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                   <Link
                     href="/sample"
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur text-white px-7 py-3.5 text-sm font-semibold transition-all"
+                    className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-[14px] font-semibold border-[1.5px] hover:bg-white/5 transition"
+                    style={{ borderColor: "rgba(255,255,255,0.18)", color: "#FFF" }}
                   >
-                    See a sample memo
+                    View sample assessment
                   </Link>
                 </div>
               </div>

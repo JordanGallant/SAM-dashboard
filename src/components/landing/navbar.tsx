@@ -2,12 +2,19 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, BarChart3, Menu, X } from "lucide-react"
+import { ArrowRight, Menu, X } from "lucide-react"
+
+// Light-field navbar matching mockup4 aesthetic. Off-white when scrolled,
+// transparent at the top, hairline border, tight Geist-style typography.
+const RULE = "rgba(10,10,10,0.10)"
+const LIME = "#D7FE3F"
+const INK = "#0A0A0A"
 
 const navLinks = [
   { href: "/how-it-works", label: "How it works" },
-  { href: "/for-angels", label: "Angels" },
-  { href: "/for-vc-funds", label: "VC Funds" },
+  { href: "/for-angels", label: "For angels" },
+  { href: "/for-vc-funds", label: "For VC funds" },
+  { href: "/sample", label: "Sample" },
   { href: "/#pricing", label: "Pricing" },
 ]
 
@@ -23,55 +30,47 @@ export function Navbar() {
   }, [])
 
   return (
-    <nav
-      className={`sticky top-0 z-50 transition-all duration-300 bg-[#050B15]/85 backdrop-blur-xl border-b ${
-        scrolled ? "border-white/10 shadow-lg shadow-black/20" : "border-white/5"
-      }`}
+    <header
+      className="sticky top-0 z-50 transition-all backdrop-blur"
+      style={{
+        background: scrolled ? "rgba(255,255,255,0.85)" : "transparent",
+        borderBottom: scrolled ? `1px solid ${RULE}` : "1px solid transparent",
+        color: INK,
+      }}
     >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        {/* Logo */}
-        <Link href="/" className="group flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] shadow-md shadow-primary/20 ring-1 ring-[#D4FF6B]/20 group-hover:shadow-lg group-hover:shadow-primary/30 transition-all">
-            <BarChart3 className="h-4 w-4 text-[#D4FF6B]" />
-          </div>
-          <span className="text-lg font-bold font-heading tracking-tight text-white">
-            Sam
-          </span>
+      <div className="mx-auto max-w-[1240px] px-6 h-14 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-1.5 font-bold text-[16px] tracking-tight">
+          sam<span className="opacity-50">/</span>
         </Link>
 
-        {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-7 text-[13.5px]">
           {navLinks.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-[13px] font-medium text-white/80 hover:text-white px-3 py-2 rounded-full hover:bg-white/5 transition-colors"
-            >
+            <Link key={l.href} href={l.href} className="hover:opacity-60 transition">
               {l.label}
             </Link>
           ))}
-        </div>
+        </nav>
 
-        {/* Right actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Link
             href="/login"
-            className="hidden sm:inline-flex items-center text-[13px] font-semibold text-white/70 hover:text-white px-3 py-2 transition-colors"
+            className="hidden sm:inline-flex text-[13.5px] hover:opacity-60 transition"
           >
-            Log in
+            Sign in
           </Link>
           <Link
             href="/register?tier=professional"
-            className="group inline-flex items-center gap-1.5 rounded-full bg-[#D4FF6B] hover:bg-[#E0FF80] text-[#050B15] px-4 py-2 text-[13px] font-semibold shadow-md shadow-[#D4FF6B]/20 hover:shadow-lg hover:shadow-[#D4FF6B]/30 transition-all"
+            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13.5px] font-semibold transition hover:scale-[1.02]"
+            style={{ background: INK, color: "#FFF" }}
           >
             Analyse a deck
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
 
-          {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen((o) => !o)}
-            className="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/80 hover:bg-white/5 hover:text-white transition-colors"
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-full"
+            style={{ border: `1px solid ${RULE}` }}
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -79,16 +78,22 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-white/10 bg-[#050B15]/95 backdrop-blur-xl">
-          <div className="mx-auto max-w-6xl px-4 py-4 flex flex-col">
+        <div
+          className="md:hidden backdrop-blur"
+          style={{
+            background: "rgba(255,255,255,0.95)",
+            borderTop: `1px solid ${RULE}`,
+          }}
+        >
+          <div className="mx-auto max-w-[1240px] px-6 py-4 flex flex-col">
             {navLinks.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setMobileOpen(false)}
-                className="text-sm font-medium text-white/70 hover:text-white py-2.5 border-b border-white/5 last:border-b-0"
+                className="text-[14px] py-2.5"
+                style={{ borderBottom: `1px solid ${RULE}` }}
               >
                 {l.label}
               </Link>
@@ -96,13 +101,16 @@ export function Navbar() {
             <Link
               href="/login"
               onClick={() => setMobileOpen(false)}
-              className="mt-3 text-sm font-semibold text-white/80 hover:text-white py-2.5"
+              className="mt-3 text-[14px] py-2.5 font-semibold"
             >
-              Log in
+              Sign in
             </Link>
           </div>
         </div>
       )}
-    </nav>
+    </header>
   )
 }
+
+// Re-export the lime constant in case anyone imports it.
+export const NAVBAR_LIME = LIME
