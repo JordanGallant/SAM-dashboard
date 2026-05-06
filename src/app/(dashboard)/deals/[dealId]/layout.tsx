@@ -5,7 +5,7 @@ import { usePathname, useParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Play, Loader2, ArrowLeft, Lock, Download, FileText, FileType } from "lucide-react"
+import { Play, Loader2, ArrowLeft, Lock, Download, FileText, FileType, Pencil, Check as CheckIcon, X as XIcon } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,7 @@ import { useDeal } from "@/hooks/use-deal"
 import { STATUS_BADGE_COLORS, PIPELINE_STAGES } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 import { useEffect, useRef, useState } from "react"
-import { updateDealStatus } from "@/app/actions/deals"
+import { updateDealStatus, renameDeal } from "@/app/actions/deals"
 import { friendlyError, type FriendlyError } from "@/lib/errors"
 import type { PipelineStatus } from "@/lib/types/deal"
 import { DealBottomSheet } from "@/components/layout/deal-bottom-sheet"
@@ -33,6 +33,10 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState<FriendlyError | null>(null)
   const [downloading, setDownloading] = useState(false)
+  // Pilot #10: inline rename for cases where extraction picked the wrong name.
+  const [editingName, setEditingName] = useState(false)
+  const [draftName, setDraftName] = useState("")
+  const [savingName, setSavingName] = useState(false)
 
   // Auto-advance pipeline status from "New" → "Reviewing" the first time the
   // user opens a deal. The "New" pill is a "you haven't reviewed this yet"
@@ -152,12 +156,86 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
           Dealroom
         </Link>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-heading font-bold leading-none">{deal.companyName}</h1>
-          <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
-            {deal.stage}
-          </span>
+          {editingName ? (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault()
+                if (savingName) return
+                setSavingName(true)
+                const result = await renameDeal(dealId, draftName)
+                setSavingName(false)
+                if (result.error) {
+                  setAnalyzeError({ title: result.error })
+                  return
+                }
+                setEditingName(false)
+                refetch()
+              }}
+              className="flex items-center gap-2"
+            >
+              <input
+                autoFocus
+                value={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    e.preventDefault()
+                    setEditingName(false)
+                  }
+                }}
+                disabled={savingName}
+                className="h-8 px-2 rounded-md border border-foreground/20 focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none text-2xl font-heading font-bold leading-none bg-background min-w-[14ch]"
+              />
+              <button
+                type="submit"
+                disabled={savingName || !draftName.trim()}
+                className="grid place-items-center h-7 w-7 rounded-md text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
+                aria-label="Save"
+              >
+                {savingName ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckIcon className="h-4 w-4" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingName(false)}
+                disabled={savingName}
+                className="grid place-items-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                aria-label="Cancel"
+              >
+                <XIcon className="h-4 w-4" />
+              </button>
+            </form>
+          ) : (
+            <div className="group flex items-center gap-2">
+              <h1 className="text-2xl font-heading font-bold leading-none">{deal.companyName}</h1>
+              <button
+                type="button"
+                onClick={() => {
+                  setDraftName(deal.companyName)
+                  setEditingName(true)
+                }}
+                title="Rename deal"
+                className="grid place-items-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+          {/* Pilot #11: stage tag only shows once analysis confirms the stage —
+              the upload-time extraction is still used as Flow 0 input but is
+              no longer surfaced as a verdict to the user. */}
+          {analysis?.executiveSummary?.stage && (
+            <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+              {analysis.executiveSummary.stage}
+            </span>
+          )}
+          {/* Pilot #14: status trigger now shows the same coloured chip as
+              the dropdown items so the active status reads at a glance. */}
           <Select defaultValue={deal.status} onValueChange={handleStatusChange}>
-            <SelectTrigger className="h-7 w-auto gap-1 text-[11px] font-mono uppercase tracking-wider">
+            <SelectTrigger
+              className={`h-7 w-auto gap-1 text-[10px] font-mono uppercase tracking-wider font-bold rounded-full border-0 ${
+                STATUS_BADGE_COLORS[deal.status] ?? "bg-gray-100 text-gray-700"
+              }`}
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

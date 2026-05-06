@@ -204,16 +204,8 @@ function CopilotPanelBody({
             <MessageSquare className="h-4 w-4 text-[#D4FF6B]" />
           </span>
           <p className="text-[9px] font-mono uppercase tracking-widest text-primary leading-none flex-1 truncate">
-            Co-pilot · {scopeLabel}
+            Ask Sam · {scopeLabel}
           </p>
-          <button
-            type="button"
-            onClick={onNewChat}
-            title="New chat"
-            className="grid place-items-center h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
           {onClose && (
             <button
               type="button"
@@ -387,6 +379,9 @@ function CopilotPanelBody({
             <Send className="h-3.5 w-3.5" />
           </button>
         </div>
+        <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+          Powered by GPT-4o · EU-hosted
+        </p>
       </form>
     </div>
   )

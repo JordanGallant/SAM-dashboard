@@ -44,8 +44,10 @@ export default function MarketPage() {
       <section>
         <SectionLabel className="mb-3">Market Size Validation</SectionLabel>
         <div className="overflow-hidden rounded-2xl border border-[#0F3D2E]/10 bg-white">
-          {/* Column header (md+ only) — labels not repeated per row */}
-          <div className="hidden md:grid md:grid-cols-[64px_minmax(0,1fr)_minmax(0,1fr)_96px] items-center gap-x-4 px-4 py-3 border-b border-[#0F3D2E]/10 bg-[#F4FAF6]/50">
+          {/* Column header (md+ only) — labels not repeated per row.
+              Variance column widened to 128px (pilot #27) so long ranges like
+              "-25% to -45%" don't bleed into the validated column. */}
+          <div className="hidden md:grid md:grid-cols-[64px_minmax(0,1fr)_minmax(0,1fr)_128px] items-center gap-x-4 px-4 py-3 border-b border-[#0F3D2E]/10 bg-[#F4FAF6]/50">
             <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">Metric</span>
             <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">Founder claim</span>
             <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">Validated</span>
@@ -64,7 +66,7 @@ export default function MarketPage() {
             return (
               <div
                 key={row.metric}
-                className={`grid grid-cols-[56px_minmax(0,1fr)_88px] md:grid-cols-[64px_minmax(0,1fr)_minmax(0,1fr)_96px] items-baseline gap-x-4 gap-y-3 px-4 py-3 ${
+                className={`grid grid-cols-[56px_minmax(0,1fr)_112px] md:grid-cols-[64px_minmax(0,1fr)_minmax(0,1fr)_128px] items-baseline gap-x-4 gap-y-3 px-4 py-3 ${
                   i !== market.marketSize.length - 1 ? "border-b border-[#0F3D2E]/5" : ""
                 } ${i % 2 === 1 ? "bg-[#F4FAF6]/30" : ""}`}
               >
@@ -93,10 +95,12 @@ export default function MarketPage() {
                   </p>
                 </div>
 
-                {/* Variance chip — sits at row 1 col 3 on mobile, col 4 on md+ */}
-                <div className="row-start-1 col-start-3 md:col-start-4 md:row-start-auto justify-self-end self-baseline">
+                {/* Variance chip — sits at row 1 col 3 on mobile, col 4 on md+.
+                    Allows wrap inside its allotted col so long ranges like
+                    "-25% to -45%" don't bleed into Validated (pilot #27). */}
+                <div className="row-start-1 col-start-3 md:col-start-4 md:row-start-auto justify-self-end self-baseline min-w-0 max-w-full">
                   <span
-                    className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-mono font-bold tabular-nums ring-1 whitespace-nowrap ${chip}`}
+                    className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-mono font-bold tabular-nums ring-1 ${chip}`}
                   >
                     {arrow}
                     {row.variance || "N/A"}

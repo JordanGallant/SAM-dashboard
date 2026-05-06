@@ -594,12 +594,12 @@ function ReportDocument({ companyName, analysis }: { companyName: string; analys
             .join("  ·  ")}
         </Text>
 
-        <Text style={[styles.verdict, { color: verdictColor(es.verdict) }]}>
-          {verdictLabel(es.verdict).toUpperCase()}
+        {/* Verdict label removed per pilot feedback #28 — overall score speaks
+            for itself; per-domain verdicts remain in the scorecard below. */}
+        <Text style={[styles.verdict, { color: "#0F3D2E" }]}>
+          {es.overallScore}/100
         </Text>
-        <Text style={styles.verdictMeta}>
-          Confidence: {es.confidence}  ·  Overall: {es.overallScore}/100
-        </Text>
+        <Text style={styles.verdictMeta}>Confidence: {es.confidence}</Text>
 
         <Text style={styles.h1}>Executive Summary</Text>
 

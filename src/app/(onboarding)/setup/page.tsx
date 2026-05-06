@@ -11,8 +11,6 @@ import {
   Loader2,
   ArrowRight,
   ArrowLeft,
-  ChevronDown,
-  ChevronUp,
   Sparkles,
   User,
   Briefcase,
@@ -24,20 +22,51 @@ import { useFundProfile } from "@/hooks/use-fund-profile"
 import { FundDocUploader } from "@/components/settings/fund-doc-uploader"
 import { cn } from "@/lib/utils"
 
-// Two steps. Required-only-where-essential. The 1-pager upload at the top of
-// step 2 is the fast path — most users with a real fund mandate doc never
-// touch the checkboxes below.
+// Two steps, fund fields mandatory (pilot feedback #5). State persists to
+// sessionStorage so a stray navigation/refresh during signup doesn't drop
+// the user back to step 0 with an empty form (pilot feedback #46).
 
 const STEPS = ["About you", "About your fund"] as const
+const STORAGE_KEY = "sam:setup-wizard:v1"
+
+type Persisted = {
+  step: number
+  firstName: string
+  lastName: string
+  phone: string
+  role: string
+  name: string
+  website: string
+  thesis: string
+  stageFocus: string[]
+  sectorFocus: string[]
+  geoFocus: string[]
+  ticketMin: string
+  ticketMax: string
+  additional: string
+}
+
+function readPersisted(): Partial<Persisted> {
+  if (typeof window === "undefined") return {}
+  try {
+    const raw = window.sessionStorage.getItem(STORAGE_KEY)
+    return raw ? (JSON.parse(raw) as Partial<Persisted>) : {}
+  } catch {
+    return {}
+  }
+}
 
 export default function SetupPage() {
   const router = useRouter()
-  const { fund, loading: fundLoading } = useFundProfile()
+  const { fund, loading: fundLoading, refetch: refetchFund } = useFundProfile()
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
   const [prefilled, setPrefilled] = useState(false)
-  const [showFundDetails, setShowFundDetails] = useState(false)
+  const [hydratedFromStorage, setHydratedFromStorage] = useState(false)
+  const [scraping, setScraping] = useState(false)
+  const [scrapeNote, setScrapeNote] = useState<string | null>(null)
+  const [scrapeError, setScrapeError] = useState<string | null>(null)
 
   // Personal
   const [firstName, setFirstName] = useState("")
@@ -55,6 +84,46 @@ export default function SetupPage() {
   const [ticketMin, setTicketMin] = useState("")
   const [ticketMax, setTicketMax] = useState("")
   const [additional, setAdditional] = useState("")
+
+  // Hydrate once from sessionStorage (covers tab-restore / accidental nav).
+  useEffect(() => {
+    if (hydratedFromStorage) return
+    const saved = readPersisted()
+    if (saved.step !== undefined) setStep(Math.min(saved.step, STEPS.length - 1))
+    if (saved.firstName) setFirstName(saved.firstName)
+    if (saved.lastName) setLastName(saved.lastName)
+    if (saved.phone) setPhone(saved.phone)
+    if (saved.role) setRole(saved.role)
+    if (saved.name) setName(saved.name)
+    if (saved.website) setWebsite(saved.website)
+    if (saved.thesis) setThesis(saved.thesis)
+    if (saved.stageFocus) setStageFocus(saved.stageFocus)
+    if (saved.sectorFocus) setSectorFocus(saved.sectorFocus)
+    if (saved.geoFocus) setGeoFocus(saved.geoFocus)
+    if (saved.ticketMin) setTicketMin(saved.ticketMin)
+    if (saved.ticketMax) setTicketMax(saved.ticketMax)
+    if (saved.additional) setAdditional(saved.additional)
+    setHydratedFromStorage(true)
+  }, [hydratedFromStorage])
+
+  // Persist on every change (after hydration to avoid clobbering with empties).
+  useEffect(() => {
+    if (!hydratedFromStorage || typeof window === "undefined") return
+    const data: Persisted = {
+      step, firstName, lastName, phone, role,
+      name, website, thesis, stageFocus, sectorFocus, geoFocus,
+      ticketMin, ticketMax, additional,
+    }
+    try {
+      window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    } catch {
+      // sessionStorage full / disabled — non-fatal.
+    }
+  }, [
+    hydratedFromStorage, step, firstName, lastName, phone, role,
+    name, website, thesis, stageFocus, sectorFocus, geoFocus,
+    ticketMin, ticketMax, additional,
+  ])
 
   useEffect(() => {
     if (fundLoading || !fund || prefilled) return
@@ -74,9 +143,60 @@ export default function SetupPage() {
     setter(arr.includes(value) ? arr.filter((x) => x !== value) : [...arr, value])
   }
 
+  // Pilot #2: scrape the fund website during onboarding to autofill the
+  // checkboxes — the existing /api/fund-website handler writes the fund row
+  // directly, so we just need to refetch and let prefill copy values back.
+  function looksLikeUrl(s: string) {
+    if (!s) return false
+    return /^(https?:\/\/)?[\w-]+(\.[\w-]+)+([\/?#].*)?$/i.test(s.trim())
+  }
+  async function handleScrape() {
+    if (!looksLikeUrl(website)) {
+      setScrapeError("Enter a valid website URL first")
+      return
+    }
+    setScraping(true)
+    setScrapeError(null)
+    setScrapeNote(null)
+    try {
+      const res = await fetch("/api/fund-website", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: website.trim() }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || "Could not scrape that site")
+
+      const auto: string[] = Array.isArray(data.autoFilledFields) ? data.autoFilledFields : []
+      const additionalUpdated = Boolean(data.additionalUpdated)
+
+      // Re-prefill from the freshly-written fund row.
+      setPrefilled(false)
+      await refetchFund()
+
+      const parts: string[] = []
+      if (auto.length) parts.push(`Auto-filled: ${auto.join(", ")}`)
+      if (additionalUpdated) parts.push("Added to additional info")
+      setScrapeNote(parts.join(" · ") || "Scraped — nothing new to fill in")
+    } catch (err) {
+      setScrapeError(err instanceof Error ? err.message : "Could not scrape that site")
+    } finally {
+      setScraping(false)
+    }
+  }
+
   async function handleComplete() {
-    if (!name.trim()) {
-      setError("Fund name is required")
+    // Pilot #5: validate the fund essentials before letting the user finish —
+    // these drive Fund Fit scoring and were too easy to skip before.
+    const missing: string[] = []
+    if (!name.trim()) missing.push("fund name")
+    if (!thesis.trim()) missing.push("investment thesis")
+    if (stageFocus.length === 0) missing.push("stage focus")
+    if (sectorFocus.length === 0) missing.push("sector focus")
+    if (geoFocus.length === 0) missing.push("geography")
+    if (!ticketMin || !ticketMax) missing.push("ticket size (min + max)")
+    if (missing.length > 0) {
+      setError(`Please complete: ${missing.join(", ")}.`)
       setStep(1)
       return
     }
@@ -101,19 +221,25 @@ export default function SetupPage() {
       return
     }
 
+    // Clear the wizard cache once the fund profile is committed.
+    if (typeof window !== "undefined") {
+      try { window.sessionStorage.removeItem(STORAGE_KEY) } catch {}
+    }
+
     void enrichLead({ firstName, lastName, phone, role }).catch(() => {})
     router.push("/deals")
   }
 
   return (
     <div className="space-y-7">
-      {/* Step indicator */}
+      {/* Step indicator — clickable for back-nav (pilot #4). */}
       <div className="flex items-center justify-center gap-3">
         {STEPS.map((label, i) => {
           const active = i === step
           const done = i < step
-          return (
-            <div key={label} className="flex items-center gap-3">
+          const clickable = i < step
+          const inner = (
+            <>
               <div
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-full font-mono text-[12px] font-bold transition-all",
@@ -129,11 +255,28 @@ export default function SetupPage() {
               <span
                 className={cn(
                   "text-[10px] font-mono uppercase tracking-widest",
-                  active ? "text-primary font-bold" : "text-muted-foreground"
+                  active ? "text-primary font-bold" : "text-muted-foreground",
+                  clickable && "underline-offset-4 group-hover:underline"
                 )}
               >
                 {label}
               </span>
+            </>
+          )
+          return (
+            <div key={label} className="flex items-center gap-3">
+              {clickable ? (
+                <button
+                  type="button"
+                  onClick={() => setStep(i)}
+                  className="group flex items-center gap-3 rounded-md px-1 -mx-1 hover:bg-foreground/5 transition-colors cursor-pointer"
+                  aria-label={`Back to ${label}`}
+                >
+                  {inner}
+                </button>
+              ) : (
+                <div className="flex items-center gap-3">{inner}</div>
+              )}
               {i < STEPS.length - 1 && (
                 <div className="h-px w-12 bg-border ml-1" />
               )}
@@ -245,168 +388,168 @@ export default function SetupPage() {
               <div className="flex-1 border-t border-foreground/10" />
             </div>
 
-            {/* Required minimum */}
-            <div className="space-y-1.5">
-              <Label htmlFor="fund-name">
-                Fund name <span className="text-red-600">*</span>
-              </Label>
-              <Input
-                id="fund-name"
-                placeholder="e.g. Horizon Ventures"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              <p className="text-[11px] text-muted-foreground">
-                The only required field. Everything else can be added later in Settings.
-              </p>
-            </div>
+            {/* All fund essentials — required for Fund Fit scoring (pilot #5). */}
+            <div className="space-y-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="fund-name">
+                  Fund name <span className="text-red-600">*</span>
+                </Label>
+                <Input
+                  id="fund-name"
+                  placeholder="e.g. Horizon Ventures"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
 
-            {/* Collapsible "more details" */}
-            <div className="rounded-xl ring-1 ring-foreground/10 bg-muted/30">
-              <button
-                type="button"
-                onClick={() => setShowFundDetails((v) => !v)}
-                className="w-full flex items-center justify-between gap-3 px-5 py-3 text-left"
-              >
-                <div>
-                  <p className="font-heading text-[13.5px] font-bold text-[#0A2E22]">
-                    Add more details
-                  </p>
-                  <p className="text-[11.5px] text-muted-foreground">
-                    Stage, sector, geography, ticket size, restrictions
-                  </p>
+              <div className="space-y-1.5">
+                <Label htmlFor="website" className="flex items-center gap-2">
+                  Website{" "}
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                    autofills the rest
+                  </span>
+                </Label>
+                <div className="flex items-stretch gap-2">
+                  <Input
+                    id="website"
+                    placeholder="https://yourfund.com"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    className="flex-1"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleScrape}
+                    disabled={scraping || !looksLikeUrl(website)}
+                    className="inline-flex items-center gap-1.5 rounded-md bg-foreground/[0.04] hover:bg-foreground/[0.08] ring-1 ring-foreground/15 px-3 text-[12.5px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {scraping ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    )}
+                    {scraping ? "Scraping…" : "Scrape"}
+                  </button>
                 </div>
-                {showFundDetails ? (
-                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                {scrapeNote && (
+                  <p className="text-[11.5px] text-emerald-700 font-medium">{scrapeNote}</p>
                 )}
-              </button>
-              {showFundDetails && (
-                <div className="border-t border-foreground/10 p-5 space-y-5">
+                {scrapeError && (
+                  <p className="text-[11.5px] text-red-700">{scrapeError}</p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="thesis">
+                  Investment thesis <span className="text-red-600">*</span>
+                </Label>
+                <Textarea
+                  id="thesis"
+                  placeholder="What do you look for in investments?"
+                  rows={3}
+                  value={thesis}
+                  onChange={(e) => setThesis(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  Stage focus <span className="text-red-600">*</span>
+                </Label>
+                <div className="flex flex-wrap gap-3">
+                  {DEAL_STAGES.map((s) => (
+                    <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
+                      <Checkbox
+                        checked={stageFocus.includes(s)}
+                        onCheckedChange={() => toggle(stageFocus, s, setStageFocus)}
+                      />
+                      {s}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  Sector focus <span className="text-red-600">*</span>
+                </Label>
+                <div className="flex flex-wrap gap-3">
+                  {SECTORS.map((s) => (
+                    <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
+                      <Checkbox
+                        checked={sectorFocus.includes(s)}
+                        onCheckedChange={() => toggle(sectorFocus, s, setSectorFocus)}
+                      />
+                      {s}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  Geography <span className="text-red-600">*</span>
+                </Label>
+                <div className="flex flex-wrap gap-3">
+                  {GEOS.map((g) => (
+                    <label key={g} className="flex items-center gap-2 text-sm cursor-pointer">
+                      <Checkbox
+                        checked={geoFocus.includes(g)}
+                        onCheckedChange={() => toggle(geoFocus, g, setGeoFocus)}
+                      />
+                      {g}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  Ticket size (EUR) <span className="text-red-600">*</span>
+                </Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                   <div className="space-y-1.5">
-                    <Label htmlFor="website">Website</Label>
+                    <Label htmlFor="ticket-min" className="text-xs font-normal text-muted-foreground">
+                      Minimum
+                    </Label>
                     <Input
-                      id="website"
-                      placeholder="https://yourfund.com"
-                      value={website}
-                      onChange={(e) => setWebsite(e.target.value)}
+                      id="ticket-min"
+                      type="number"
+                      placeholder="250000"
+                      value={ticketMin}
+                      onChange={(e) => setTicketMin(e.target.value)}
                     />
                   </div>
-
                   <div className="space-y-1.5">
-                    <Label htmlFor="thesis">Investment thesis</Label>
-                    <Textarea
-                      id="thesis"
-                      placeholder="What do you look for in investments?"
-                      rows={3}
-                      value={thesis}
-                      onChange={(e) => setThesis(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Stage focus</Label>
-                    <div className="flex flex-wrap gap-3">
-                      {DEAL_STAGES.map((s) => (
-                        <label
-                          key={s}
-                          className="flex items-center gap-2 text-sm cursor-pointer"
-                        >
-                          <Checkbox
-                            checked={stageFocus.includes(s)}
-                            onCheckedChange={() => toggle(stageFocus, s, setStageFocus)}
-                          />
-                          {s}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Sector focus</Label>
-                    <div className="flex flex-wrap gap-3">
-                      {SECTORS.map((s) => (
-                        <label
-                          key={s}
-                          className="flex items-center gap-2 text-sm cursor-pointer"
-                        >
-                          <Checkbox
-                            checked={sectorFocus.includes(s)}
-                            onCheckedChange={() => toggle(sectorFocus, s, setSectorFocus)}
-                          />
-                          {s}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Geography</Label>
-                    <div className="flex flex-wrap gap-3">
-                      {GEOS.map((g) => (
-                        <label
-                          key={g}
-                          className="flex items-center gap-2 text-sm cursor-pointer"
-                        >
-                          <Checkbox
-                            checked={geoFocus.includes(g)}
-                            onCheckedChange={() => toggle(geoFocus, g, setGeoFocus)}
-                          />
-                          {g}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Ticket size (EUR)</Label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                      <div className="space-y-1.5">
-                        <Label
-                          htmlFor="ticket-min"
-                          className="text-xs font-normal text-muted-foreground"
-                        >
-                          Minimum
-                        </Label>
-                        <Input
-                          id="ticket-min"
-                          type="number"
-                          placeholder="250000"
-                          value={ticketMin}
-                          onChange={(e) => setTicketMin(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label
-                          htmlFor="ticket-max"
-                          className="text-xs font-normal text-muted-foreground"
-                        >
-                          Maximum
-                        </Label>
-                        <Input
-                          id="ticket-max"
-                          type="number"
-                          placeholder="2000000"
-                          value={ticketMax}
-                          onChange={(e) => setTicketMax(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="additional">Anything else?</Label>
-                    <Textarea
-                      id="additional"
-                      rows={3}
-                      placeholder="Restrictions, side-letter constraints, preferences…"
-                      value={additional}
-                      onChange={(e) => setAdditional(e.target.value)}
+                    <Label htmlFor="ticket-max" className="text-xs font-normal text-muted-foreground">
+                      Maximum
+                    </Label>
+                    <Input
+                      id="ticket-max"
+                      type="number"
+                      placeholder="2000000"
+                      value={ticketMax}
+                      onChange={(e) => setTicketMax(e.target.value)}
                     />
                   </div>
                 </div>
-              )}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="additional">
+                  Anything else?{" "}
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                    optional
+                  </span>
+                </Label>
+                <Textarea
+                  id="additional"
+                  rows={3}
+                  placeholder="Restrictions, side-letter constraints, preferences…"
+                  value={additional}
+                  onChange={(e) => setAdditional(e.target.value)}
+                />
+              </div>
             </div>
           </div>
         )}

@@ -13,20 +13,20 @@ export async function POST(request: Request) {
   try {
     const { tier } = (await request.json()) as { tier: Tier }
 
-    // Fund tier is custom-priced — no self-serve checkout. Direct to sales.
-    if (tier === "fund") {
-      return NextResponse.json(
-        {
-          error: "Fund tier requires a walkthrough",
-          contact: true,
-          mailto: "hello@sam.ai?subject=SAM%20Fund%20-%20Walkthrough%20request",
-        },
-        { status: 400 }
-      )
-    }
-
     const priceId = PRICE_IDS[tier]
     if (!priceId) {
+      // No Stripe price configured. For Fund this means we're sales-only;
+      // for the others it means the env var is missing in this environment.
+      if (tier === "fund") {
+        return NextResponse.json(
+          {
+            error: "Fund tier requires a walkthrough",
+            contact: true,
+            mailto: "hello@sam.ai?subject=SAM%20Fund%20-%20Walkthrough%20request",
+          },
+          { status: 400 }
+        )
+      }
       return NextResponse.json({ error: "Invalid tier" }, { status: 400 })
     }
 

@@ -37,6 +37,31 @@ const score10 = (s: string | undefined): number => {
 
 const trim = (s: string | undefined) => (s ?? "").trim()
 
+// Pilot #13: strip rubric narration from prose ("Weighting applied (per stage
+// rubric for Pre-Seed: Team 40% / Market 25% / …) yields a computed…").
+// The LLM occasionally writes its own scoring math into the thesis output;
+// we don't want that bleeding into the user-facing memo. Cheap regex sweep —
+// pure string in, pure string out, no behavioural change if the pattern is
+// absent.
+const RUBRIC_RE =
+  /\s*(?:Weighting applied|Per[- ]?stage rubric|Stage rubric)\s*\([^)]{0,300}\)\s*(?:yields|gives|produces|results in)?[^.]{0,200}\./gi
+
+function stripRubricNarration(s: string | undefined): string {
+  if (!s) return ""
+  let out = s.trim()
+  // First pass: remove fully-formed sentences matching the rubric template.
+  out = out.replace(RUBRIC_RE, " ")
+  // Second pass: clean up any orphaned percentage cascades like
+  // "Team 40% / Market 25% / Product 20% / Traction 10% / Finance 5%".
+  out = out.replace(
+    /\s*(?:Team|Market|Product|Traction|Finance)\s+\d{1,3}%\s*(?:\/\s*(?:Team|Market|Product|Traction|Finance)\s+\d{1,3}%\s*){2,}/gi,
+    " ",
+  )
+  // Collapse double-spaces from removals + restore leading capital if needed.
+  out = out.replace(/\s{2,}/g, " ").replace(/\s+([.,;:])/g, "$1").trim()
+  return out
+}
+
 const mapDomainVerdict = (s: string | undefined): DomainVerdict => {
   const v = (s ?? "").toLowerCase()
   if (v.includes("strong")) return "Strong"
@@ -278,7 +303,7 @@ export function reshapeFlatToDealAnalysis(
         { domain: "Traction", score: tractionScore, verdict: mapDomainVerdict(flat.traction_verdict), keyFinding: trim(flat.traction_finding), dataCompleteness: tractionCompleteness },
         { domain: "Finance", score: financeScore, verdict: mapDomainVerdict(flat.finance_verdict), keyFinding: trim(flat.finance_finding), dataCompleteness: financeCompleteness },
       ],
-      thesis: trim(flat.investment_thesis),
+      thesis: stripRubricNarration(flat.investment_thesis),
       strengths: findings([flat.strength_1, flat.strength_2, flat.strength_3], "Info"),
       risks: findings([flat.risk_1, flat.risk_2, flat.risk_3], "Warning"),
       recommendedNextSteps: [flat.next_step_1, flat.next_step_2, flat.next_step_3, flat.next_step_4]

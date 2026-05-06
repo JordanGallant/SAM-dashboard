@@ -22,19 +22,40 @@ function BillingContent() {
   const [loading, setLoading] = useState<Tier | null>(null)
   const [portalLoading, setPortalLoading] = useState(false)
   const [subStatus, setSubStatus] = useState<string | null>(null)
+  // Pilot #18: usage count vs cap so users know when they're approaching the
+  // tier limit. Counted as analyses started this calendar month.
+  const [memosUsed, setMemosUsed] = useState<number | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
-      const { data } = await supabase
-        .from("profiles")
-        .select("subscription_status")
-        .eq("id", user.id)
-        .maybeSingle()
+      const startOfMonth = new Date()
+      startOfMonth.setDate(1)
+      startOfMonth.setHours(0, 0, 0, 0)
+      const [{ data }, { count }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("subscription_status")
+          .eq("id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("analyses")
+          .select("id, deals!inner(user_id)", { count: "exact", head: true })
+          .eq("deals.user_id", user.id)
+          .gte("created_at", startOfMonth.toISOString()),
+      ])
       setSubStatus(data?.subscription_status ?? "inactive")
+      setMemosUsed(count ?? 0)
     })
   }, [])
+
+  const memoCap = config.dealsPerMonth // -1 = unlimited
+  const memoPct = memoCap === -1 || memoCap === 0 || memosUsed === null
+    ? 0
+    : Math.min(100, Math.round((memosUsed / memoCap) * 100))
+  const memoNearLimit = memoCap > 0 && memoPct >= 80
+  const memoAtLimit = memoCap > 0 && memosUsed !== null && memosUsed >= memoCap
 
   async function handleSubscribe(targetTier: Tier) {
     setLoading(targetTier)
@@ -184,6 +205,43 @@ function BillingContent() {
               </div>
             ))}
           </div>
+
+          {/* Pilot #18: monthly memo usage meter. Hides for unlimited tiers. */}
+          {memoCap !== -1 && memosUsed !== null && (
+            <div className="mt-5">
+              <div className="flex items-baseline justify-between mb-2">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold">
+                  Memos this month
+                </p>
+                <p className="font-mono tabular-nums text-[13px] font-semibold">
+                  {memosUsed} / {memoCap}
+                </p>
+              </div>
+              <div className="h-2 rounded-full bg-foreground/10 overflow-hidden">
+                <div
+                  className={cn(
+                    "h-full rounded-full transition-[width] duration-500",
+                    memoAtLimit
+                      ? "bg-red-500"
+                      : memoNearLimit
+                      ? "bg-amber-500"
+                      : "bg-gradient-to-r from-[#0F3D2E] to-[#00A86B]",
+                  )}
+                  style={{ width: `${memoPct}%` }}
+                />
+              </div>
+              {memoNearLimit && !memoAtLimit && (
+                <p className="mt-2 text-[12px] text-amber-700 font-medium">
+                  You&apos;ve used {memoPct}% of this month&apos;s memos — consider upgrading to avoid hitting the cap.
+                </p>
+              )}
+              {memoAtLimit && (
+                <p className="mt-2 text-[12px] text-red-700 font-medium">
+                  Cap reached for this month. Upgrade below or wait until next billing cycle to analyse new decks.
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
             {isActive && (

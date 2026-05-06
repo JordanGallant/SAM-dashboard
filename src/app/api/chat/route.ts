@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
 import { createClient } from "@/lib/supabase/server"
-import { dbToDeal, type DbDeal, type DbDocument, type DbAnalysis } from "@/lib/db-mappers"
+import { dbToDeal, dbToFund, type DbDeal, type DbDocument, type DbAnalysis, type DbFund } from "@/lib/db-mappers"
 import type { Deal } from "@/lib/types/deal"
+import type { FundProfile } from "@/lib/types/fund"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
@@ -126,6 +127,35 @@ async function getPipelineContext(supabase: Awaited<ReturnType<typeof createClie
     .join("\n")}`
 }
 
+// Pilot feedback #22: Ask Sam couldn't answer fund-fit questions because the
+// system prompt didn't include the user's fund profile. Inject thesis, focus,
+// and ticket window so questions like "does this fit my mandate?" are
+// grounded in real numbers.
+async function getFundContext(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string
+): Promise<string> {
+  const { data: row } = await supabase
+    .from("funds")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle()
+  if (!row) return "FUND PROFILE: not configured yet — user has not completed setup."
+  const fund: FundProfile = dbToFund(row as DbFund)
+  const lines = [
+    `FUND PROFILE: ${fund.name}`,
+    fund.thesis ? `Thesis: ${fund.thesis}` : null,
+    fund.stageFocus.length ? `Stage focus: ${fund.stageFocus.join(", ")}` : null,
+    fund.sectorFocus.length ? `Sector focus: ${fund.sectorFocus.join(", ")}` : null,
+    fund.geoFocus.length ? `Geography: ${fund.geoFocus.join(", ")}` : null,
+    fund.ticketSizeMin || fund.ticketSizeMax
+      ? `Ticket size: €${fund.ticketSizeMin?.toLocaleString() ?? "?"} – €${fund.ticketSizeMax?.toLocaleString() ?? "?"}`
+      : null,
+    fund.additional ? `Notes: ${fund.additional}` : null,
+  ].filter(Boolean)
+  return lines.join("\n")
+}
+
 export async function POST(req: Request) {
   // Burst protection — chat hits Azure on every message; trivial abuse vector.
   // 30/min/IP gives a real user plenty of headroom while clipping bots.
@@ -170,9 +200,12 @@ export async function POST(req: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const context = body.dealId
-    ? await getScopedDealContext(supabase, body.dealId, body.scope)
-    : await getPipelineContext(supabase, user.id)
+  const [context, fundContext] = await Promise.all([
+    body.dealId
+      ? getScopedDealContext(supabase, body.dealId, body.scope)
+      : getPipelineContext(supabase, user.id),
+    getFundContext(supabase, user.id),
+  ])
 
   const client = new OpenAI({ baseURL: endpoint, apiKey: key })
 
@@ -182,7 +215,7 @@ export async function POST(req: Request) {
       temperature: 0.4,
       max_tokens: 600,
       messages: [
-        { role: "system", content: `${SYSTEM_BASE}\n\n${context}` },
+        { role: "system", content: `${SYSTEM_BASE}\n\n${fundContext}\n\n${context}` },
         ...messages.map((m) => ({ role: m.role, content: m.content })),
       ],
     })

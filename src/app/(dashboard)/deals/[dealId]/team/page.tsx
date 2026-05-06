@@ -30,14 +30,21 @@ function GoogleGlyph({ className }: { className?: string }) {
   )
 }
 
-function profileUrl(founder: FounderRow, companyName: string | undefined) {
-  if (founder.linkedinUrl) return { href: founder.linkedinUrl, kind: "linkedin" as const }
-  // Fallback: a targeted Google search likely to surface their LinkedIn profile
-  const query = [founder.name, companyName, "linkedin"].filter(Boolean).join(" ")
-  return {
+// Both LinkedIn and Google links — LinkedIn falls back to a LinkedIn-scoped
+// search when we don't have a confirmed URL, so the LinkedIn glyph always
+// renders and the Google glyph always offers a wider web search alongside.
+function profileLinks(founder: FounderRow, companyName: string | undefined) {
+  const query = [founder.name, companyName].filter(Boolean).join(" ")
+  const linkedin = founder.linkedinUrl
+    ? { href: founder.linkedinUrl, confirmed: true }
+    : {
+        href: `https://www.google.com/search?q=${encodeURIComponent(`${query} site:linkedin.com/in`)}`,
+        confirmed: false,
+      }
+  const google = {
     href: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
-    kind: "search" as const,
   }
+  return { linkedin, google }
 }
 
 const AVATAR_GRADIENTS = [
@@ -151,13 +158,11 @@ function FounderCard({
   grad: string
   companyName?: string
 }) {
-  const link = profileUrl(f, companyName)
-  const isLinkedIn = link.kind === "linkedin"
-  const linkLabel = isLinkedIn ? "View LinkedIn" : "Search on Google"
+  const links = profileLinks(f, companyName)
   return (
     <article className="group relative rounded-2xl bg-card ring-1 ring-foreground/10 hover:ring-foreground/20 transition-shadow hover:shadow-sm overflow-hidden">
       <div className="p-5">
-        {/* Header — avatar + name + role + linkedin */}
+        {/* Header — avatar + name + role + LinkedIn + Google */}
         <div className="flex items-start gap-3">
           <div
             className={`shrink-0 grid place-items-center h-12 w-12 rounded-full bg-gradient-to-br ${grad} ring-1 ring-black/5 shadow-sm`}
@@ -172,19 +177,26 @@ function FounderCard({
                 {f.name}
               </h3>
               <a
-                href={link.href}
+                href={links.linkedin.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`shrink-0 inline-flex items-center transition-colors ${
-                  isLinkedIn ? "text-[#0A66C2] hover:text-[#084c92]" : "text-muted-foreground hover:text-foreground"
+                  links.linkedin.confirmed
+                    ? "text-[#0A66C2] hover:text-[#084c92]"
+                    : "text-[#0A66C2]/55 hover:text-[#0A66C2]"
                 }`}
-                title={linkLabel}
+                title={links.linkedin.confirmed ? "View LinkedIn profile" : "Search LinkedIn for this name"}
               >
-                {isLinkedIn ? (
-                  <LinkedInGlyph className="h-3.5 w-3.5" />
-                ) : (
-                  <GoogleGlyph className="h-3.5 w-3.5" />
-                )}
+                <LinkedInGlyph className="h-3.5 w-3.5" />
+              </a>
+              <a
+                href={links.google.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+                title="Search on Google"
+              >
+                <GoogleGlyph className="h-3.5 w-3.5" />
               </a>
             </div>
             {f.role && (
@@ -234,21 +246,23 @@ function FounderCard({
           </div>
         )}
 
-        {/* Profile lookup link — direct LinkedIn if Flow 8 found one, Google search fallback */}
+        {/* Profile lookup link — primary footer link points at LinkedIn (or
+            LinkedIn-scoped search if no confirmed URL); Google glyph in the
+            header keeps the wider-web fallback one click away. */}
         <a
-          href={link.href}
+          href={links.linkedin.href}
           target="_blank"
           rel="noopener noreferrer"
           className={`mt-4 inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
-            isLinkedIn ? "text-[#0A66C2] hover:text-[#084c92]" : "text-muted-foreground hover:text-foreground"
+            links.linkedin.confirmed ? "text-[#0A66C2] hover:text-[#084c92]" : "text-[#0A66C2]/70 hover:text-[#0A66C2]"
           }`}
         >
-          {isLinkedIn ? (
+          {links.linkedin.confirmed ? (
             <LinkedInGlyph className="h-3 w-3" />
           ) : (
             <GoogleGlyph className="h-3 w-3" />
           )}
-          {linkLabel}
+          {links.linkedin.confirmed ? "View LinkedIn" : "Search LinkedIn"}
         </a>
       </div>
     </article>

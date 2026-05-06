@@ -437,9 +437,12 @@ function DealRow({
             <h3 className="font-heading font-bold text-[14px] text-[#0A2E22] truncate">
               {deal.companyName}
             </h3>
-            <span className={`hidden sm:inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest shrink-0 ${STAGE_BADGE_COLORS[deal.stage] ?? "bg-gray-100 text-gray-700"}`}>
-              {deal.stage}
-            </span>
+            {/* Pilot #11: only render stage once analysis confirms it. */}
+            {exec?.stage && (
+              <span className={`hidden sm:inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest shrink-0 ${STAGE_BADGE_COLORS[exec.stage] ?? "bg-gray-100 text-gray-700"}`}>
+                {exec.stage}
+              </span>
+            )}
             <span className={`hidden sm:inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest shrink-0 ${STATUS_BADGE_COLORS[deal.status] ?? "bg-gray-100 text-gray-700"}`}>
               {deal.status}
             </span>

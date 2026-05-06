@@ -46,7 +46,10 @@ export function DomainSources({
   externalLinks?: ExternalSource[]
   generatedAt?: string
 }) {
-  const docs = documents.filter((d) => d.filename)
+  // Pilot #9: pitch deck is the input, not a source — exclude it from this
+  // block. Prompt instruction has been unreliable; post-filter is the safe
+  // guard. Other doc types (transcripts, DD docs, financial models) still show.
+  const docs = documents.filter((d) => d.filename && d.docType !== "pitch-deck")
   const links = dedupeByUrl(externalLinks)
 
   if (docs.length === 0 && links.length === 0) return null

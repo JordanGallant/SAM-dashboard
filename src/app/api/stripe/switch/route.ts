@@ -17,15 +17,14 @@ export async function POST(request: Request) {
   try {
     const { tier } = (await request.json()) as { tier: Tier }
 
-    if (tier === "fund") {
-      return NextResponse.json(
-        { error: "Fund tier requires a walkthrough", contact: true },
-        { status: 400 }
-      )
-    }
-
     const priceId = PRICE_IDS[tier]
     if (!priceId) {
+      if (tier === "fund") {
+        return NextResponse.json(
+          { error: "Fund tier requires a walkthrough", contact: true },
+          { status: 400 }
+        )
+      }
       return NextResponse.json({ error: "Invalid tier" }, { status: 400 })
     }
 

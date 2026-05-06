@@ -110,18 +110,19 @@ export async function generateExecutiveSummaryDocx(es: ExecutiveSummary): Promis
             spacing: { after: 200 },
           }),
 
-          // Verdict
+          // Score header — verdict label removed per pilot feedback #28; the
+          // per-domain verdict still appears in the scorecard table below.
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: verdictLabel(es.verdict).toUpperCase(), bold: true, size: 48, font: "Calibri", color: verdictColor(es.verdict) }),
+              new TextRun({ text: `${es.overallScore}/100`, bold: true, size: 48, font: "Calibri", color: "0F3D2E" }),
             ],
             spacing: { after: 60 },
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: [
-              new TextRun({ text: `Confidence: ${es.confidence}  |  Overall Score: ${es.overallScore}/100`, size: 20, font: "Calibri", color: "555555" }),
+              new TextRun({ text: `Confidence: ${es.confidence}`, size: 20, font: "Calibri", color: "555555" }),
             ],
             spacing: { after: 300 },
           }),
@@ -661,22 +662,18 @@ export async function generateFullReportDocx(
       ],
       spacing: { after: 200 },
     }),
+    // Score header — verdict label removed per pilot feedback #28.
     new Paragraph({
       alignment: AlignmentType.CENTER,
       children: [
-        new TextRun({ text: verdictLabel(es.verdict).toUpperCase(), bold: true, size: 48, font: "Calibri", color: verdictColor(es.verdict) }),
+        new TextRun({ text: `${es.overallScore}/100`, bold: true, size: 48, font: "Calibri", color: "0F3D2E" }),
       ],
       spacing: { after: 60 },
     }),
     new Paragraph({
       alignment: AlignmentType.CENTER,
       children: [
-        new TextRun({
-          text: `Confidence: ${es.confidence}  |  Overall Score: ${es.overallScore}/100`,
-          size: 20,
-          font: "Calibri",
-          color: "555555",
-        }),
+        new TextRun({ text: `Confidence: ${es.confidence}`, size: 20, font: "Calibri", color: "555555" }),
       ],
       spacing: { after: 300 },
     }),
