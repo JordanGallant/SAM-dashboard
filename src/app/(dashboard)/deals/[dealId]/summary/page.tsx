@@ -114,89 +114,81 @@ export default function SummaryPage() {
 
   return (
     <div className="space-y-6">
-    {/* Pilot #26: top hero is a 12-col grid — Company (left, narrow),
-        Investment thesis (center, dominant), Confidence + performance
-        overview (right). Proportions widened to 3 / 6 / 3 and the two
-        graphs stack vertically inside the right column so neither gets
-        squished into a 150px slot when the right rail (Ask Sam) is open. */}
-    <div className="grid gap-5 lg:grid-cols-12">
-      {/* 1. Company details */}
-      <div className="lg:col-span-3 rounded-2xl bg-card ring-1 ring-foreground/10 p-6">
-        <div className="flex items-center gap-2.5">
-          <div className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-primary/10 ring-1 ring-primary/30">
-            <Building2 className="h-4 w-4 text-primary" />
+      {/* Hero strip — company / score / radar in a single compact row across
+          the FULL width of the main pane. Thesis + domains drop below at full
+          width so prose has the widest possible measure. */}
+      <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr_1fr] rounded-2xl bg-card ring-1 ring-foreground/10 overflow-hidden">
+        {/* 1. Company */}
+        <div className="p-5 lg:border-r border-foreground/10">
+          <div className="flex items-center gap-2.5">
+            <div className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-primary/10 ring-1 ring-primary/30">
+              <Building2 className="h-4 w-4 text-primary" />
+            </div>
+            <h1 className="font-heading text-lg font-bold leading-tight truncate">
+              {es.companyName}
+            </h1>
           </div>
-          <h1 className="font-heading text-lg font-bold leading-tight truncate">
-            {es.companyName}
-          </h1>
+          <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5 text-[12.5px]">
+            {[
+              ["Stage", es.stage],
+              ["Sector", es.sector],
+              ["Geography", es.geography],
+              ["Raising", es.raising || null],
+              ["MRR", es.mrr || null],
+            ]
+              .filter(([, v]) => Boolean(v))
+              .map(([label, value]) => (
+                <div key={label as string} className="flex flex-col gap-0.5 min-w-0">
+                  <dt className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                    {label}
+                  </dt>
+                  <dd className="text-foreground/85 truncate" title={String(value)}>
+                    {value}
+                  </dd>
+                </div>
+              ))}
+          </dl>
         </div>
-        <dl className="mt-5 space-y-3 text-[13px]">
-          {[
-            ["Stage", es.stage],
-            ["Sector", es.sector],
-            ["Geography", es.geography],
-            ["Raising", es.raising || null],
-            ["MRR", es.mrr || null],
-          ]
-            .filter(([, v]) => Boolean(v))
-            .map(([label, value]) => (
-              <div key={label as string} className="flex flex-col gap-1">
-                <dt className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                  {label}
-                </dt>
-                <dd className="text-foreground/85 leading-tight" title={String(value)}>
-                  {value}
-                </dd>
-              </div>
-            ))}
-        </dl>
-      </div>
 
-      {/* 2. Investment thesis — dominant column */}
-      <div className="lg:col-span-5">
-        <ThesisCard thesis={es.thesis} />
-      </div>
-
-      {/* 3. Confidence + performance overview — wider column (4/12) so the
-             radar labels (Team/Market/Product/Traction/Finance/Exit) don't
-             clip. Two graphs stacked vertically for breathing room. */}
-      <div className="lg:col-span-4 rounded-2xl bg-card ring-1 ring-foreground/10 p-6 flex flex-col gap-6">
-        <div className="flex flex-col items-center">
-          <SectionLabel className="self-start mb-3">Score &amp; confidence</SectionLabel>
-          <ScoreGauge score={es.overallScore} size={170} />
-          <p className="mt-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground text-center">
+        {/* 2. Score + confidence */}
+        <div className="p-5 flex flex-col items-center justify-center lg:border-r border-foreground/10">
+          <SectionLabel className="self-start mb-2">Score</SectionLabel>
+          <ScoreGauge score={es.overallScore} size={140} />
+          <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground text-center">
             {es.confidence} confidence
           </p>
         </div>
-        <div className="border-t border-foreground/10 pt-5">
-          <SectionLabel className="mb-3">Performance overview</SectionLabel>
-          <DomainRadar scorecard={es.scorecard} height={240} />
+
+        {/* 3. Performance overview — radar */}
+        <div className="p-5">
+          <SectionLabel className="mb-2">Performance overview</SectionLabel>
+          <DomainRadar scorecard={es.scorecard} height={180} />
         </div>
       </div>
-    </div>
 
-    {/* Domain sub-scores strip — compact row, full width under hero */}
-    <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-4">
-      <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {es.scorecard.map((row) => (
-          <li
-            key={row.domain}
-            className="flex items-baseline justify-between gap-2 px-2 py-1 rounded-lg hover:bg-muted/40 transition-colors"
-          >
-            <span className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
-              {row.domain}
-            </span>
-            <span className={`font-mono font-bold tabular-nums text-[14px] ${scoreText(row.score)}`}>
-              {row.score}
-              <span className="text-muted-foreground font-normal text-[11px]">/100</span>
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
+      {/* Domain sub-score strip — full width under hero */}
+      <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-4">
+        <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+          {es.scorecard.map((row) => (
+            <li
+              key={row.domain}
+              className="flex items-baseline justify-between gap-2 px-2 py-1 rounded-lg hover:bg-muted/40 transition-colors"
+            >
+              <span className="text-[10.5px] font-mono uppercase tracking-widest text-muted-foreground">
+                {row.domain}
+              </span>
+              <span className={`font-mono font-bold tabular-nums text-[14px] ${scoreText(row.score)}`}>
+                {row.score}
+                <span className="text-muted-foreground font-normal text-[10px]">/100</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-    {/* Domain breakdowns — full width below hero */}
-    <div className="space-y-5">
+      {/* Main column — thesis full-width, then domain cards, then callouts */}
+      <div className="space-y-5">
+        <ThesisCard thesis={es.thesis} />
 
 
         {/* Domain cards — one per scorecard row */}
@@ -339,8 +331,8 @@ export default function SummaryPage() {
             </ol>
           </section>
         )}
-    </div>
-    <DomainSources documents={deal.documents} externalLinks={founderLinks} generatedAt={deal.analysis.createdAt} />
+      </div>
+      <DomainSources documents={deal.documents} externalLinks={founderLinks} generatedAt={deal.analysis.createdAt} />
     </div>
   )
 }
