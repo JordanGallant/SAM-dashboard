@@ -153,23 +153,24 @@ export default function SummaryPage() {
       </div>
 
       {/* 2. Investment thesis — dominant column */}
-      <div className="lg:col-span-6">
+      <div className="lg:col-span-5">
         <ThesisCard thesis={es.thesis} />
       </div>
 
-      {/* 3. Confidence + performance overview — graphs stacked vertically
-             so each gets the full column width instead of fighting for it. */}
-      <div className="lg:col-span-3 rounded-2xl bg-card ring-1 ring-foreground/10 p-6 flex flex-col gap-5">
+      {/* 3. Confidence + performance overview — wider column (4/12) so the
+             radar labels (Team/Market/Product/Traction/Finance/Exit) don't
+             clip. Two graphs stacked vertically for breathing room. */}
+      <div className="lg:col-span-4 rounded-2xl bg-card ring-1 ring-foreground/10 p-6 flex flex-col gap-6">
         <div className="flex flex-col items-center">
           <SectionLabel className="self-start mb-3">Score &amp; confidence</SectionLabel>
-          <ScoreGauge score={es.overallScore} size={150} />
+          <ScoreGauge score={es.overallScore} size={170} />
           <p className="mt-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground text-center">
             {es.confidence} confidence
           </p>
         </div>
-        <div className="border-t border-foreground/10 pt-4">
-          <SectionLabel className="mb-2">Performance overview</SectionLabel>
-          <DomainRadar scorecard={es.scorecard} height={200} />
+        <div className="border-t border-foreground/10 pt-5">
+          <SectionLabel className="mb-3">Performance overview</SectionLabel>
+          <DomainRadar scorecard={es.scorecard} height={240} />
         </div>
       </div>
     </div>
