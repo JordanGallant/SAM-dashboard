@@ -116,11 +116,12 @@ export default function SummaryPage() {
     <div className="space-y-6">
     {/* Pilot #26: top hero is a 12-col grid — Company (left, narrow),
         Investment thesis (center, dominant), Confidence + performance
-        overview as two graphs side by side (right). Domain sub-scores +
-        cards drop underneath. */}
+        overview (right). Proportions widened to 3 / 6 / 3 and the two
+        graphs stack vertically inside the right column so neither gets
+        squished into a 150px slot when the right rail (Ask Sam) is open. */}
     <div className="grid gap-5 lg:grid-cols-12">
       {/* 1. Company details */}
-      <div className="lg:col-span-3 rounded-2xl bg-card ring-1 ring-foreground/10 p-5">
+      <div className="lg:col-span-3 rounded-2xl bg-card ring-1 ring-foreground/10 p-6">
         <div className="flex items-center gap-2.5">
           <div className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-primary/10 ring-1 ring-primary/30">
             <Building2 className="h-4 w-4 text-primary" />
@@ -129,7 +130,7 @@ export default function SummaryPage() {
             {es.companyName}
           </h1>
         </div>
-        <dl className="mt-4 space-y-2 text-[12.5px]">
+        <dl className="mt-5 space-y-3 text-[13px]">
           {[
             ["Stage", es.stage],
             ["Sector", es.sector],
@@ -139,11 +140,11 @@ export default function SummaryPage() {
           ]
             .filter(([, v]) => Boolean(v))
             .map(([label, value]) => (
-              <div key={label as string} className="flex items-baseline justify-between gap-3">
-                <dt className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground shrink-0">
+              <div key={label as string} className="flex flex-col gap-1">
+                <dt className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                   {label}
                 </dt>
-                <dd className="text-right text-foreground/85 truncate" title={String(value)}>
+                <dd className="text-foreground/85 leading-tight" title={String(value)}>
                   {value}
                 </dd>
               </div>
@@ -152,23 +153,23 @@ export default function SummaryPage() {
       </div>
 
       {/* 2. Investment thesis — dominant column */}
-      <div className="lg:col-span-5">
+      <div className="lg:col-span-6">
         <ThesisCard thesis={es.thesis} />
       </div>
 
-      {/* 3. Confidence + performance overview — two graphs side by side */}
-      <div className="lg:col-span-4 rounded-2xl bg-card ring-1 ring-foreground/10 p-5">
-        <SectionLabel className="mb-3">Confidence &amp; performance</SectionLabel>
-        <div className="grid grid-cols-2 gap-3 items-center">
-          <div className="flex flex-col items-center">
-            <ScoreGauge score={es.overallScore} size={120} />
-            <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground text-center">
-              {es.confidence} confidence
-            </p>
-          </div>
-          <div>
-            <DomainRadar scorecard={es.scorecard} height={130} />
-          </div>
+      {/* 3. Confidence + performance overview — graphs stacked vertically
+             so each gets the full column width instead of fighting for it. */}
+      <div className="lg:col-span-3 rounded-2xl bg-card ring-1 ring-foreground/10 p-6 flex flex-col gap-5">
+        <div className="flex flex-col items-center">
+          <SectionLabel className="self-start mb-3">Score &amp; confidence</SectionLabel>
+          <ScoreGauge score={es.overallScore} size={150} />
+          <p className="mt-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground text-center">
+            {es.confidence} confidence
+          </p>
+        </div>
+        <div className="border-t border-foreground/10 pt-4">
+          <SectionLabel className="mb-2">Performance overview</SectionLabel>
+          <DomainRadar scorecard={es.scorecard} height={200} />
         </div>
       </div>
     </div>
