@@ -6,14 +6,54 @@ import { DEAL_STAGES } from "@/lib/constants"
 import type { DealStage } from "@/lib/types/deal"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 
-const MAX_TEXT_CHARS = 8000
+const MAX_TEXT_CHARS = 12000
+const PRIMARY_PAGES = 6
+const MIN_PRIMARY_CHARS = 400
 
+// Extract text for company-name + stage extraction. Strategy:
+//   1. Try first PRIMARY_PAGES pages.
+//   2. If that yields very little text, expand to the whole deck — image-heavy
+//      decks often have a few text-light cover slides followed by denser
+//      content. Better to over-read once than reject the upload.
+//   3. Cap at MAX_TEXT_CHARS so the LLM call stays fast.
 async function extractFirstPagesText(buffer: Buffer): Promise<string> {
-  // unpdf is pure-JS — runs on Vercel serverless without binaries.
   const pdf = await getDocumentProxy(new Uint8Array(buffer))
   const { text } = await extractText(pdf, { mergePages: false })
   const pages = Array.isArray(text) ? text : [String(text)]
-  return pages.slice(0, 3).join("\n").slice(0, MAX_TEXT_CHARS)
+  const primary = pages.slice(0, PRIMARY_PAGES).join("\n").trim()
+  if (primary.length >= MIN_PRIMARY_CHARS) {
+    return primary.slice(0, MAX_TEXT_CHARS)
+  }
+  // Expand: walk the whole deck. Stop once we hit MAX_TEXT_CHARS.
+  let combined = primary
+  for (let i = PRIMARY_PAGES; i < pages.length; i++) {
+    combined += "\n" + (pages[i] || "")
+    if (combined.length >= MAX_TEXT_CHARS) break
+  }
+  return combined.slice(0, MAX_TEXT_CHARS)
+}
+
+// Pull a fallback company name out of the upload filename when the LLM
+// can't read enough text. e.g. "Sevvy_Pitch_Deck (1).pdf" → "Sevvy".
+function companyNameFromFilename(filename: string): string {
+  const base = filename
+    .replace(/\.pdf$/i, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\([^)]*\)/g, "")
+    .replace(/pitch[\s-]*deck/gi, "")
+    .replace(/investor[\s-]*deck/gi, "")
+    .replace(/teaser/gi, "")
+    .replace(/v\d+(\.\d+)?/gi, "")
+    .replace(/20\d{2}.*$/i, "")
+    .replace(/[^A-Za-z0-9 .]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+  // Title-case first 4 tokens max.
+  const words = base.split(" ").filter(Boolean).slice(0, 4)
+  return words
+    .map((w) => (w.length <= 3 ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1).toLowerCase()))
+    .join(" ")
+    .trim()
 }
 
 async function extractDealMeta(deckText: string): Promise<{ companyName: string; stage: DealStage }> {
@@ -135,9 +175,18 @@ export async function POST(request: Request) {
       )
     }
 
-    if (deckText.trim().length < 30) {
+    // Image-only / scanned guard. Drop the threshold to 20 chars (was 30) so a
+    // pdf that contains at least a title slide of text isn't rejected, and
+    // bias the error message toward "send a text-based version" rather than
+    // "your file is broken" which the pilot found confusing.
+    const textLen = deckText.trim().length
+    if (textLen < 20) {
       return NextResponse.json(
-        { error: "Could not read text from this PDF. It may be image-only or scanned — try a text-based deck." },
+        {
+          error:
+            "We couldn't read enough text from this PDF — it looks image-only or scanned. " +
+            "Re-export the deck as a text-based PDF (most slide tools have a 'Save as PDF' option) and try again.",
+        },
         { status: 400 }
       )
     }
@@ -146,11 +195,20 @@ export async function POST(request: Request) {
     try {
       meta = await extractDealMeta(deckText)
     } catch (err) {
-      console.error("extractDealMeta failed", err)
-      return NextResponse.json(
-        { error: err instanceof Error ? err.message : "Failed to extract deck metadata" },
-        { status: 502 }
-      )
+      // PDF processing #3 fix: when the LLM can't extract a name, derive one
+      // from the filename instead of rejecting the upload outright. The user
+      // can rename it later via the inline-rename pencil on the deal page.
+      const fallback = companyNameFromFilename(filename)
+      if (fallback) {
+        console.warn("extractDealMeta used filename fallback", { filename, fallback, err })
+        meta = { companyName: fallback, stage: "Seed" }
+      } else {
+        console.error("extractDealMeta failed and no usable filename", err)
+        return NextResponse.json(
+          { error: err instanceof Error ? err.message : "Failed to extract deck metadata" },
+          { status: 502 }
+        )
+      }
     }
 
     const { data: fund } = await supabase
