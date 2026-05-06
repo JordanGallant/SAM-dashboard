@@ -163,10 +163,18 @@ export default function FundFitPage() {
         </div>
       </EditorialCard>
 
-      <EditorialCard label="Thesis alignment" icon={<Compass className="h-3.5 w-3.5" />}>
+      <EditorialCard
+        label="Thesis alignment"
+        icon={<Compass className="h-3.5 w-3.5" />}
+        rightSlot={
+          <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            Sub-score
+          </span>
+        }
+      >
         <div className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
           <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-mono font-bold text-primary leading-none tabular-nums">{fit.thesisAlignment}</span>
+            <span className="text-2xl font-mono font-bold text-foreground/80 leading-none tabular-nums">{fit.thesisAlignment}</span>
             <span className="text-xs font-mono text-muted-foreground">/100</span>
           </div>
           <p className="mt-3 text-sm text-foreground/75 leading-relaxed">
@@ -175,6 +183,9 @@ export default function FundFitPage() {
               : fit.thesisAlignment >= 40
                 ? "Partial alignment with fund thesis. Some criteria do not match."
                 : "Weak alignment with fund thesis."}
+          </p>
+          <p className="mt-2 text-[11.5px] text-muted-foreground/85 leading-relaxed">
+            One input to the overall Fund Fit score above; not the headline number.
           </p>
         </div>
       </EditorialCard>

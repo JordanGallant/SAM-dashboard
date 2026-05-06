@@ -27,6 +27,7 @@ import {
   FileText,
   Mail,
   Sparkles,
+  PlayCircle,
 } from "lucide-react"
 
 // ---------- design tokens ----------
@@ -58,8 +59,8 @@ export default function Mockup4() {
         <FeatureCards />
         <Audiences />
         <Quotes />
-        <DarkAI />
         <Trust />
+        <DarkAI />
         <Pricing />
         <FAQ />
         <ClosingCTA />
@@ -853,119 +854,202 @@ function DrawCheck({ inView, delay = 0 }: { inView: boolean; delay?: number }) {
 }
 
 // ============================================================
-// Quotes — featured pull-quote + clean 3-column grid below
+// Quotes — ramp-style featured case study (image left, editorial right)
 // ============================================================
 function Quotes() {
-  const featured = {
-    quote:
-      "I review 40+ decks a month. Sam cuts my first-pass from hours to minutes, and the report gives me exactly the right questions before a founder call.",
-    role: "Partner · Pre-seed fund",
-  }
-  const supporting = [
-    {
-      quote:
-        "I thought it would just recap the deck. It doesn't — it challenges it. Red flags I would have found in week three, Sam flags on the first signal.",
-      role: "Principal · Seed fund",
-    },
-    {
-      quote:
-        "We used to lose deals because internal alignment took too long. Now everyone reads the same memo before we decide.",
-      role: "Managing Partner",
-    },
-    {
-      quote:
-        "Sam doesn't replace judgment — it sharpens it. We screen twice as many deals without adding headcount.",
-      role: "Investment Director",
-    },
-    {
-      quote:
-        "Sam flagged a team issue I would have only found after a second call. Time saved and risk avoided.",
-      role: "Senior Associate",
-    },
-    {
-      quote:
-        "The Executive Summary gives me everything I need for a first call in two minutes. It used to take an afternoon.",
-      role: "Investor · Series A",
-    },
-  ]
   return (
     <section
       className="py-24 md:py-32 border-y"
       style={{ borderColor: RULE, background: BONE }}
     >
       <div className="mx-auto max-w-[1240px] px-6">
-        <div className="max-w-2xl mb-14">
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
-            What partners are saying
-          </p>
-          <h2
-            className="mt-3 font-bold tracking-[-0.025em] leading-[1.04]"
-            style={{ fontSize: "clamp(36px, 5vw, 64px)" }}
-          >
-            From the funds running
-            <br />
-            <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
-              their first-pass on Sam.
-            </span>
-          </h2>
+        {/* Featured case-study row */}
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          {/* Left — visual / "watch story" tile */}
+          <CaseStudyTile />
+
+          {/* Right — editorial */}
+          <div>
+            <h2
+              className="font-bold tracking-[-0.025em] leading-[1.06]"
+              style={{ fontSize: "clamp(34px, 4.2vw, 54px)" }}
+            >
+              Keep your partners focused on judgment.{" "}
+              <span style={{ color: SUBINK }}>
+                Let Sam handle the first-pass.
+              </span>
+            </h2>
+
+            <blockquote
+              className="mt-8 text-[16px] md:text-[17px] leading-[1.6]"
+              style={{ color: "rgba(10,10,10,0.78)" }}
+            >
+              &ldquo;Gone are the days of scribbled notes after a 10-minute deck
+              scan. Sam delivers a structured memo every partner reads the same
+              way — every deck, every time. We pass faster, and we&rsquo;re more
+              honest about why.&rdquo;
+            </blockquote>
+
+            <div className="mt-7 flex items-center gap-4">
+              <span
+                className="grid place-items-center h-11 w-11 rounded-full font-semibold text-[12.5px] tracking-[0.04em]"
+                style={{ background: ACCENT, color: LIME }}
+                aria-hidden
+              >
+                SB
+              </span>
+              <div>
+                <p className="text-[14.5px] font-semibold leading-tight">
+                  Sven Bakker
+                </p>
+                <p
+                  className="text-[12px] mt-1"
+                  style={{ color: SUBINK }}
+                >
+                  Managing Partner, Green Whale Smart Capital
+                </p>
+              </div>
+            </div>
+
+            <Link
+              href="/sample"
+              className="mt-7 inline-flex items-center gap-1.5 text-[14px] font-semibold border-b-[1.5px] pb-0.5 hover:gap-2.5 transition-all"
+              style={{ color: INK, borderColor: INK }}
+            >
+              Read their story
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         </div>
 
-        {/* Featured pull-quote */}
-        <motion.figure
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-          transition={{ duration: 0.6, ease: EASE }}
-          className="rounded-3xl bg-white border p-8 md:p-12"
-          style={{ borderColor: RULE }}
-        >
-          <span
-            className="font-serif italic font-normal block leading-[0.6] opacity-30"
-            style={{ fontSize: "clamp(60px, 8vw, 120px)", color: ACCENT }}
-            aria-hidden
+        {/* Sub-block below — mirrors ramp's "AI that learns from your team..." */}
+        <div className="mt-24 md:mt-32 max-w-3xl">
+          <h3
+            className="font-bold tracking-[-0.02em] leading-[1.1]"
+            style={{ fontSize: "clamp(26px, 3.2vw, 40px)" }}
           >
-            &ldquo;
-          </span>
-          <blockquote
-            className="mt-2 font-medium tracking-[-0.015em] leading-[1.25]"
-            style={{ fontSize: "clamp(22px, 2.6vw, 34px)" }}
+            Memos that learn from your fund.{" "}
+            <span style={{ color: SUBINK }}>
+              Powered by 1,000+ partners who screened before you.
+            </span>
+          </h3>
+          <Link
+            href="/how-it-works"
+            className="mt-5 inline-flex items-center gap-1.5 text-[14px] font-semibold border-b-[1.5px] pb-0.5 hover:gap-2.5 transition-all"
+            style={{ color: INK, borderColor: INK }}
           >
-            {featured.quote}
-          </blockquote>
-          <figcaption
-            className="mt-7 text-[11px] font-mono uppercase tracking-[0.2em]"
-            style={{ color: SUBINK }}
-          >
-            {featured.role}
-          </figcaption>
-        </motion.figure>
-
-        {/* Supporting quote grid — clean, no rotation, no metric pills */}
-        <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {supporting.map((q, i) => (
-            <motion.figure
-              key={i}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-              transition={{ duration: 0.5, ease: EASE, delay: 0.05 * i }}
-              className="rounded-2xl bg-white border p-6 hover:-translate-y-1 transition"
-              style={{ borderColor: RULE }}
-            >
-              <blockquote className="text-[14.5px] leading-[1.55] text-[#0A0A0A]/85">
-                {q.quote}
-              </blockquote>
-              <figcaption
-                className="mt-5 pt-4 border-t text-[10.5px] font-mono uppercase tracking-widest"
-                style={{ color: SUBINK, borderColor: RULE }}
-              >
-                {q.role}
-              </figcaption>
-            </motion.figure>
-          ))}
+            Learn about the Sam framework
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </div>
     </section>
+  )
+}
+
+// Brand-controlled "case study" tile — replaces the missing customer photo.
+// Forest panel, floating memo preview, eyebrow + watch-story pill.
+function CaseStudyTile() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+      transition={{ duration: 0.6, ease: EASE }}
+      className="relative rounded-3xl overflow-hidden aspect-[5/4] lg:aspect-[6/5] p-7 flex flex-col justify-end"
+      style={{ background: ACCENT, color: "white" }}
+    >
+      {/* faint dotted grid */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.18]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+        }}
+      />
+      {/* lime soft halo bottom-right */}
+      <div
+        aria-hidden
+        className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full opacity-30"
+        style={{
+          background: `radial-gradient(closest-side, ${LIME} 0%, transparent 70%)`,
+        }}
+      />
+
+      {/* eyebrow — top-left */}
+      <div className="absolute top-7 left-7 right-7 flex items-center justify-between">
+        <span className="inline-flex items-center gap-2 text-[10.5px] font-mono uppercase tracking-[0.2em] opacity-80">
+          <span
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ background: LIME }}
+          />
+          Case study · 03
+        </span>
+        <span className="text-[10.5px] font-mono uppercase tracking-[0.2em] opacity-60">
+          1:24
+        </span>
+      </div>
+
+      {/* floating memo preview — top-right */}
+      <motion.div
+        initial={{ opacity: 0, y: 10, rotate: -2 }}
+        whileInView={{ opacity: 1, y: 0, rotate: -2 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7, ease: EASE, delay: 0.2 }}
+        className="absolute top-20 right-7 w-[58%] max-w-[280px] rounded-xl bg-white text-[#0A0A0A] p-4 shadow-2xl"
+        style={{ transformOrigin: "top right" }}
+      >
+        <div className="flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-1 w-1 rounded-full" style={{ background: ACCENT_HI }} />
+            Memo · GW-014
+          </span>
+          <span style={{ color: ACCENT }}>82</span>
+        </div>
+        <p className="mt-2 text-[11.5px] font-semibold leading-tight">
+          Investment thesis
+        </p>
+        <p className="mt-1 text-[10px] leading-[1.5]" style={{ color: SUBINK }}>
+          Strong founder-market fit, defensible distribution, capital-efficient growth.
+        </p>
+        <div className="mt-3 space-y-1.5">
+          {[
+            ["Team", 88],
+            ["Market", 76],
+            ["Product", 84],
+          ].map(([l, v]) => (
+            <div key={l as string} className="flex items-center gap-2 text-[9px]">
+              <span className="w-12" style={{ color: SUBINK }}>{l}</span>
+              <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: SOFT }}>
+                <div className="h-full rounded-full" style={{ width: `${v}%`, background: ACCENT }} />
+              </div>
+              <span className="w-5 text-right tabular-nums font-semibold">{v as number}</span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* big SAM watermark — bottom-left, behind pill */}
+      <div
+        aria-hidden
+        className="absolute bottom-2 left-5 font-bold leading-none opacity-[0.06] select-none"
+        style={{ fontSize: "clamp(120px, 18vw, 200px)" }}
+      >
+        SAM
+      </div>
+
+      {/* watch story pill — bottom-left, in front */}
+      <button
+        type="button"
+        className="relative self-start inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[13px] font-semibold transition hover:scale-[1.02]"
+        style={{ color: ACCENT }}
+      >
+        <PlayCircle className="h-4 w-4" />
+        Watch story
+      </button>
+    </motion.div>
   )
 }
 

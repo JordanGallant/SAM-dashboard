@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useTier } from "@/lib/tier-context"
@@ -220,6 +221,19 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
                 >
                   <FileType className="mr-2 h-3.5 w-3.5 text-blue-600" />
                   Word document (.docx)
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleRunAnalysis}
+                  disabled={analyzing || deal.documents.length === 0}
+                  className="cursor-pointer"
+                >
+                  {analyzing ? (
+                    <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Play className="mr-2 h-3.5 w-3.5 text-primary" />
+                  )}
+                  {analyzing ? "Starting…" : "Reanalyse pitch deck"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
