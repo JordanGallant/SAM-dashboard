@@ -1,133 +1,157 @@
-// SAM landing — Terminal Minimalist style.
-// Linear / Vercel / Reflect DNA. Cool off-white, Geist throughout, monochrome
-// hero, no card boxes, sections separated by edge-to-edge hairline rules,
-// 1px ring buttons, no shadows, no gradients. Quietly confident, technical,
-// restrained — the opposite of the previous gradient-heavy SaaS look.
-//
-// Self-contained on purpose: every section is rendered inline so the visual
-// language stays consistent. If we want to extract sections later, do it then.
+// SAM landing — mockup3.
+// Off-white field with full-bleed accent slabs. Oversized geometric-sans hero,
+// asymmetric bento, near-black AI section, big-stat strip on green, alternating
+// feature slabs, closing CTA. Uses SAM's green palette (#0F3D2E / #00A86B)
+// and Geist throughout — no external typefaces. Animations via framer-motion.
 
-import { Fragment } from "react"
+"use client"
+
 import Link from "next/link"
-import { ArrowRight, Check } from "lucide-react"
-import ScoreShowcase from "./score-showcase"
+import Image from "next/image"
+import { useEffect, useRef, useState } from "react"
+import {
+  motion,
+  useInView,
+  useScroll,
+  useTransform,
+  useMotionValue,
+  useSpring,
+} from "framer-motion"
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  X,
+  Brain,
+  FileText,
+  ScanLine,
+  Target,
+  Users,
+  TrendingUp,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react"
 
-const BG = "#F8F8F9"
-const INK = "#0A0E14"
-const RULE = "rgba(10,14,20,0.10)"
-const RULE_STRONG = "rgba(10,14,20,0.18)"
-// Dark-zone tokens — used by sections that flip to the near-black palette.
-// `DARK_RULE` is the white-on-dark equivalent of `RULE`; `DARK_RULE_STRONG`
-// of `RULE_STRONG`. Background gradient is the diagonal deep-green wash.
-const DARK_BG = "#0A0E14"
-const DARK_RULE = "rgba(255,255,255,0.10)"
-const DARK_RULE_STRONG = "rgba(255,255,255,0.18)"
-const DARK_GRADIENT =
-  "linear-gradient(135deg, #050B15 0%, #0B1124 50%, #1E3A8A 100%)"
-// SAM brand palette is applied inline via Tailwind arbitrary values:
-// #1E3A8A (deep green) for eyebrows + price accents, #3B82F6 (bright green)
-// for checkmarks + step markers, and a from-[#1E3A8A] to-[#3B82F6] gradient
-// for primary CTAs, the logo square, and the hero "Save both" line. On dark
-// zones, eyebrows shift to lime #A5B4FC for legibility; gradient is reused.
+// ----- design tokens -----
+const FIELD = "#F7F7F2" // off-white field
+const INK = "#0A2E22" // primary text
+const NEAR_BLACK = "#0A0E14"
+const ACCENT = "#0F3D2E" // forest
+const ACCENT_HI = "#00A86B" // bright
+const ACCENT_LIME = "#D4FF6B"
+const RULE = "rgba(10,46,34,0.10)"
 
-// Tiny gradient hairline accent — placed above section titles in dark zones
-// (and a couple of key light ones) for rhythm. Light = brand gradient on its
-// own; dark = same gradient against the dark surface, slightly brighter end.
-function GradientHairline({ tone = "light" }: { tone?: "light" | "dark" }) {
+const EASE = [0.22, 1, 0.36, 1] as [number, number, number, number]
+
+// =====================================================================
+// page
+// =====================================================================
+export default function Mockup3() {
   return (
-    <span
-      aria-hidden
-      className={
-        tone === "dark"
-          ? "block h-px w-12 bg-gradient-to-r from-[#3B82F6] to-[#A5B4FC] mb-5"
-          : "block h-px w-12 bg-gradient-to-r from-[#1E3A8A] to-[#3B82F6] mb-5"
-      }
-    />
-  )
-}
-
-// Mono pill chip — `[ NEW ]`-style inline tag. Auto-uppercases, fixed sizing.
-function Chip({
-  children,
-  tone = "light",
-}: {
-  children: React.ReactNode
-  tone?: "light" | "dark"
-}) {
-  const cls =
-    tone === "dark"
-      ? "ring-1 ring-white/25 text-white/80"
-      : "ring-1 ring-foreground/15 text-black/65"
-  return (
-    <span
-      className={`inline-flex items-center text-[9px] font-mono uppercase tracking-[0.18em] px-1.5 py-0.5 rounded-sm align-middle ${cls}`}
-    >
-      [ {children} ]
-    </span>
-  )
-}
-
-export default function Home() {
-  return (
-    <div style={{ background: BG, color: INK }} className="min-h-screen font-sans">
-      <ChooserBar current={3} />
-      <Header />
-      <Hero />
-      <StatsBand />
-      <Problem />
-      <Framework />
-      <ScoreShowcase />
-      <Position />
-      <Audiences />
-      <Trust />
-      <Pricing />
-      <FAQ />
-      <FinalCTA />
+    <div className="min-h-screen overflow-x-hidden" style={{ background: FIELD, color: INK }}>
+      <Nav />
+      <main>
+        <Hero />
+        <LogoWall />
+        <BigStatStrip />
+        <BentoGrid />
+        <DarkAIBanner />
+        <FeatureSlab
+          eyebrow="01 · INTAKE"
+          title={<>Drop in a deck. <em className="not-italic font-serif italic">Sam reads it.</em></>}
+          body="Upload a pitch deck and SAM extracts the company, stage, raise, founders, and metrics. No forms, no manual tagging. The whole memo starts from the file."
+          bullets={[
+            "PDF, DOCX, or pasted text",
+            "Founders + roles + LinkedIn",
+            "TAM / SAM / SOM with sources",
+          ]}
+          screenshot={<ScreenshotIntake />}
+          flip={false}
+        />
+        <FeatureSlab
+          eyebrow="02 · ANALYSIS"
+          title={<>Five domains, <em className="not-italic font-serif italic">one verdict.</em></>}
+          body="Team, Market, Product, Traction, Finance. Each scored 0–100 with a one-line key finding. The Executive Summary rolls them up into Strong Buy / Explore / Conditional Pass / Deny."
+          bullets={[
+            "Domain scorecards with verdict + confidence",
+            "Strengths and risks tagged by severity",
+            "Recommended next steps for the partner call",
+          ]}
+          screenshot={<ScreenshotScorecard />}
+          flip={true}
+        />
+        <FeatureSlab
+          eyebrow="03 · FUND FIT"
+          title={<>Built around <em className="not-italic font-serif italic">your mandate.</em></>}
+          body="Set sector, stage, geography, ticket size. SAM scores every deal against your own thesis and tells you exactly which criteria pass — and which don't."
+          bullets={[
+            "Mandate uploaded once, applied to every deal",
+            "Pass / fail per criterion with reasoning",
+            "Portfolio conflict detection",
+          ]}
+          screenshot={<ScreenshotFundFit />}
+          flip={false}
+        />
+        <QuoteSpotlight />
+        <CaseStudyRow />
+        <Comparison />
+        <ClosingCTA />
+      </main>
       <Footer />
     </div>
   )
 }
 
-// -----------------------------------------------------------------------------
-// Header
-// -----------------------------------------------------------------------------
+// =====================================================================
+// nav
+// =====================================================================
+function Nav() {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
-function Header() {
   return (
-    <header className="border-b" style={{ borderColor: RULE_STRONG }}>
-      <div className="mx-auto max-w-[1180px] px-8 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="h-4 w-4 rounded-sm bg-gradient-to-br from-[#1E3A8A] to-[#3B82F6]" />
-          <span className="text-[15px] font-semibold tracking-[-0.01em]">sam</span>
+    <header
+      className={`sticky top-0 z-50 transition-all backdrop-blur ${
+        scrolled ? "bg-[#F7F7F2]/85 border-b" : "bg-transparent"
+      }`}
+      style={{ borderColor: RULE }}
+    >
+      <div className="mx-auto max-w-[1200px] px-6 h-16 flex items-center justify-between">
+        <Link href="/mockup3" className="flex items-center gap-2 font-bold text-[15px] tracking-tight">
+          <span
+            className="grid place-items-center h-6 w-6 rounded-md text-white text-[11px] font-bold"
+            style={{ background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_HI})` }}
+          >
+            S
+          </span>
+          Sam
         </Link>
-        <div className="hidden md:flex items-center gap-7 text-[13px] text-black/65">
-          <Link href="/how-it-works" className="hover:text-black">
-            Method
-          </Link>
-          <Link href="/for-angels" className="hover:text-black">
-            For angels
-          </Link>
-          <Link href="/for-vc-funds" className="hover:text-black">
-            For funds
-          </Link>
-          <Link href="/#pricing" className="hover:text-black">
-            Pricing
-          </Link>
-          <Link href="/sample" className="hover:text-black">
-            Sample memo
-          </Link>
-        </div>
-        <div className="flex items-center gap-2 text-[13px]">
-          <Link href="/login" className="text-black/65 hover:text-black px-2">
+        <nav className="hidden md:flex items-center gap-7 text-[13.5px]">
+          <NavItem label="Product" />
+          <NavItem label="Solutions" />
+          <NavItem label="Customers" />
+          <NavItem label="Resources" />
+          <NavItem label="Pricing" />
+        </nav>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/login"
+            className="hidden sm:inline-flex text-[13.5px] hover:opacity-70 transition"
+          >
             Sign in
           </Link>
           <Link
             href="/register"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-br from-[#1E3A8A] to-[#3B82F6] text-white ring-1 ring-transparent hover:opacity-90 transition-opacity"
-            style={{ borderRadius: 0 }}
+            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-[#0A2E22] hover:scale-[1.02] transition"
+            style={{ background: ACCENT_LIME }}
           >
-            <span>Get started</span>
-            <ArrowRight className="h-3 w-3" />
+            Get started
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>
@@ -135,430 +159,277 @@ function Header() {
   )
 }
 
-// -----------------------------------------------------------------------------
-// Hero
-// -----------------------------------------------------------------------------
-
-function Hero() {
+function NavItem({ label }: { label: string }) {
   return (
-    <section
-      className="border-b relative bg-gradient-to-b from-white via-[#F8F8F9] to-[#F8F8F9]"
-      style={{ borderColor: RULE_STRONG }}
-    >
-      {/* Faint corner radial wash — reinforces the hero glow without zoning */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.08),transparent_55%)]"
+    <button className="hover:opacity-60 transition relative group">
+      <span>{label}</span>
+      <span
+        className="absolute -bottom-1 left-0 right-0 h-px scale-x-0 group-hover:scale-x-100 transition origin-left"
+        style={{ background: INK }}
       />
-      <div className="mx-auto max-w-[1180px] px-8 py-24">
-        <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-16 items-center">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-[#1E3A8A]">
-                SAM / INVESTMENT MEMO · v1.4
-              </p>
-              <Chip>EU</Chip>
-              <Chip>AI-NATIVE</Chip>
-            </div>
+    </button>
+  )
+}
 
-            <h1
-              className="mt-7 font-bold tracking-[-0.035em]"
-              style={{ fontSize: "clamp(48px, 6vw, 72px)", lineHeight: 1.0 }}
+// =====================================================================
+// hero
+// =====================================================================
+function Hero() {
+  const ref = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] })
+  const y = useTransform(scrollYProgress, [0, 1], [0, -40])
+  const cardY = useTransform(scrollYProgress, [0, 1], [0, -60])
+
+  return (
+    <section ref={ref} className="relative pt-12 md:pt-20 pb-24 md:pb-28 overflow-hidden">
+      <DotGrid />
+      <div className="relative mx-auto max-w-[1200px] px-6">
+        <div className="grid lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-16 items-end">
+          {/* LEFT — copy */}
+          <motion.div style={{ y }}>
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/55"
             >
-              Time is money.
+              The investment memo, generated.
+            </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: EASE, delay: 0.05 }}
+              className="mt-5 font-bold leading-[0.95] tracking-[-0.035em]"
+              style={{
+                fontSize: "clamp(44px, 8.5vw, 116px)",
+                color: INK,
+              }}
+            >
+              Decks in.
               <br />
-              <span className="bg-gradient-to-r from-[#1E3A8A] via-[#3B82F6] to-[#93C5FD] bg-clip-text text-transparent">
-                Save both.
+              <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
+                Memos out.
               </span>
-            </h1>
-
-            {/* Static SVG underline flourish — minimal single-stroke wave that
-                hints at "signal" without animating. Sits flush under the H1. */}
-            <svg
-              aria-hidden
-              viewBox="0 0 240 8"
-              className="mt-3 h-2 w-[240px]"
-              preserveAspectRatio="none"
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: EASE, delay: 0.18 }}
+              className="mt-7 max-w-[540px] text-[17px] leading-[1.55] text-[#0A2E22]/70"
             >
-              <path
-                d="M0 4 Q 30 0 60 4 T 120 4 T 180 4 T 240 4"
-                fill="none"
-                stroke="url(#heroWaveGrad)"
-                strokeWidth="1"
-              />
-              <defs>
-                <linearGradient id="heroWaveGrad" x1="0" x2="1" y1="0" y2="0">
-                  <stop offset="0%" stopColor="#1E3A8A" />
-                  <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-            </svg>
-
-            <p className="mt-7 max-w-[58ch] text-[16.5px] leading-[1.55] text-black/65">
-              Structured investment memos, scored across five domains. Twelve minutes
-              from deck to IC-ready. Built for partners who read twenty decks a week and
-              decide on five.
-            </p>
-
-            <div className="mt-10 flex items-center gap-3">
+              SAM reads pitch decks the way an analyst would — five domains, scorecards,
+              a partner-ready memo with verdict and next steps. Five minutes, not five hours.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.3 }}
+              className="mt-9 flex flex-wrap items-center gap-3"
+            >
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 px-5 py-3 text-[14px] font-medium bg-gradient-to-br from-[#1E3A8A] to-[#3B82F6] text-white ring-1 ring-transparent hover:opacity-90 transition-opacity"
-                style={{ borderRadius: 0 }}
+                className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold text-[#0A2E22] hover:scale-[1.02] transition shadow-sm"
+                style={{ background: ACCENT_LIME }}
               >
-                Get started
-                <ArrowRight className="h-3.5 w-3.5" />
+                Try Sam free
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition" />
               </Link>
               <Link
                 href="/sample"
-                className="inline-flex items-center gap-2 px-5 py-3 text-[14px] font-medium text-black/60 hover:text-black transition-colors"
-              >
-                See a sample memo →
-              </Link>
-            </div>
-
-            <div className="mt-10 grid grid-cols-3 gap-6 max-w-md text-[12px] font-mono uppercase tracking-[0.15em] text-black/45">
-              <div>
-                <span className="block text-black">No credit card</span>
-                <span>14-day trial</span>
-              </div>
-              <div>
-                <span className="block text-black">EU-based</span>
-                <span>GDPR by design</span>
-              </div>
-              <div>
-                <span className="block text-black">Cancel anytime</span>
-                <span>Self-serve</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Browser-chrome frame around the dashboard screenshot. Flat ring,
-              no shadow, no large radius — keeps the terminal language. The
-              radial green glow sits behind the frame to anchor it visually. */}
-          <div className="relative">
-            <div className="absolute -inset-8 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.10),transparent_60%)] blur-2xl" />
-            <div className="ring-1 bg-white rounded" style={{ borderColor: RULE_STRONG }}>
-              <div
-                className="border-b px-3 py-2.5 flex items-center gap-3"
+                className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-[14px] font-medium border hover:bg-white/60 transition"
                 style={{ borderColor: RULE }}
               >
-                <div className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
-                </div>
-                <div
-                  className="flex-1 ml-2 px-3 py-1 ring-1 text-[11px] font-mono text-black/55 truncate"
-                  style={{ borderColor: RULE, borderRadius: 2 }}
-                >
-                  sam.ai/deals/vrey/summary
-                </div>
-              </div>
-              <img
-                src="/design/hero-img-new.png"
-                alt="Sam dashboard — deal summary view for Vrey"
-                className="block w-full h-auto"
+                See a sample memo
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </motion.div>
+          </motion.div>
+
+          {/* RIGHT — floating product mock */}
+          <motion.div style={{ y: cardY }} className="relative">
+            <FloatingCard />
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function DotGrid() {
+  return (
+    <div
+      aria-hidden
+      className="absolute inset-0 -z-10 opacity-[0.55]"
+      style={{
+        backgroundImage:
+          "radial-gradient(rgba(10,46,34,0.10) 1px, transparent 1px)",
+        backgroundSize: "24px 24px",
+        maskImage: "radial-gradient(ellipse 70% 60% at 50% 30%, black, transparent)",
+        WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 30%, black, transparent)",
+      }}
+    />
+  )
+}
+
+function FloatingCard() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24, rotate: -1.5 }}
+      animate={{ opacity: 1, y: 0, rotate: -1.5 }}
+      transition={{ duration: 0.9, ease: EASE, delay: 0.15 }}
+      className="relative origin-bottom-left will-change-transform"
+    >
+      {/* shadow card */}
+      <div
+        className="absolute -inset-x-6 -inset-y-6 -z-10 rounded-[28px] blur-2xl opacity-40"
+        style={{ background: `radial-gradient(ellipse at 30% 20%, ${ACCENT_LIME}, transparent 65%)` }}
+      />
+      <div
+        className="rounded-[20px] bg-white shadow-[0_20px_60px_-20px_rgba(10,46,34,0.25)] ring-1 overflow-hidden"
+        style={{ borderColor: RULE, borderWidth: 1 }}
+      >
+        {/* top bar */}
+        <div className="flex items-center gap-2 px-4 h-9 border-b" style={{ borderColor: RULE }}>
+          <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
+          <span className="ml-3 text-[11px] font-mono text-[#0A2E22]/50">canaaro · executive summary</span>
+        </div>
+        {/* card body */}
+        <div className="p-5 space-y-4">
+          <div className="flex items-baseline justify-between">
+            <div>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-[#0A2E22]/55">Verdict</p>
+              <p className="font-bold text-[20px] tracking-tight mt-1" style={{ color: ACCENT }}>
+                Strong Buy
+              </p>
+            </div>
+            <ScoreRing score={84} />
+          </div>
+          <ScorecardRows />
+          <RowTicker />
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+function ScoreRing({ score }: { score: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: "0px 0px -20% 0px" })
+  const r = 26
+  const c = 2 * Math.PI * r
+  const offset = c - (score / 100) * c
+  return (
+    <div ref={ref} className="relative h-[68px] w-[68px]">
+      <svg viewBox="0 0 68 68" className="h-full w-full -rotate-90">
+        <circle cx="34" cy="34" r={r} stroke={RULE} strokeWidth="5" fill="none" />
+        <motion.circle
+          cx="34"
+          cy="34"
+          r={r}
+          stroke={ACCENT_HI}
+          strokeWidth="5"
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          initial={{ strokeDashoffset: c }}
+          animate={inView ? { strokeDashoffset: offset } : { strokeDashoffset: c }}
+          transition={{ duration: 1.4, ease: EASE, delay: 0.3 }}
+        />
+      </svg>
+      <div className="absolute inset-0 grid place-items-center">
+        <CountUp to={score} start={inView} className="font-bold text-[18px] tabular-nums" />
+      </div>
+    </div>
+  )
+}
+
+function ScorecardRows() {
+  const rows = [
+    { label: "Team", score: 88, finding: "Repeat ops + technical founders" },
+    { label: "Market", score: 79, finding: "€6.2B EU TAM, validated" },
+    { label: "Product", score: 86, finding: "Workflow moat plausible" },
+    { label: "Traction", score: 72, finding: "€420K ARR, 14% MoM" },
+    { label: "Finance", score: 81, finding: "18mo runway · clean cap" },
+  ]
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" })
+  return (
+    <div ref={ref} className="grid grid-cols-1 gap-1.5">
+      {rows.map((r, i) => (
+        <motion.div
+          key={r.label}
+          initial={{ opacity: 0, y: 6 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+          transition={{ duration: 0.4, ease: EASE, delay: 0.05 * i + 0.5 }}
+          className="grid grid-cols-[80px_1fr_36px] items-center gap-3 text-[12px]"
+        >
+          <span className="font-mono uppercase tracking-widest text-[10px] text-[#0A2E22]/55">
+            {r.label}
+          </span>
+          <span className="text-[#0A2E22]/85 truncate">{r.finding}</span>
+          <span className="font-bold tabular-nums text-right" style={{ color: ACCENT }}>
+            {r.score}
+          </span>
+        </motion.div>
+      ))}
+    </div>
+  )
+}
+
+// rolling-counter ticker — small "live" flair like ramp's transaction feed
+function RowTicker() {
+  const items = [
+    "› Founder LinkedIn verified",
+    "› Sources: 14",
+    "› Strengths: 3 · Risks: 2",
+    "› Memo ready · 4m 12s",
+  ]
+  const [idx, setIdx] = useState(0)
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % items.length), 1800)
+    return () => clearInterval(t)
+  }, [items.length])
+  return (
+    <div
+      className="rounded-md px-3 py-2 font-mono text-[11px] overflow-hidden"
+      style={{ background: "rgba(0,168,107,0.06)", color: ACCENT }}
+    >
+      <motion.div key={idx} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.4 }}>
+        {items[idx]}
+      </motion.div>
+    </div>
+  )
+}
+
+// =====================================================================
+// logo wall
+// =====================================================================
+function LogoWall() {
+  const partners = [
+    { name: "Green Whale Smart Capital", logo: "/partners/green-whale.png", invert: true },
+    { name: "Heliphant", logo: "/partners/heliphant.png", invert: false },
+    { name: "Spotlight Invest", logo: "/partners/spotlight-invest.png", invert: false },
+  ]
+  return (
+    <section className="border-y" style={{ borderColor: RULE }}>
+      <div className="mx-auto max-w-[1200px] px-6 py-12">
+        <p className="text-center text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/55">
+          Trusted by European VC funds
+        </p>
+        <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 items-center gap-8">
+          {partners.map((p) => (
+            <div key={p.name} className="flex items-center justify-center h-12">
+              <Image
+                src={p.logo}
+                alt={p.name}
+                width={180}
+                height={48}
+                unoptimized
+                className={`max-h-10 w-auto object-contain grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition ${p.invert ? "invert" : ""}`}
               />
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// -----------------------------------------------------------------------------
-// Stats band
-// -----------------------------------------------------------------------------
-
-function StatsBand() {
-  const stats: { n: string; l: string; score?: string }[] = [
-    { n: "12 min", l: "Deck → IC-ready memo" },
-    { n: "5 domains", l: "Scored, weighted, audited", score: "8.4 / 10" },
-    { n: "1,000+", l: "Memos generated to date" },
-    { n: "€250k", l: "Average decision at stake" },
-  ]
-  return (
-    <section
-      className="border-b relative overflow-hidden"
-      style={{
-        background: DARK_GRADIENT,
-        color: "#F8F8F9",
-        borderColor: DARK_RULE_STRONG,
-      }}
-    >
-      {/* Hairline grid backdrop — adds technical texture, very low contrast */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-0 opacity-60"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
-      {/* Soft lime glow bottom-left for asymmetric warmth */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(165,180,252,0.10),transparent_55%)]"
-      />
-      <div className="mx-auto max-w-[1180px] grid grid-cols-2 md:grid-cols-4 px-8 py-14 relative">
-        {stats.map((s, i) => (
-          <div
-            key={i}
-            className={`px-7 ${i % 2 === 1 ? "border-l md:border-l" : ""} ${i >= 2 ? "md:border-l border-l md:pt-0 pt-8" : ""} ${i < 2 ? "md:pb-0 pb-8" : ""}`}
-            style={{ borderColor: DARK_RULE_STRONG }}
-          >
-            <p className="font-mono font-bold tabular-nums tracking-[-0.02em] text-[36px] leading-none bg-gradient-to-r from-[#A5B4FC] to-[#3B82F6] bg-clip-text text-transparent">
-              {s.n}
-            </p>
-            <p className="mt-3 text-[12px] font-mono uppercase tracking-[0.18em] text-white/55">
-              {s.l}
-            </p>
-            {s.score && (
-              <div className="mt-4 inline-flex flex-col gap-1">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="font-mono tabular-nums text-[11px] text-white/85">
-                    {s.score}
-                  </span>
-                  <span className="text-[9px] font-mono uppercase tracking-[0.18em] text-white/40">
-                    avg
-                  </span>
-                </div>
-                <span
-                  aria-hidden
-                  className="block h-[3px] w-20 bg-white/10 relative overflow-hidden"
-                >
-                  <span className="absolute inset-y-0 left-0 w-[84%] bg-gradient-to-r from-[#3B82F6] to-[#A5B4FC]" />
-                </span>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-// -----------------------------------------------------------------------------
-// Problem — Without / With as hairline-divided columns (no cards)
-// -----------------------------------------------------------------------------
-
-function Problem() {
-  const without = [
-    "Deck opened at 11pm, scanned in 8 minutes",
-    "\"Good team — I think?\" scribbled in a notebook",
-    "Passed on a deal last March, can't remember why",
-    "Every partner screens slightly differently",
-    "No memory, no comparability, no defensible verdict",
-  ]
-  const withSam = [
-    "From scribbled notes → a structured, searchable memo",
-    "From \"good team — I think?\" → evidence-backed verdicts",
-    "From a 10-minute screen → a defensible decision record",
-    "From inconsistent judgement → memos your partners can compare",
-    "From lost context → ask any deal \"why did we pass?\" six months later",
-  ]
-  return (
-    <section
-      className="border-b bg-gradient-to-b from-white via-[#F8F8F9] to-[#F8F8F9]"
-      style={{ borderColor: RULE_STRONG }}
-    >
-      <div className="mx-auto max-w-[1180px] px-8 py-24">
-        <GradientHairline />
-        <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-[#1E3A8A]">
-          01 / the problem
-        </p>
-        <h2 className="mt-5 font-bold tracking-[-0.03em] text-[40px] leading-[1.05] max-w-3xl">
-          Pitch decks lie. <span className="text-black/35">Memos don&apos;t.</span>
-        </h2>
-        <p className="mt-5 text-[16px] text-black/60 max-w-[60ch] leading-relaxed">
-          The first-screen workflow today is improvised, inconsistent, and forgotten by
-          Wednesday. Sam replaces it with a structured artefact you can compare, search,
-          and defend.
-        </p>
-
-        <div className="mt-14 grid md:grid-cols-2 gap-px bg-[rgba(10,14,20,0.10)]">
-          <div className="bg-[#F8F8F9] p-8">
-            <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-black/45 mb-5">
-              Without Sam
-            </p>
-            <ul>
-              {without.map((line) => (
-                <li
-                  key={line}
-                  className="border-b py-3 text-[14.5px] leading-[1.55] text-black/55 flex items-start gap-3 first:border-t"
-                  style={{ borderColor: RULE }}
-                >
-                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/30 pt-1 shrink-0 w-5">
-                    ✕
-                  </span>
-                  <span>{line}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="bg-[#F8F8F9] p-8">
-            <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-[#3B82F6] mb-5">
-              With Sam
-            </p>
-            <ul>
-              {withSam.map((line) => (
-                <li
-                  key={line}
-                  className="border-b py-3 text-[14.5px] leading-[1.55] text-black/85 flex items-start gap-3 first:border-t"
-                  style={{ borderColor: RULE }}
-                >
-                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#3B82F6] pt-1 shrink-0 w-5">
-                    →
-                  </span>
-                  <span>{line}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// -----------------------------------------------------------------------------
-// Framework — 4-step pipeline, hairline rows
-// -----------------------------------------------------------------------------
-
-function Framework() {
-  const steps = [
-    {
-      n: "01",
-      title: "Upload a deck",
-      body: "Drag in a PDF. Or forward to your sam intake address. Auto-extracts company name, stage, sector.",
-      // Slightly taller card — extra detail line for asymmetric rhythm.
-      detail: "Works with any deck format. No template required.",
-    },
-    {
-      n: "02",
-      title: "Sam reads it for you",
-      body: "Five domains analysed in parallel. Team via LinkedIn. Market via TAM/SAM/SOM validation. Finance via valuation triangulation.",
-      detail: null,
-    },
-    {
-      n: "03",
-      title: "Compare against your fund",
-      body: "Drop a 1-pager mandate doc. Sam scores fund-fit against your thesis, stage, sector, geography, and stated restrictions.",
-      detail: "Mandate is reused across every future deck.",
-    },
-    {
-      n: "04",
-      title: "Decide and archive",
-      body: "Twelve minutes from deck to verdict. The memo is the artefact — searchable, citable, comparable, exportable to Word or PDF.",
-      detail: null,
-    },
-  ]
-  return (
-    <section
-      className="border-b bg-gradient-to-b from-[#F8F8F9] to-[#F0EFF0]"
-      style={{ borderColor: RULE_STRONG }}
-    >
-      <div className="mx-auto max-w-[1180px] px-8 py-24">
-        <GradientHairline />
-        {/* Anchor ribbon — short gradient bar above the eyebrow so the section
-            opens with a stronger visual mark than the global hairline alone. */}
-        <div
-          aria-hidden
-          className="h-1 w-24 bg-gradient-to-r from-[#1E3A8A] via-[#3B82F6] to-[#A5B4FC]"
-        />
-        <p className="mt-5 text-[10px] font-mono uppercase tracking-[0.22em] text-[#1E3A8A]">
-          02 / the framework
-        </p>
-        <h2 className="mt-5 font-bold tracking-[-0.03em] text-[44px] md:text-[56px] leading-[1.02] max-w-3xl">
-          Same{" "}
-          <span className="bg-gradient-to-r from-[#1E3A8A] via-[#3B82F6] to-[#A5B4FC] bg-clip-text text-transparent">
-            five domains
-          </span>
-          . <span className="text-black/35">Every deck.</span>
-        </h2>
-        <p className="mt-5 text-[16px] leading-[1.55] text-black/60 max-w-[58ch]">
-          Each deck moves through the same five evaluation domains, in
-          parallel, with consistent scoring.
-        </p>
-
-        {/* Horizontal 4-step pipeline — large outlined gradient numerals as
-            anchors, gradient connector lines between cards on lg, vertical
-            connectors on mobile. Cards 1 + 3 carry an extra detail line so
-            the row reads as composed, not stamped from a 4-up template.
-            Each card has 4 size-2 ink corner brackets for an
-            engineering-blueprint feel. */}
-        <div className="mt-14 grid gap-3 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] lg:gap-0 lg:items-stretch">
-          {steps.map((s, i) => (
-            <Fragment key={s.n}>
-              <div
-                className="relative ring-1 bg-white px-7 pt-7 pb-8 flex flex-col"
-                style={{ borderColor: RULE, borderRadius: 0 }}
-              >
-                {/* Top-edge gradient hairline — feature ribbon over each step */}
-                <div
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-[#1E3A8A] via-[#3B82F6] to-[#A5B4FC]"
-                />
-                {/* Four ink corner brackets — engineering-blueprint feel */}
-                <span
-                  aria-hidden
-                  className="absolute top-0 left-0 size-2 bg-[#0A0E14]"
-                />
-                <span
-                  aria-hidden
-                  className="absolute top-0 right-0 size-2 bg-[#0A0E14]"
-                />
-                <span
-                  aria-hidden
-                  className="absolute bottom-0 left-0 size-2 bg-[#0A0E14]"
-                />
-                <span
-                  aria-hidden
-                  className="absolute bottom-0 right-0 size-2 bg-[#0A0E14]"
-                />
-                {/* Big outlined gradient numeral — the visual anchor */}
-                <p
-                  className="font-mono tabular-nums tracking-[-0.04em] text-[64px] leading-none bg-gradient-to-br from-[#1E3A8A] via-[#3B82F6] to-[#A5B4FC] bg-clip-text text-transparent"
-                  style={{
-                    WebkitTextStroke: "1px rgba(30,58,138,0.45)",
-                  }}
-                >
-                  {s.n}
-                </p>
-                <h3 className="mt-5 font-semibold tracking-[-0.02em] text-[18px]">
-                  {s.title}
-                </h3>
-                <p className="mt-3 text-[14px] leading-[1.55] text-black/65">
-                  {s.body}
-                </p>
-                {s.detail ? (
-                  <p className="mt-3 text-[13px] leading-[1.55] text-black/45">
-                    {s.detail}
-                  </p>
-                ) : null}
-              </div>
-              {/* Connector — horizontal on lg, vertical on mobile/tablet.
-                  Hidden after the last card. */}
-              {i < steps.length - 1 ? (
-                <div
-                  aria-hidden
-                  className="hidden lg:flex items-center justify-center self-center w-8"
-                >
-                  <div className="h-px w-full bg-gradient-to-r from-[#1E3A8A] via-[#3B82F6] to-[#A5B4FC]" />
-                </div>
-              ) : null}
-              {i < steps.length - 1 ? (
-                <div
-                  aria-hidden
-                  className="lg:hidden flex justify-center py-1"
-                >
-                  <div className="w-px h-6 bg-gradient-to-b from-[#1E3A8A] via-[#3B82F6] to-[#A5B4FC]" />
-                </div>
-              ) : null}
-            </Fragment>
           ))}
         </div>
       </div>
@@ -566,588 +437,745 @@ function Framework() {
   )
 }
 
-// -----------------------------------------------------------------------------
-// Position statement — the "Sam is not a database" line, promoted
-// -----------------------------------------------------------------------------
-
-function Position() {
+// =====================================================================
+// big stat strip
+// =====================================================================
+function BigStatStrip() {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: "0px 0px -20% 0px" })
+  const stats = [
+    { display: "10×", label: "Faster first-pass screening" },
+    { display: "8.2/10", label: "Average rating" },
+    { display: "4.0/5", label: "Verdict accuracy" },
+  ]
   return (
     <section
-      className="border-b relative overflow-hidden"
+      ref={ref}
+      className="relative overflow-hidden"
+      style={{ background: ACCENT, color: "#F7F7F2" }}
+    >
+      <div className="mx-auto max-w-[1200px] px-6 py-20 md:py-24">
+        <h2 className="font-bold tracking-[-0.025em] leading-[1.02] max-w-3xl"
+            style={{ fontSize: "clamp(40px, 5.4vw, 72px)" }}>
+          The numbers from the funds
+          <br />
+          <span className="font-serif italic font-normal" style={{ color: ACCENT_LIME }}>
+            already running on Sam.
+          </span>
+        </h2>
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-px"
+             style={{ background: "rgba(255,255,255,0.16)" }}>
+          {stats.map((s, i) => (
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, y: 16 }}
+              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0 }}
+              transition={{ duration: 0.6, ease: EASE, delay: 0.08 * i }}
+              className="px-6 py-10 md:py-12"
+              style={{ background: ACCENT }}
+            >
+              <p className="font-bold tabular-nums tracking-[-0.03em]"
+                 style={{ fontSize: "clamp(56px, 7vw, 104px)", color: ACCENT_LIME, lineHeight: 0.95 }}>
+                {s.display}
+              </p>
+              <p className="mt-3 text-[13px] font-mono uppercase tracking-widest opacity-75">
+                {s.label}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// =====================================================================
+// bento grid
+// =====================================================================
+function BentoGrid() {
+  return (
+    <section className="py-24 md:py-28">
+      <div className="mx-auto max-w-[1200px] px-6">
+        <div className="max-w-2xl mb-12">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/55">
+            What you get
+          </p>
+          <h2 className="mt-3 font-bold tracking-[-0.025em] leading-[1.05]"
+              style={{ fontSize: "clamp(40px, 5vw, 64px)", color: INK }}>
+            Everything in the memo,
+            <br />
+            <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
+              one place.
+            </span>
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-6 auto-rows-[180px] gap-3">
+          <BentoTile className="md:col-span-3 md:row-span-2" eyebrow="Team" title="Founders, scored." icon={Users} accent>
+            <FounderRows />
+          </BentoTile>
+          <BentoTile className="md:col-span-3" eyebrow="Market" title="TAM / SAM / SOM" icon={Target}>
+            <MarketBars />
+          </BentoTile>
+          <BentoTile className="md:col-span-2" eyebrow="Product" title="Moat audit" icon={ShieldCheck}>
+            <MoatList />
+          </BentoTile>
+          <BentoTile className="md:col-span-1" eyebrow="Traction" title="MoM" icon={TrendingUp} dense>
+            <Sparkline />
+          </BentoTile>
+          <BentoTile className="md:col-span-3 md:row-span-2" eyebrow="Fund Fit" title="Scored against your mandate." icon={ScanLine} accent>
+            <FundFitMini />
+          </BentoTile>
+          <BentoTile className="md:col-span-3" eyebrow="Sources" title="Citations on every claim." icon={FileText}>
+            <SourcePills />
+          </BentoTile>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function BentoTile({
+  className = "",
+  eyebrow,
+  title,
+  icon: Icon,
+  children,
+  accent,
+  dense,
+}: {
+  className?: string
+  eyebrow: string
+  title: string
+  icon: React.ComponentType<{ className?: string }>
+  children?: React.ReactNode
+  accent?: boolean
+  dense?: boolean
+}) {
+  return (
+    <motion.div
+      whileHover={{ y: -2 }}
+      transition={{ duration: 0.3, ease: EASE }}
+      className={`group relative overflow-hidden rounded-2xl p-5 md:p-6 border ${className}`}
       style={{
-        background: DARK_BG,
-        color: "#F8F8F9",
-        borderColor: DARK_RULE_STRONG,
+        background: accent ? "linear-gradient(135deg, #FFFFFF 0%, #F0FAF4 100%)" : "#FFFFFF",
+        borderColor: RULE,
       }}
     >
-      {/* Hairline grid backdrop — slightly stronger here so the position
-          statement reads as the page's "manifesto" beat. */}
+      <div className="flex items-start justify-between">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-[#0A2E22]/55">
+          {eyebrow}
+        </p>
+        <Icon className="h-4 w-4 text-[#0A2E22]/40 group-hover:text-[#0A2E22] transition" />
+      </div>
+      <p className={`mt-2 font-bold tracking-tight ${dense ? "text-[15px]" : "text-[18px] md:text-[22px]"}`}>
+        {title}
+      </p>
+      {children && <div className="mt-4">{children}</div>}
+    </motion.div>
+  )
+}
+
+function FounderRows() {
+  const founders = [
+    { name: "Jordan A.", role: "CEO", score: 92 },
+    { name: "Marie K.", role: "CTO", score: 84 },
+    { name: "Tomás R.", role: "Head of Growth", score: 76 },
+  ]
+  return (
+    <div className="space-y-2.5">
+      {founders.map((f) => (
+        <div key={f.name} className="flex items-center gap-3 text-[12.5px]">
+          <span
+            className="grid place-items-center h-8 w-8 rounded-full font-bold text-[12px] text-white"
+            style={{ background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_HI})` }}
+          >
+            {f.name[0]}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold truncate">{f.name}</p>
+            <p className="text-[10.5px] font-mono uppercase tracking-widest text-[#0A2E22]/55">
+              {f.role}
+            </p>
+          </div>
+          <span className="font-bold tabular-nums" style={{ color: ACCENT }}>
+            {f.score}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function MarketBars() {
+  const data = [
+    { l: "TAM", v: "€6.2B", w: 100 },
+    { l: "SAM", v: "€1.4B", w: 60 },
+    { l: "SOM", v: "€180M", w: 22 },
+  ]
+  return (
+    <div className="space-y-2">
+      {data.map((d) => (
+        <div key={d.l} className="flex items-center gap-3 text-[12px]">
+          <span className="w-9 font-mono uppercase text-[10px] tracking-widest text-[#0A2E22]/55">
+            {d.l}
+          </span>
+          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "rgba(10,46,34,0.06)" }}>
+            <motion.div
+              initial={{ width: 0 }}
+              whileInView={{ width: `${d.w}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: EASE }}
+              className="h-full rounded-full"
+              style={{ background: `linear-gradient(90deg, ${ACCENT}, ${ACCENT_HI})` }}
+            />
+          </div>
+          <span className="font-mono font-semibold tabular-nums w-14 text-right">{d.v}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function MoatList() {
+  const items = [
+    { l: "Workflow lock-in", on: true },
+    { l: "Network effects", on: false },
+    { l: "Data moat", on: true },
+  ]
+  return (
+    <ul className="space-y-2 text-[12.5px]">
+      {items.map((i) => (
+        <li key={i.l} className="flex items-center gap-2">
+          {i.on ? (
+            <span className="grid place-items-center h-4 w-4 rounded-full" style={{ background: ACCENT_HI }}>
+              <Check className="h-2.5 w-2.5 text-white stroke-[3]" />
+            </span>
+          ) : (
+            <span className="grid place-items-center h-4 w-4 rounded-full" style={{ background: "rgba(10,46,34,0.06)" }}>
+              <X className="h-2.5 w-2.5 text-[#0A2E22]/40 stroke-[2.5]" />
+            </span>
+          )}
+          <span className={i.on ? "" : "text-[#0A2E22]/40"}>{i.l}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function Sparkline() {
+  const points = [10, 18, 14, 22, 28, 24, 36, 42, 48, 56]
+  const max = Math.max(...points)
+  const path = points
+    .map((p, i) => `${(i / (points.length - 1)) * 100},${100 - (p / max) * 100}`)
+    .join(" L ")
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-12">
+      <motion.path
+        d={`M ${path}`}
+        fill="none"
+        stroke={ACCENT_HI}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0 }}
+        whileInView={{ pathLength: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1.4, ease: EASE }}
+      />
+    </svg>
+  )
+}
+
+function FundFitMini() {
+  const rows = [
+    { l: "Sector: B2B SaaS", on: true },
+    { l: "Stage: Seed–Series A", on: true },
+    { l: "Geography: EU", on: true },
+    { l: "Ticket: €500K–€2M", on: true },
+    { l: "Solo founder allowed", on: false },
+  ]
+  return (
+    <div className="space-y-2.5">
+      {rows.map((r) => (
+        <div key={r.l} className="flex items-center justify-between text-[12.5px]">
+          <span className={r.on ? "" : "text-[#0A2E22]/40 line-through"}>{r.l}</span>
+          {r.on ? (
+            <Check className="h-4 w-4" style={{ color: ACCENT_HI }} />
+          ) : (
+            <X className="h-4 w-4 text-[#0A2E22]/40" />
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function SourcePills() {
+  const pills = [
+    "Pitch Deck",
+    "Crunchbase",
+    "LinkedIn",
+    "Companies House",
+    "Founder website",
+    "McKinsey 2024",
+  ]
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {pills.map((p) => (
+        <span
+          key={p}
+          className="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-semibold border"
+          style={{ borderColor: RULE, background: "rgba(10,46,34,0.03)" }}
+        >
+          {p}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+// =====================================================================
+// dark AI banner — full-bleed near-black with animated agent stream
+// =====================================================================
+function DarkAIBanner() {
+  return (
+    <section className="relative overflow-hidden" style={{ background: NEAR_BLACK, color: "#F7F7F2" }}>
+      {/* glow */}
       <div
         aria-hidden
         className="absolute inset-0 -z-0"
         style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
+          background: `radial-gradient(ellipse 60% 40% at 30% 30%, rgba(0,168,107,0.18), transparent 70%)`,
         }}
       />
-      {/* Diagonal green wash to hint at the brand without zoning everything */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.18),transparent_60%)]"
-      />
-      <div className="mx-auto max-w-[1180px] px-8 py-28 relative">
-        <GradientHairline tone="dark" />
-        <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-[#A5B4FC]">
-          03 / where sam sits
-        </p>
-        <p className="mt-7 font-bold tracking-[-0.025em] text-[32px] md:text-[42px] leading-[1.1] max-w-[24ch]">
-          Sam is not a startup database.
-          <br />
-          Not a CRM.
-          <br />
-          Not a data platform.
-        </p>
-        <p className="mt-7 font-bold tracking-[-0.025em] text-[32px] md:text-[42px] leading-[1.1] max-w-[24ch]">
-          <span className="text-white/40">It&apos;s the </span>
-          <span className="bg-gradient-to-r from-[#A5B4FC] via-[#3B82F6] to-[#93C5FD] bg-clip-text text-transparent">
-            evaluation layer
-          </span>
-          <span className="text-white/40"> between the deck and the decision.</span>
-        </p>
-
-        {/* Corner-bracket SVG flourish — frames the manifesto block from the
-            bottom-right with thin strokes. Single colour, no fills. */}
-        <svg
-          aria-hidden
-          viewBox="0 0 64 64"
-          className="absolute bottom-10 right-8 h-10 w-10 text-white/25 hidden md:block"
-        >
-          <path
-            d="M44 4 L60 4 L60 20 M60 44 L60 60 L44 60"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-          />
-        </svg>
-      </div>
-    </section>
-  )
-}
-
-// -----------------------------------------------------------------------------
-// Audiences — 3 archetypes, list-style
-// -----------------------------------------------------------------------------
-
-function Audiences() {
-  const list = [
-    {
-      label: "For angels",
-      best: "Best for solo deal flow",
-      stat: "50+ decks / month",
-      body: "You see fifty decks a month and meet with five. Sam gives you a structured second opinion before the first call. Six months later, you can still explain why you passed.",
-      href: "/for-angels",
-      cta: "See the angel workflow",
-    },
-    {
-      label: "For syndicates & scouts",
-      best: "Best for shared notes",
-      stat: "3–10 partners aligned",
-      body: "Your deal notes live across three tools and two heads. Sam produces a consistent memo per deal that your syndicate partners can actually compare and reference.",
-      href: "/how-it-works",
-      cta: "See the pro workflow",
-    },
-    {
-      label: "For VC funds",
-      best: "Best for institutional teams",
-      stat: "5+ analysts · shared memos",
-      body: "First-screening capacity is the bottleneck in every fund. Sam handles the triage layer so your analysts spend their time on the deals that matter, not on the ones they'll pass.",
-      href: "/for-vc-funds",
-      cta: "See the fund workflow",
-    },
-  ]
-  return (
-    <section
-      className="border-b bg-gradient-to-b from-white via-[#F8F8F9] to-[#F8F8F9]"
-      style={{ borderColor: RULE_STRONG }}
-    >
-      <div className="mx-auto max-w-[1180px] px-8 py-24">
-        <GradientHairline />
-        <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-[#1E3A8A]">
-          04 / who it&apos;s for
-        </p>
-        <h2 className="mt-5 font-bold tracking-[-0.03em] text-[40px] leading-[1.05] max-w-3xl">
-          Different roles. <span className="text-black/35">Same framework.</span>
-        </h2>
-
-        {/* Three archetype cards — staggered gradient directions create a
-            composed grid (not three stamped tiles). Each card carries its
-            own gradient hairline accent across the top and a clip-text
-            gradient label so the page has rhythm without extra chrome. */}
-        <div className="mt-14 grid md:grid-cols-3 gap-3">
-          {list.map((a, i) => {
-            // Stagger gradient direction + indigo intensity per card.
-            const washes = [
-              "bg-gradient-to-br from-white via-[#F8F8F9] to-[#EEF2FF]",
-              "bg-gradient-to-bl from-white via-[#F4F6FF] to-[#E0E7FF]",
-              "bg-gradient-to-tr from-white via-[#F8F7FF] to-[#EDE9FE]",
-            ]
-            return (
-              <article
-                key={a.label}
-                className={`relative ring-1 flex flex-col ${washes[i]}`}
-                style={{ borderColor: RULE_STRONG, borderRadius: 0 }}
-              >
-                {/* Top-edge gradient hairline — feature ribbon */}
-                <div
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-[#1E3A8A] via-[#3B82F6] to-[#A5B4FC]"
-                />
-                <div className="flex flex-col flex-1 px-7 py-8">
-                  <p className="text-[10px] font-mono uppercase tracking-[0.22em] bg-gradient-to-r from-[#1E3A8A] to-[#3B82F6] bg-clip-text text-transparent">
-                    {a.label}
-                  </p>
-                  <p className="mt-1.5 text-[12px] font-mono uppercase tracking-[0.15em] text-black/65">
-                    {a.best}
-                  </p>
-                  <p className="mt-6 text-[15px] leading-[1.6] text-black/70 flex-1">
-                    {a.body}
-                  </p>
-                  <div className="mt-7 pt-5 border-t flex items-center justify-between" style={{ borderColor: RULE }}>
-                    <p className="font-mono text-[12px] text-black">{a.stat}</p>
-                    <Link
-                      href={a.href}
-                      className="inline-flex items-center gap-1.5 text-[13px] font-medium hover:underline underline-offset-4 decoration-black/40"
-                    >
-                      {a.cta}
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            )
-          })}
+      <div className="relative mx-auto max-w-[1200px] px-6 py-24 md:py-32 grid lg:grid-cols-[1.1fr_1fr] gap-16 items-center">
+        <div>
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em]" style={{ color: ACCENT_LIME }}>
+            Built for the AI era of venture
+          </p>
+          <h2 className="mt-4 font-bold tracking-[-0.03em] leading-[0.98]"
+              style={{ fontSize: "clamp(40px, 6.4vw, 88px)" }}>
+            An analyst that
+            <br />
+            <span className="font-serif italic font-normal" style={{ color: ACCENT_LIME }}>
+              never gets tired.
+            </span>
+          </h2>
+          <p className="mt-7 max-w-xl text-[16px] leading-[1.6] text-white/65">
+            SAM reads the deck, fact-checks the founders, validates the market, and drafts the
+            memo. You spend your judgment where it matters — the partner call.
+          </p>
         </div>
+        <AgentStream />
       </div>
     </section>
   )
 }
 
-// -----------------------------------------------------------------------------
-// Trust — EU pillars, hairline list
-// -----------------------------------------------------------------------------
-
-function Trust() {
-  const pillars = [
-    {
-      label: "Designed for EU processing",
-      desc: "Sam is built around EU-based processing and storage. GDPR is treated as an architectural constraint, not a compliance checkbox.",
-    },
-    {
-      label: "GDPR by design",
-      desc: "Data minimisation, retention rules, and processing scopes are baked into the framework, not bolted on afterwards.",
-    },
-    {
-      label: "No model training on your decks",
-      desc: "Your submitted decks are never used to train any model — ours or anyone else's.",
-    },
-    {
-      label: "Deletion on your schedule",
-      desc: "You set the retention window. When it ends, decks and derived artefacts are removed from storage.",
-    },
+function AgentStream() {
+  const events = [
+    { t: "00:02", msg: "Parsing pitch deck (24 pages)…", tag: "intake" },
+    { t: "00:14", msg: "Founders extracted · 3 LinkedIn matches", tag: "team" },
+    { t: "00:31", msg: "Validating TAM claim against McKinsey 2024…", tag: "market" },
+    { t: "00:47", msg: "Risk flagged: solo founder, no CTO", tag: "team" },
+    { t: "01:02", msg: "Moat audit complete · workflow lock-in plausible", tag: "product" },
+    { t: "01:18", msg: "Writing executive summary…", tag: "summary" },
+    { t: "01:31", msg: "Verdict: Strong Buy · 84/100", tag: "done" },
   ]
-  return (
-    <section
-      className="border-b bg-gradient-to-b from-[#F8F8F9] to-[#F0EFF0]"
-      style={{ borderColor: RULE_STRONG }}
-    >
-      <div className="mx-auto max-w-[1180px] px-8 py-24">
-        {/* Feature ribbon — slightly heavier than the standard hairline so
-            this beat reads as the page's "trust" anchor. */}
-        <div className="h-1 w-24 bg-gradient-to-r from-[#1E3A8A] via-[#3B82F6] to-[#A5B4FC] mb-5" />
-        <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-[#1E3A8A]">
-          05 / data sovereignty
-        </p>
-        <h2 className="mt-5 font-bold tracking-[-0.03em] text-[40px] leading-[1.05] max-w-3xl">
-          European stack. <span className="text-black/35">No exceptions.</span>
-        </h2>
+  const [visible, setVisible] = useState(0)
+  useEffect(() => {
+    if (visible >= events.length) return
+    const t = setTimeout(() => setVisible((v) => v + 1), 700)
+    return () => clearTimeout(t)
+  }, [visible, events.length])
 
-        {/* Four pillars — 2x2 grid of staggered gradient-wash cards.
-            Each carries a top-edge gradient hairline; the wash direction
-            alternates so the grid feels composed, not stamped. */}
-        <div className="mt-14 grid md:grid-cols-2 gap-3">
-          {pillars.map((p, i) => {
-            const washes = [
-              "bg-gradient-to-br from-white via-[#F8F8F9] to-[#EEF2FF]",
-              "bg-gradient-to-bl from-white via-[#F4F6FF] to-[#E0E7FF]",
-              "bg-gradient-to-tr from-white via-[#F8F7FF] to-[#EDE9FE]",
-              "bg-gradient-to-tl from-white via-[#F4F6FF] to-[#E0E7FF]",
-            ]
-            return (
-              <div
-                key={p.label}
-                className={`relative ring-1 ${washes[i]}`}
-                style={{ borderColor: RULE_STRONG, borderRadius: 0 }}
-              >
-                <div
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-[#1E3A8A] via-[#3B82F6] to-[#A5B4FC]"
-                />
-                <div className="px-7 py-8">
-                  <p className="font-semibold tracking-[-0.01em] text-[15px] bg-gradient-to-r from-[#1E3A8A] to-[#3B82F6] bg-clip-text text-transparent">
-                    {p.label}
-                  </p>
-                  <p className="mt-3 text-[14.5px] leading-[1.6] text-black/65 max-w-[60ch]">
-                    {p.desc}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+  return (
+    <div className="rounded-2xl border p-5 md:p-6 backdrop-blur"
+         style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }}>
+      <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-white/55">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full" style={{ background: ACCENT_HI }} />
+          <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: ACCENT_HI }} />
+        </span>
+        Agent · live
       </div>
-    </section>
+      <div className="mt-4 space-y-2 font-mono text-[12.5px]">
+        {events.slice(0, visible).map((e, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, ease: EASE }}
+            className="flex items-baseline gap-3"
+          >
+            <span className="text-white/40 tabular-nums">{e.t}</span>
+            <span className="text-[10px] uppercase tracking-widest px-1.5 py-0.5 rounded"
+                  style={{ background: "rgba(212,255,107,0.12)", color: ACCENT_LIME }}>
+              {e.tag}
+            </span>
+            <span className="text-white/85 truncate">{e.msg}</span>
+          </motion.div>
+        ))}
+        {visible < events.length && (
+          <div className="text-white/40 flex items-center gap-2">
+            <span className="inline-block h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: ACCENT_HI }} />
+            <span>thinking…</span>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
-// -----------------------------------------------------------------------------
-// Pricing — terminal-style 3 tier picker
-// -----------------------------------------------------------------------------
-
-function Pricing() {
-  const tiers = [
-    {
-      key: "starter",
-      name: "Angel",
-      price: "149",
-      memos: "10 / month",
-      seats: "1 seat",
-      desc: "For individual investors who want a structured second opinion on every deck.",
-      cta: "Start free trial",
-      href: "/register?tier=starter",
-      everything: false,
-    },
-    {
-      key: "professional",
-      name: "Pro",
-      price: "299",
-      memos: "30 / month",
-      seats: "3 seats",
-      desc: "For syndicates, scouts, and solo GPs running a meaningful pipeline.",
-      cta: "Start free trial",
-      href: "/register?tier=professional",
-      everything: false,
-      featured: true,
-    },
-    {
-      key: "fund",
-      name: "Fund",
-      price: "Custom",
-      memos: "Unlimited",
-      seats: "Unlimited",
-      desc: "For fund teams running first-screening at scale, with shared memory.",
-      cta: "Book a walkthrough",
-      href: "mailto:hello@sam.ai?subject=SAM%20Fund%20-%20Walkthrough%20request",
-      everything: true,
-    },
-  ] as const
-
-  const FEATURES_ALL = [
-    "Structured memo (verdict + top risks + questions)",
-    "Domain scoring",
-    "Source review",
-    "Stage-aware scoring",
-    "First-call diligence questions",
-    "Missing info checklist",
-    "Export (PDF + Word)",
-    "Deal archive",
-    "Fund profile (thesis, sector, stage)",
-  ]
-  const FEATURES_FUND_ONLY = [
-    "Fund fit scoring",
-    "Deal comparison (side by side)",
-    "Shared workspace",
-    "Shared memo library",
-    "2-factor authentication",
-    "Tailored knowledgebase",
-    "CRM connections",
-    "Dedicated support",
-  ]
-
+// =====================================================================
+// alternating feature slabs
+// =====================================================================
+function FeatureSlab({
+  eyebrow,
+  title,
+  body,
+  bullets,
+  screenshot,
+  flip,
+}: {
+  eyebrow: string
+  title: React.ReactNode
+  body: string
+  bullets: string[]
+  screenshot: React.ReactNode
+  flip: boolean
+}) {
   return (
-    <section
-      id="pricing"
-      className="border-b bg-gradient-to-b from-white via-[#F8F8F9] to-[#F0EFF0]"
-      style={{ borderColor: RULE_STRONG }}
-    >
-      <div className="mx-auto max-w-[1180px] px-8 py-24">
-        <GradientHairline />
-        <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-[#1E3A8A]">
-          06 / pricing
-        </p>
-        <h2 className="mt-5 font-bold tracking-[-0.03em] text-[40px] leading-[1.05] max-w-3xl">
-          Three tiers. <span className="text-black/35">Cancel anytime.</span>
-        </h2>
-
-        <div className="mt-14 grid md:grid-cols-3 ring-1 relative" style={{ borderColor: RULE_STRONG }}>
-          {tiers.map((t, i) => {
-            const featured = "featured" in t && t.featured
-            return (
-            <div
-              key={t.key}
-              className={`relative p-7 md:p-8 flex flex-col bg-gradient-to-b from-white to-[#F4F3F4] ${
-                i > 0 ? "border-t md:border-t-0 md:border-l" : ""
-              } ${featured ? "ring-2 ring-[#1E3A8A] z-10 -my-px" : ""}`}
-              style={{ borderColor: RULE_STRONG }}
+    <section className="py-20 md:py-28 border-t" style={{ borderColor: RULE }}>
+      <div className="mx-auto max-w-[1200px] px-6">
+        <div className={`grid lg:grid-cols-2 gap-12 lg:gap-20 items-center ${flip ? "lg:[&>*:first-child]:order-2" : ""}`}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+            transition={{ duration: 0.6, ease: EASE }}
+          >
+            <p className="text-[11px] font-mono uppercase tracking-[0.18em]" style={{ color: ACCENT }}>
+              {eyebrow}
+            </p>
+            <h3 className="mt-4 font-bold tracking-[-0.025em] leading-[1.05]"
+                style={{ fontSize: "clamp(34px, 4.8vw, 60px)", color: INK }}>
+              {title}
+            </h3>
+            <p className="mt-6 text-[16px] leading-[1.65] text-[#0A2E22]/70 max-w-xl">{body}</p>
+            <ul className="mt-7 space-y-2.5">
+              {bullets.map((b) => (
+                <li key={b} className="flex items-center gap-2.5 text-[14px]">
+                  <span className="grid place-items-center h-4 w-4 rounded-full" style={{ background: ACCENT_HI }}>
+                    <Check className="h-2.5 w-2.5 text-white stroke-[3]" />
+                  </span>
+                  {b}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/sample"
+              className="mt-8 inline-flex items-center gap-1.5 text-[14px] font-semibold border-b pb-0.5 transition"
+              style={{ color: ACCENT, borderColor: ACCENT }}
             >
-              {featured && (
-                <span
-                  className="absolute -top-3 left-7 px-2 py-0.5 text-[9px] font-mono uppercase tracking-[0.22em] bg-[#1E3A8A] text-white z-10"
-                  style={{ borderRadius: 0 }}
-                >
-                  Most popular
-                </span>
-              )}
-              <p className="relative text-[10px] font-mono uppercase tracking-[0.22em] text-[#1E3A8A]">
-                Tier 0{i + 1}
-              </p>
-              <h3 className="mt-2 font-bold tracking-[-0.02em] text-[24px]">{t.name}</h3>
-              <p className="mt-2 text-[13px] text-black/55 leading-[1.55] min-h-[40px]">
-                {t.desc}
-              </p>
-
-              <div className="mt-6 flex items-baseline gap-1">
-                {t.price === "Custom" ? (
-                  <span className="font-bold tracking-[-0.03em] text-[44px] leading-none">
-                    Custom
-                  </span>
-                ) : (
-                  <>
-                    <span className="text-[15px] text-black/40">€</span>
-                    <span className="font-mono font-bold tabular-nums tracking-[-0.03em] text-[52px] leading-none">
-                      {t.price}
-                    </span>
-                    <span className="text-[13px] text-black/40 ml-1">/mo</span>
-                  </>
-                )}
-              </div>
-
-              <div
-                className="mt-5 flex flex-col gap-1 px-3 py-2.5 ring-1"
-                style={{ borderColor: RULE }}
-              >
-                <div className="flex items-center justify-between text-[12px]">
-                  <span className="font-mono uppercase tracking-[0.18em] text-[10px] text-black/45">
-                    Memos
-                  </span>
-                  <span className="font-semibold">{t.memos}</span>
-                </div>
-                <div className="flex items-center justify-between text-[12px]">
-                  <span className="font-mono uppercase tracking-[0.18em] text-[10px] text-black/45">
-                    Seats
-                  </span>
-                  <span className="font-semibold">{t.seats}</span>
-                </div>
-              </div>
-
-              <Link
-                href={t.href}
-                className={
-                  featured
-                    ? "mt-7 inline-flex items-center justify-center gap-2 px-4 py-3 text-[13px] font-medium bg-[#1E3A8A] hover:bg-[#152D6E] text-white ring-1 ring-transparent transition-colors"
-                    : "mt-7 inline-flex items-center justify-center gap-2 px-4 py-3 text-[13px] font-medium ring-1 hover:bg-black hover:text-white transition-colors"
-                }
-                style={{ borderRadius: 0 }}
-              >
-                {t.cta}
-                <ArrowRight className="h-3 w-3" />
-              </Link>
-
-              <ul className="mt-7 space-y-2 text-[13px]">
-                {FEATURES_ALL.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <Check className="h-3.5 w-3.5 stroke-[2.5] mt-0.5 shrink-0 text-[#3B82F6]" />
-                    <span className="text-black/85">{f}</span>
-                  </li>
-                ))}
-                {FEATURES_FUND_ONLY.map((f) => (
-                  <li
-                    key={f}
-                    className={`flex items-start gap-2 ${t.everything ? "" : "opacity-40"}`}
-                  >
-                    <Check
-                      className={`h-3.5 w-3.5 stroke-[2.5] mt-0.5 shrink-0 ${
-                        t.everything ? "text-[#3B82F6]" : "opacity-30"
-                      }`}
-                    />
-                    <span className={t.everything ? "text-black/85" : "text-black/45"}>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            )
-          })}
+              See it in a real memo
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+            transition={{ duration: 0.7, ease: EASE }}
+          >
+            {screenshot}
+          </motion.div>
         </div>
       </div>
     </section>
   )
 }
 
-// -----------------------------------------------------------------------------
-// FAQ — clean accordion via <details>
-// -----------------------------------------------------------------------------
+function ScreenshotIntake() {
+  return (
+    <div className="rounded-2xl bg-white border p-5 shadow-[0_20px_60px_-20px_rgba(10,46,34,0.20)]"
+         style={{ borderColor: RULE }}>
+      <div className="rounded-xl border-2 border-dashed p-7 text-center"
+           style={{ borderColor: RULE }}>
+        <FileText className="h-6 w-6 mx-auto mb-3" style={{ color: ACCENT }} />
+        <p className="font-bold text-[15px]">Drop your pitch deck</p>
+        <p className="text-[12px] text-[#0A2E22]/55 mt-1">PDF, DOCX, up to 25MB</p>
+      </div>
+      <div className="mt-4 space-y-2 text-[12px] font-mono">
+        {["✓ canaaro_deck.pdf · 24 pages", "✓ Founders extracted (3)", "✓ Stage: Seed · Raising €1.2M"].map((l, i) => (
+          <motion.div
+            key={l}
+            initial={{ opacity: 0, x: -6 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.35, delay: 0.15 * i }}
+            className="text-[#0A2E22]/75"
+          >
+            {l}
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
-function FAQ() {
-  const faqs = [
+function ScreenshotScorecard() {
+  const rows = [
+    { l: "Team", s: 88, v: "Strong" },
+    { l: "Market", s: 79, v: "Strong" },
+    { l: "Product", s: 86, v: "Strong" },
+    { l: "Traction", s: 72, v: "Moderate" },
+    { l: "Finance", s: 81, v: "Strong" },
+  ]
+  return (
+    <div className="rounded-2xl bg-white border p-6 shadow-[0_20px_60px_-20px_rgba(10,46,34,0.20)]"
+         style={{ borderColor: RULE }}>
+      <p className="text-[10px] font-mono uppercase tracking-widest text-[#0A2E22]/55">Scorecard</p>
+      <div className="mt-3 space-y-3">
+        {rows.map((r, i) => (
+          <motion.div
+            key={r.l}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.06 * i }}
+            className="grid grid-cols-[80px_1fr_60px_28px] items-center gap-3 text-[13px]"
+          >
+            <span className="font-mono uppercase tracking-widest text-[10px] text-[#0A2E22]/55">{r.l}</span>
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(10,46,34,0.06)" }}>
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: `linear-gradient(90deg, ${ACCENT}, ${ACCENT_HI})` }}
+                initial={{ width: 0 }}
+                whileInView={{ width: `${r.s}%` }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, ease: EASE, delay: 0.1 * i }}
+              />
+            </div>
+            <span className="text-[11px] font-semibold" style={{ color: ACCENT }}>{r.v}</span>
+            <span className="font-bold tabular-nums text-right">{r.s}</span>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ScreenshotFundFit() {
+  return (
+    <div className="rounded-2xl bg-white border p-6 shadow-[0_20px_60px_-20px_rgba(10,46,34,0.20)]"
+         style={{ borderColor: RULE }}>
+      <div className="flex items-baseline justify-between mb-4">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-[#0A2E22]/55">
+          Fund Fit · canaaro
+        </p>
+        <p className="font-bold text-[16px]" style={{ color: ACCENT }}>4 / 5 match</p>
+      </div>
+      <FundFitMini />
+    </div>
+  )
+}
+
+// =====================================================================
+// quote spotlight
+// =====================================================================
+function QuoteSpotlight() {
+  return (
+    <section className="py-24 md:py-32" style={{ background: ACCENT_LIME }}>
+      <div className="mx-auto max-w-[1100px] px-6">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/65">
+          What investors say
+        </p>
+        <blockquote className="mt-6 font-bold tracking-[-0.025em] leading-[1.08]"
+                    style={{ fontSize: "clamp(30px, 4.4vw, 56px)", color: "#0A2E22" }}>
+          <span className="font-serif italic font-normal opacity-50 mr-2">“</span>
+          I review 40+ decks a month. Sam cuts my first-pass from hours to minutes,
+          and the report gives me <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
+            exactly the right questions
+          </span> before a founder call.
+          <span className="font-serif italic font-normal opacity-50 ml-2">”</span>
+        </blockquote>
+        <p className="mt-8 text-[12px] font-mono uppercase tracking-widest text-[#0A2E22]/65">
+          Partner · Pre-seed fund
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// =====================================================================
+// case study cards
+// =====================================================================
+function CaseStudyRow() {
+  const cards = [
     {
-      q: "How is Sam different from using generic AI to analyse a pitch deck?",
-      a: "Sam applies a fixed five-domain evaluation framework to every deck — the same structure, scoring rubric, and severity classifications every time. Generic AI returns whatever comes out of a prompt, so the output varies, can't be compared across deals, and lacks a defensible methodology. Sam's framework is the product; the model is just the engine behind it.",
+      quote: "I thought it would just recap the deck. It doesn't — it challenges it. Red flags I would have found in week three, Sam flags on the first signal.",
+      role: "Principal · Seed fund",
+      metric: { value: "Week 3 → Day 1", label: "Risk detection" },
     },
     {
-      q: "Is my pitch deck data secure and confidential?",
-      a: "Yes. Sam runs on European servers only. Your deck is processed, analysed, and stored within the EU. No submitted material is used to train any model, and data is deleted on your retention schedule.",
+      quote: "We used to lose deals because internal alignment took too long. Now everyone reads the same memo before we decide. It's changed how we work.",
+      role: "Managing Partner",
+      metric: { value: "1 source", label: "of truth" },
     },
     {
-      q: "What does a Sam investment memo actually include?",
-      a: "Executive summary, overall score and confidence rating, per-domain verdicts across Team, Market, Product, Traction, and Financials, investment thesis, red flags, due diligence questionnaire, and IC-ready next steps. Structured the same way every time.",
-    },
-    {
-      q: "How long does it take to generate a memo?",
-      a: "Analysis runs in the background. You can close the browser — the memo appears in your account when ready, and you'll get an email notification.",
-    },
-    {
-      q: "Can Sam replace a human analyst or associate?",
-      a: "No. Sam handles the repetitive first-screening layer — consistent structure, scoring, red flags — so your analyst can focus on the deals worth deeper work. It is infrastructure, not a substitute for judgment.",
-    },
-    {
-      q: "What stage of startups does Sam work best for?",
-      a: "Pre-seed through Series A. The framework is stage-aware: traction weighs less at pre-seed, more at Series A. Later-stage evaluation is available and benchmarked against public comparables, but pre-seed to Series A is where Sam's framework delivers the most differentiation.",
-    },
-    {
-      q: "Do I need any technical setup to use Sam?",
-      a: "No. Upload a PDF, or forward a deck by email. The memo appears in your account. No CRM integration required, no data warehouse, no IT project.",
-    },
-    {
-      q: "Is Sam suitable for a solo angel investor, or only for funds?",
-      a: "Both. The Angel tier is priced for individual investors handling their own deal flow. The Fund tier adds team accounts, priority processing, and shared memo libraries. Same framework, different workflow.",
-    },
-    {
-      q: "Can I export memos to my CRM, Notion, or Word?",
-      a: "Yes. Memos export as a Word document or PDF, plus a shareable link. CRM-native pushes (Affinity, HubSpot) are on the roadmap.",
-    },
-    {
-      q: "What happens to my pitch deck after the analysis runs?",
-      a: "It stays in your account, encrypted at rest in the EU, until you delete it or it expires under your retention policy. It is never used for model training.",
+      quote: "Sam doesn't replace judgment — it sharpens it. We screen twice as many deals without adding headcount.",
+      role: "Investment Director",
+      metric: { value: "2×", label: "deals screened" },
     },
   ]
   return (
-    <section className="border-b" style={{ borderColor: RULE_STRONG }}>
-      <div className="mx-auto max-w-[1180px] px-8 py-24">
-        <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-[#1E3A8A]">
-          07 / faq
-        </p>
-        <h2 className="mt-5 font-bold tracking-[-0.03em] text-[40px] leading-[1.05] max-w-3xl">
-          The questions <span className="text-black/35">we get most.</span>
-        </h2>
-
-        <div className="mt-14 divide-y ring-1" style={{ borderColor: RULE_STRONG }}>
-          {faqs.map((f) => (
-            <details key={f.q} className="group" style={{ borderColor: RULE_STRONG }}>
-              <summary className="cursor-pointer flex items-start justify-between gap-6 px-8 py-6 list-none hover:bg-black/[0.015] transition-colors">
-                <span className="font-semibold tracking-[-0.01em] text-[16px]">{f.q}</span>
-                <span className="font-mono text-[18px] text-black/45 group-open:rotate-45 transition-transform shrink-0">
-                  +
-                </span>
-              </summary>
-              <div className="px-8 pb-7 text-[14.5px] leading-[1.65] text-black/65 max-w-[68ch]">
-                {f.a}
+    <section className="py-24 md:py-28">
+      <div className="mx-auto max-w-[1200px] px-6">
+        <div className="max-w-2xl mb-10">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/55">Stories</p>
+          <h2 className="mt-3 font-bold tracking-[-0.025em] leading-[1.05]"
+              style={{ fontSize: "clamp(34px, 4.4vw, 56px)" }}>
+            How partners are using Sam.
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {cards.map((c, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.06 * i }}
+              className="rounded-2xl bg-white border p-6 md:p-7 hover:-translate-y-1 transition shadow-sm"
+              style={{ borderColor: RULE }}
+            >
+              <div className="flex items-baseline justify-between gap-4 mb-5">
+                <p className="font-bold tracking-tight"
+                   style={{ fontSize: "clamp(22px, 2.4vw, 30px)", color: ACCENT }}>
+                  {c.metric.value}
+                </p>
+                <p className="text-[10.5px] font-mono uppercase tracking-widest text-[#0A2E22]/55 text-right">
+                  {c.metric.label}
+                </p>
               </div>
-            </details>
+              <p className="text-[14px] leading-[1.55] text-[#0A2E22]/85">{c.quote}</p>
+              <p className="mt-5 pt-5 border-t text-[10.5px] font-mono uppercase tracking-widest text-[#0A2E22]/55"
+                 style={{ borderColor: RULE }}>
+                {c.role}
+              </p>
+            </motion.div>
           ))}
         </div>
-
-        <p className="mt-10 text-[13px] text-black/55">
-          More questions?{" "}
-          <a
-            href="mailto:hello@sam.ai"
-            className="text-black underline underline-offset-4 decoration-black/40 hover:decoration-black"
-          >
-            hello@sam.ai
-          </a>
-        </p>
       </div>
     </section>
   )
 }
 
-// -----------------------------------------------------------------------------
-// Final CTA
-// -----------------------------------------------------------------------------
-
-function FinalCTA() {
+// =====================================================================
+// comparison checklist
+// =====================================================================
+function Comparison() {
+  const rows = [
+    { feat: "Reads pitch decks", sam: true, sheets: false, llm: true },
+    { feat: "Five-domain scorecard with verdict", sam: true, sheets: false, llm: false },
+    { feat: "Citations on every claim", sam: true, sheets: false, llm: false },
+    { feat: "Mandate-aware fund fit", sam: true, sheets: false, llm: false },
+    { feat: "EU-resident, no model training on your decks", sam: true, sheets: true, llm: false },
+    { feat: "Partner-ready memo in five minutes", sam: true, sheets: false, llm: false },
+  ]
   return (
-    <section
-      className="border-b relative overflow-hidden"
-      style={{
-        background: DARK_GRADIENT,
-        color: "#F8F8F9",
-        borderColor: DARK_RULE_STRONG,
-      }}
-    >
-      {/* Hairline grid backdrop — same density as Position for consistency */}
+    <section className="py-24 md:py-28 border-t" style={{ borderColor: RULE }}>
+      <div className="mx-auto max-w-[1100px] px-6">
+        <div className="max-w-2xl mb-10">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/55">
+            Sam vs. the alternatives
+          </p>
+          <h2 className="mt-3 font-bold tracking-[-0.025em] leading-[1.05]"
+              style={{ fontSize: "clamp(34px, 4.4vw, 56px)" }}>
+            Why partners are switching.
+          </h2>
+        </div>
+        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: RULE }}>
+          <div className="grid grid-cols-[1fr_120px_120px_140px] text-[11px] font-mono uppercase tracking-widest"
+               style={{ background: "rgba(10,46,34,0.03)" }}>
+            <div className="px-5 py-3.5 text-[#0A2E22]/55">Capability</div>
+            <div className="px-3 py-3.5 text-center font-bold" style={{ color: ACCENT }}>Sam</div>
+            <div className="px-3 py-3.5 text-center text-[#0A2E22]/55">Spreadsheets</div>
+            <div className="px-3 py-3.5 text-center text-[#0A2E22]/55">Generic LLM</div>
+          </div>
+          {rows.map((r, i) => (
+            <div key={r.feat}
+                 className={`grid grid-cols-[1fr_120px_120px_140px] items-center text-[13.5px] ${i % 2 === 1 ? "bg-white" : ""}`}
+                 style={{ borderTop: `1px solid ${RULE}` }}>
+              <div className="px-5 py-4">{r.feat}</div>
+              <CheckCell on={r.sam} accent />
+              <CheckCell on={r.sheets} />
+              <CheckCell on={r.llm} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function CheckCell({ on, accent }: { on: boolean; accent?: boolean }) {
+  return (
+    <div className="px-3 py-4 grid place-items-center">
+      {on ? (
+        <span className="grid place-items-center h-5 w-5 rounded-full"
+              style={{ background: accent ? ACCENT_HI : "rgba(10,46,34,0.6)" }}>
+          <Check className="h-3 w-3 text-white stroke-[3]" />
+        </span>
+      ) : (
+        <span className="grid place-items-center h-5 w-5 rounded-full"
+              style={{ background: "rgba(10,46,34,0.06)" }}>
+          <X className="h-3 w-3 text-[#0A2E22]/35 stroke-[2.5]" />
+        </span>
+      )}
+    </div>
+  )
+}
+
+// =====================================================================
+// closing CTA
+// =====================================================================
+function ClosingCTA() {
+  return (
+    <section className="relative overflow-hidden" style={{ background: ACCENT, color: "#F7F7F2" }}>
       <div
         aria-hidden
-        className="absolute inset-0 -z-0 opacity-70"
+        className="absolute inset-0 -z-0 opacity-30"
         style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
+          background: `radial-gradient(ellipse 50% 60% at 80% 50%, rgba(212,255,107,0.4), transparent 70%)`,
         }}
       />
-      {/* Twin radial glows — green top-right, lime bottom-left — give the band
-          atmosphere without competing with the headline. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.22),transparent_55%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(165,180,252,0.10),transparent_60%)]"
-      />
-      <div className="mx-auto max-w-[1180px] px-8 py-28 md:py-32 relative">
-        <GradientHairline tone="dark" />
-        <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-[#A5B4FC]">
-          08 / start today
-        </p>
-        <h2
-          className="mt-7 font-bold tracking-[-0.04em] leading-[0.98]"
-          style={{ fontSize: "clamp(48px, 6vw, 80px)" }}
-        >
-          Stop reading
+      <div className="relative mx-auto max-w-[1100px] px-6 py-24 md:py-32 text-center">
+        <h2 className="font-bold tracking-[-0.03em] leading-[0.98] mx-auto max-w-3xl"
+            style={{ fontSize: "clamp(44px, 7vw, 96px)" }}>
+          Ready to read your next deck
           <br />
-          <span className="bg-gradient-to-r from-white via-[#A5B4FC] to-[#3B82F6] bg-clip-text text-transparent">
-            decks at 11pm.
+          <span className="font-serif italic font-normal" style={{ color: ACCENT_LIME }}>
+            in five minutes?
           </span>
         </h2>
-        <p className="mt-7 max-w-[60ch] text-[17px] leading-[1.55] text-white/70">
-          Upload a deck. Twelve minutes later, a structured memo lands in your account.
-          Free 14-day trial, no credit card.
-        </p>
-        <div className="mt-10 flex items-center gap-3">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 px-6 py-3.5 text-[14px] font-medium bg-gradient-to-br from-[#1E3A8A] to-[#3B82F6] text-white hover:opacity-90 transition-opacity"
-            style={{ borderRadius: 0, boxShadow: "0 0 0 1px rgba(165,180,252,0.35)" }}
+            className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14.5px] font-semibold text-[#0A2E22] hover:scale-[1.02] transition shadow-md"
+            style={{ background: ACCENT_LIME }}
           >
-            Get started for free
-            <ArrowRight className="h-3.5 w-3.5" />
+            Try Sam free
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition" />
           </Link>
           <Link
             href="/sample"
-            className="inline-flex items-center gap-2 px-5 py-3.5 text-[14px] font-medium text-white/65 hover:text-white transition-colors ring-1 ring-white/15"
-            style={{ borderRadius: 0 }}
+            className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[14px] font-medium border hover:bg-white/10 transition"
+            style={{ borderColor: "rgba(247,247,242,0.3)" }}
           >
-            See a sample memo →
+            See a sample memo
+            <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
       </div>
@@ -1155,51 +1183,77 @@ function FinalCTA() {
   )
 }
 
-// -----------------------------------------------------------------------------
-// Footer
-// -----------------------------------------------------------------------------
-
+// =====================================================================
+// footer
+// =====================================================================
 function Footer() {
   return (
-    <footer>
-      <div className="mx-auto max-w-[1180px] px-8 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-[11px] font-mono uppercase tracking-[0.18em] text-black/45">
-        <div className="flex items-center gap-2.5">
-          <div className="h-3 w-3 rounded-sm bg-gradient-to-br from-[#1E3A8A] to-[#3B82F6]" />
-          <span className="text-black">© sam · 2026</span>
+    <footer className="border-t" style={{ borderColor: RULE, background: NEAR_BLACK, color: "#F7F7F2" }}>
+      <div className="mx-auto max-w-[1200px] px-6 py-16 grid grid-cols-2 md:grid-cols-5 gap-8 text-[13px]">
+        <div className="col-span-2">
+          <div className="flex items-center gap-2 font-bold text-[15px]">
+            <span
+              className="grid place-items-center h-6 w-6 rounded-md text-white text-[11px] font-bold"
+              style={{ background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_HI})` }}
+            >
+              S
+            </span>
+            Sam
+          </div>
+          <p className="mt-4 text-white/55 max-w-xs leading-[1.6]">
+            The AI investment associate for European VC funds.
+          </p>
         </div>
-        <div className="flex items-center gap-5">
-          <Link href="/privacy" className="hover:text-black">
-            Privacy
-          </Link>
-          <Link href="/how-it-works" className="hover:text-black">
-            Method
-          </Link>
-          <a href="mailto:hello@sam.ai" className="hover:text-black">
-            Contact
-          </a>
+        {[
+          { h: "Product", l: ["Features", "Pricing", "Sample memo", "Changelog"] },
+          { h: "Company", l: ["About", "Customers", "Blog", "Careers"] },
+          { h: "Legal", l: ["Privacy", "Security", "GDPR", "Terms"] },
+        ].map((c) => (
+          <div key={c.h}>
+            <p className="text-[11px] font-mono uppercase tracking-widest text-white/40 mb-3">{c.h}</p>
+            <ul className="space-y-2">
+              {c.l.map((it) => (
+                <li key={it}><a className="hover:text-white transition text-white/70">{it}</a></li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div className="border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+        <div className="mx-auto max-w-[1200px] px-6 py-5 flex flex-wrap items-center justify-between gap-4 text-[12px] text-white/45">
+          <p>© 2026 Sam. EU-based.</p>
+          <p className="font-mono uppercase tracking-widest">SOC 2 · GDPR · ISO 27001</p>
         </div>
       </div>
     </footer>
   )
 }
 
-function ChooserBar({ current }: { current: number }) {
-  return (
-    <div className="border-b bg-white text-[10px] font-mono uppercase tracking-[0.22em]" style={{ borderColor: "rgba(10,14,20,0.18)" }}>
-      <div className="mx-auto max-w-[1180px] px-8 py-2 flex items-center gap-5">
-        <span className="text-black/45">Mockups · pick one</span>
-        {[1, 2, 3].map((n) => (
-          <Link
-            key={n}
-            href={`/mockup${n}`}
-            className={`px-2 py-0.5 ${
-              n === current ? "bg-black text-white" : "text-black/65 hover:text-black"
-            }`}
-          >
-            {n === 1 ? "queercom" : n === 2 ? "iris" : "terminal"}
-          </Link>
-        ))}
-      </div>
-    </div>
-  )
+// =====================================================================
+// helpers
+// =====================================================================
+function CountUp({
+  to,
+  duration = 1.4,
+  start,
+  className,
+}: {
+  to: number
+  duration?: number
+  start: boolean
+  className?: string
+}) {
+  const [display, setDisplay] = useState(0)
+  const motionValue = useMotionValue(0)
+  const spring = useSpring(motionValue, { damping: 30, stiffness: 110, duration: duration * 1000 })
+
+  useEffect(() => {
+    if (start) motionValue.set(to)
+  }, [start, to, motionValue])
+
+  useEffect(() => {
+    return spring.on("change", (v) => setDisplay(Math.round(v)))
+  }, [spring])
+
+  return <span className={className}>{display}</span>
 }

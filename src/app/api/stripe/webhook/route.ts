@@ -33,7 +33,30 @@ export async function POST(request: Request) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session
       const userId = session.metadata?.supabase_user_id
-      const tier = session.metadata?.tier
+      let tier = session.metadata?.tier
+
+      // Coupon-driven tier upgrade. Any discount applied at checkout bumps
+      // the user to Professional so they get Fund Fit + Word export — which
+      // is what people expect when they redeem a coupon. Without this,
+      // someone redeeming on the Starter price stays on Starter and the
+      // coupon silently does nothing for tier-gated features. Fund tier is
+      // sales-only and never reached here, so we don't need to handle it.
+      const hasDiscount = (session.total_details?.amount_discount ?? 0) > 0
+      if (hasDiscount && tier !== "fund") {
+        tier = "professional"
+        // Keep the subscription's own metadata in sync, otherwise the next
+        // customer.subscription.updated event would read the original tier
+        // and downgrade them back to Starter.
+        if (typeof session.subscription === "string") {
+          try {
+            await getStripe().subscriptions.update(session.subscription, {
+              metadata: { supabase_user_id: userId ?? "", tier },
+            })
+          } catch (err) {
+            console.error("Failed to sync subscription metadata after coupon:", err)
+          }
+        }
+      }
 
       if (userId && tier) {
         await supabaseAdmin

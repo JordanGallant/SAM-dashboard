@@ -36,6 +36,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Reuse the existing Stripe customer if we have one — otherwise checkout
+    // creates a brand new Customer record on every visit, which fragments
+    // their billing history across multiple customers in the dashboard.
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("stripe_customer_id")
+      .eq("id", user.id)
+      .maybeSingle()
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3004"
 
     const session = await getStripe().checkout.sessions.create({
@@ -44,7 +53,9 @@ export async function POST(request: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/settings/billing?canceled=true`,
-      customer_email: user.email,
+      ...(profile?.stripe_customer_id
+        ? { customer: profile.stripe_customer_id }
+        : { customer_email: user.email }),
       allow_promotion_codes: true,
       metadata: {
         supabase_user_id: user.id,

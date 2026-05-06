@@ -48,6 +48,7 @@ export async function updateSession(request: NextRequest) {
       "/mockup1",
       "/mockup2",
       "/mockup3",
+      "/mockup4",
     ]
     const isPublic =
       publicRoutes.some((route) => pathname === route) ||

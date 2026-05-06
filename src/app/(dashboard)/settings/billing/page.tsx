@@ -39,6 +39,33 @@ function BillingContent() {
   async function handleSubscribe(targetTier: Tier) {
     setLoading(targetTier)
     try {
+      // If the user is already on an active subscription, switch the existing
+      // sub in place rather than running a fresh checkout — the latter would
+      // create a parallel subscription and double-bill them.
+      if (subStatus === "active") {
+        const direction =
+          TIER_ORDER.indexOf(targetTier) > TIER_ORDER.indexOf(tier) ? "Upgrade" : "Downgrade"
+        const ok = window.confirm(
+          `${direction} to ${TIER_CONFIG[targetTier].label} (€${TIER_CONFIG[targetTier].price}/mo)?\n\nProrated charges or credits will appear on your next invoice.`
+        )
+        if (!ok) return
+
+        const res = await fetch("/api/stripe/switch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tier: targetTier }),
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          console.error("Switch failed:", data.error)
+          alert(`Switch failed: ${data.error ?? "unknown error"}`)
+          return
+        }
+        // Reload so TierProvider picks up the new tier from profiles.
+        window.location.reload()
+        return
+      }
+
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

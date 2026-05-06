@@ -60,37 +60,37 @@ export function DomainSources({
     : null
 
   return (
-    <section className="mt-2 border-t border-foreground/10 pt-5">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-foreground/55">
+    <section className="mt-2 border-t border-foreground/10 pt-4">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-[9px] font-mono uppercase tracking-widest font-extrabold text-foreground/70">
           Sources
         </span>
-        <span className="text-[11px] font-mono tabular-nums text-muted-foreground">
+        <span className="text-[10px] font-mono tabular-nums font-semibold text-muted-foreground">
           {docs.length + links.length}
         </span>
         {generatedLabel && (
-          <span className="ml-auto text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+          <span className="ml-auto text-[9px] font-mono uppercase tracking-widest text-muted-foreground/70">
             Generated · {generatedLabel}
           </span>
         )}
       </div>
 
-      <ul className="flex flex-wrap gap-x-3 gap-y-2">
+      <ul className="flex flex-wrap gap-x-2 gap-y-1.5">
         {docs.map((d) => (
           <li key={d.id}>
             <a
               href={d.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.04] hover:bg-foreground/[0.07] ring-1 ring-foreground/10 px-2.5 py-1 text-[11.5px] text-foreground/75 hover:text-foreground transition-colors max-w-full"
+              className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.04] hover:bg-foreground/[0.08] ring-1 ring-foreground/10 px-2 py-0.5 text-[10.5px] font-semibold text-foreground/80 hover:text-foreground transition-colors max-w-full"
               title={d.filename}
             >
-              <FileText className="h-3 w-3 shrink-0 text-muted-foreground" />
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/80">
+              <FileText className="h-2.5 w-2.5 shrink-0 text-muted-foreground" />
+              <span className="font-mono text-[9px] uppercase tracking-widest font-bold text-muted-foreground/85">
                 {DOC_KIND_LABELS[d.docType] ?? "Doc"}
               </span>
-              <span className="text-foreground/60">·</span>
-              <span className="truncate max-w-[28ch]">{d.filename}</span>
+              <span className="text-foreground/40">·</span>
+              <span className="truncate max-w-[26ch] font-medium">{d.filename}</span>
             </a>
           </li>
         ))}
@@ -102,17 +102,17 @@ export function DomainSources({
                 href={l.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.04] hover:bg-foreground/[0.07] ring-1 ring-foreground/10 px-2.5 py-1 text-[11.5px] transition-colors max-w-full ${
-                  isLinkedIn ? "text-[#0A66C2] hover:text-[#084c92]" : "text-foreground/75 hover:text-foreground"
+                className={`inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.04] hover:bg-foreground/[0.08] ring-1 ring-foreground/10 px-2 py-0.5 text-[10.5px] font-semibold transition-colors max-w-full ${
+                  isLinkedIn ? "text-[#0A66C2] hover:text-[#084c92]" : "text-foreground/80 hover:text-foreground"
                 }`}
                 title={l.url}
               >
                 {isLinkedIn ? (
-                  <LinkedInGlyph className="h-3 w-3 shrink-0" />
+                  <LinkedInGlyph className="h-2.5 w-2.5 shrink-0" />
                 ) : (
-                  <ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />
+                  <ExternalLink className="h-2.5 w-2.5 shrink-0 text-muted-foreground" />
                 )}
-                <span className="truncate max-w-[28ch]">{l.label}</span>
+                <span className="truncate max-w-[26ch]">{l.label}</span>
               </a>
             </li>
           )

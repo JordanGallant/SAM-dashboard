@@ -64,7 +64,10 @@ export function dbToDocument(row: DbDocument): DealDocument {
     docType: row.doc_type,
     uploadedAt: row.uploaded_at,
     size: row.size_bytes ?? 0,
-    url: row.storage_path,
+    // Source pills click through this endpoint, which signs the storage
+    // path on demand and 302-redirects. Embedding raw storage paths or
+    // long-lived signed URLs would be either broken or unsafe.
+    url: `/api/documents/${row.id}/download`,
   }
 }
 

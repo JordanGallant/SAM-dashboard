@@ -16,7 +16,7 @@ import { useTier } from "@/lib/tier-context"
 import { useDeal } from "@/hooks/use-deal"
 import { STATUS_BADGE_COLORS, PIPELINE_STAGES } from "@/lib/constants"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { updateDealStatus } from "@/app/actions/deals"
 import { friendlyError, type FriendlyError } from "@/lib/errors"
 import type { PipelineStatus } from "@/lib/types/deal"
@@ -32,6 +32,21 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState<FriendlyError | null>(null)
   const [downloading, setDownloading] = useState(false)
+
+  // Auto-advance pipeline status from "New" → "Reviewing" the first time the
+  // user opens a deal. The "New" pill is a "you haven't reviewed this yet"
+  // signal — once they're inside, that's no longer true. Tracked per-mount
+  // so a single component instance won't double-fire even if `deal` re-resolves.
+  const autoAdvancedRef = useRef<Set<string>>(new Set())
+  useEffect(() => {
+    if (!deal) return
+    if (deal.status !== "New") return
+    if (autoAdvancedRef.current.has(dealId)) return
+    autoAdvancedRef.current.add(dealId)
+    void updateDealStatus(dealId, "Reviewing")
+      .then(() => refetch())
+      .catch(() => {})
+  }, [deal, dealId, refetch])
 
   if (loading) {
     return <p className="text-sm text-muted-foreground">Loading deal...</p>
