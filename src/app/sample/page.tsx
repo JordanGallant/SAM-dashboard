@@ -57,13 +57,13 @@ export default function SamplePage() {
                     <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
                     <span className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate" style={{ background: "#FFF", border: "1px solid rgba(10,10,10,0.10)", color: "rgba(10,10,10,0.55)" }}>
-                      sam.ai/deals/vrey/summary
+                      sam.ai/deals/mystartup/summary
                     </span>
                   </div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/design/hero-img-new.png"
-                    alt="Sam dashboard — VREY memo with overall score, radar chart, and domain breakdowns"
+                    alt="Sam dashboard — MyStartup memo with overall score, radar chart, and domain breakdowns"
                     className="block w-full h-auto"
                   />
                 </div>
@@ -105,7 +105,7 @@ export default function SamplePage() {
                   <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
                   <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
                   <span className="ml-3 flex-1 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] font-mono text-white/40 truncate">
-                    sam.ai/deals/vrey/summary
+                    sam.ai/deals/mystartup/summary
                   </span>
                 </div>
                 <div className="relative aspect-[16/10] overflow-hidden">
@@ -146,7 +146,7 @@ export default function SamplePage() {
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-400/70" />
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/70" />
                       <span className="ml-2 text-[9px] font-mono text-white/35 truncate">
-                        sam.ai/deals/vrey/{m.slug}
+                        sam.ai/deals/mystartup/{m.slug}
                       </span>
                     </div>
                     <div className="relative aspect-[4/3] overflow-hidden">

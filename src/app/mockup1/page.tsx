@@ -495,7 +495,7 @@ function Hero() {
               </div>
             </div>
             <figcaption className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.22em] opacity-50">
-              Specimen · sam.ai/deals/vrey/summary
+              Specimen · sam.ai/deals/mystartup/summary
             </figcaption>
           </figure>
         </div>
@@ -651,9 +651,9 @@ function SamSits() {
         <aside className="lg:col-span-5">
           <div className="rounded-[14px] border p-6" style={{ borderColor: RULE, background: PAPER }}>
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] opacity-65">From the dashboard</p>
-            <h3 className="mt-3 font-bold text-[24px] leading-tight">VREY · pitch_deck.pdf → IC-ready memo</h3>
+            <h3 className="mt-3 font-bold text-[24px] leading-tight">MyStartup · pitch_deck.pdf → IC-ready memo</h3>
             <p className="mt-3 text-[13.5px] leading-relaxed opacity-80">
-              The dashboard at <span className="font-mono opacity-90">sam.ai/deals/vrey/summary</span> renders the memo with overall score, radar, domain breakdowns, top risks and questions. The memo travels through your IC and lives in your archive — answer your future self&apos;s question: <em>why did we pass on this</em>?
+              The dashboard at <span className="font-mono opacity-90">sam.ai/deals/mystartup/summary</span> renders the memo with overall score, radar, domain breakdowns, top risks and questions. The memo travels through your IC and lives in your archive — answer your future self&apos;s question: <em>why did we pass on this</em>?
             </p>
             <div className="mt-5 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-[0.22em]">
               {["Strong Buy", "Explore", "Deny"].map((v) => (

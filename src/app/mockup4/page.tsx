@@ -57,7 +57,6 @@ export default function Mockup4() {
         <OnePlatform />
         <Framework />
         <DarkAI />
-        <SourceAttribution />
         <MissingInfo />
         <AskSamSection />
         <Audiences />
@@ -191,7 +190,8 @@ function Hero() {
           </motion.div>
         </div>
 
-        {/* Real SAM dashboard screenshot — replaces the previous animated mock */}
+        {/* Synthetic preview — fully fictional MyStartup data so we never
+            ship real customer information on the public landing page. */}
         <motion.div
           style={{ y: cardY }}
           initial={{ opacity: 0, y: 40 }}
@@ -199,49 +199,7 @@ function Hero() {
           transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
           className="relative mt-16 mx-auto max-w-[1080px]"
         >
-          {/* soft halo behind the screenshot */}
-          <div
-            aria-hidden
-            className="absolute -inset-8 -z-10 rounded-[2rem] blur-2xl"
-            style={{ background: "radial-gradient(ellipse at center, rgba(15,61,46,0.10), transparent 60%)" }}
-          />
-          <div
-            className="relative rounded-2xl bg-white shadow-2xl overflow-hidden"
-            style={{ border: `1px solid ${RULE}` }}
-          >
-            <div
-              className="flex items-center gap-2 px-4 py-2.5"
-              style={{ borderBottom: `1px solid ${RULE}`, background: SOFT_FIELD }}
-            >
-              <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
-              <span
-                className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate"
-                style={{ background: "#FFF", border: `1px solid ${RULE}`, color: SUBINK }}
-              >
-                sam.ai/deals/vrey/summary
-              </span>
-            </div>
-            {/* 2:1 viewport — matches the previous PreviewCard's intrinsic
-                height (~540px at 1080px wide). Top-aligned so the executive
-                summary header is what lands above the fold. */}
-            <div className="relative aspect-[2/1] overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/design/dashboard-summary.png"
-                alt="Sam dashboard — VREY executive summary with score, scorecard and Ask Sam co-pilot"
-                className="absolute inset-0 w-full h-auto object-cover object-top"
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
-                style={{
-                  background: "linear-gradient(to top, rgba(255,255,255,0.95), transparent)",
-                }}
-              />
-            </div>
-          </div>
+          <PreviewCard />
         </motion.div>
       </div>
     </section>
@@ -317,7 +275,7 @@ function PreviewCard() {
           <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
         </div>
-        <p className="ml-3 text-[12px] font-mono text-[#0A0A0A]/45">sam · canaaro · executive summary</p>
+        <p className="ml-3 text-[12px] font-mono text-[#0A0A0A]/45">sam · mystartup · executive summary</p>
       </div>
 
       <div className="grid lg:grid-cols-[280px_1fr] gap-0">
@@ -326,14 +284,14 @@ function PreviewCard() {
           <p className="text-[10px] font-mono uppercase tracking-widest" style={{ color: SUBINK }}>Pipeline</p>
           <ul className="mt-4 space-y-2 text-[13.5px]">
             <li className="flex items-center justify-between p-2 rounded-lg" style={{ background: SOFT }}>
-              <span className="font-semibold">Canaaro</span>
+              <span className="font-semibold">MyStartup</span>
               <span className="font-mono text-[11px]" style={{ color: ACCENT }}>84</span>
             </li>
             {[
-              { n: "VREY", s: 71 },
-              { n: "Vint Labs", s: 62 },
+              { n: "Acme Labs", s: 71 },
+              { n: "Northbeam", s: 62 },
               { n: "Atlas AI", s: 58 },
-              { n: "Northbeam", s: 49 },
+              { n: "Beacon", s: 49 },
             ].map((d) => (
               <li key={d.n} className="flex items-center justify-between px-2 py-2 rounded-lg hover:bg-black/[0.03] transition">
                 <span>{d.n}</span>
@@ -348,7 +306,7 @@ function PreviewCard() {
           <div className="flex items-baseline justify-between gap-4 mb-5">
             <div>
               <p className="text-[10px] font-mono uppercase tracking-widest" style={{ color: SUBINK }}>
-                canaaro · seed · €1.2M raise
+                mystartup · seed · €1.2M raise
               </p>
               <h3 className="mt-1 font-bold text-[26px] tracking-[-0.02em]">Verdict: Strong Buy</h3>
             </div>
@@ -2171,7 +2129,7 @@ function SourceAttribution() {
                 className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate"
                 style={{ background: "#FFF", border: `1px solid ${RULE}`, color: SUBINK }}
               >
-                sam.ai/deals/vrey/team
+                sam.ai/deals/mystartup/team
               </span>
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -2305,7 +2263,7 @@ function AskSamSection() {
               <Sparkles className="h-3.5 w-3.5" />
             </span>
             <p className="text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
-              Ask Sam · Team analysis · VREY
+              Ask Sam · Team analysis · MyStartup
             </p>
           </div>
           <div className="p-5 space-y-3">
