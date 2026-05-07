@@ -190,8 +190,9 @@ function Hero() {
           </motion.div>
         </div>
 
-        {/* Synthetic preview — fully fictional MyStartup data so we never
-            ship real customer information on the public landing page. */}
+        {/* Real SAM dashboard screenshot — captured via /root/screen-sam.js
+            (admin@sam.com session, demo deal). Refresh by re-running that
+            script when the dashboard layout changes. */}
         <motion.div
           style={{ y: cardY }}
           initial={{ opacity: 0, y: 40 }}
@@ -199,7 +200,46 @@ function Hero() {
           transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
           className="relative mt-16 mx-auto max-w-[1080px]"
         >
-          <PreviewCard />
+          <div
+            aria-hidden
+            className="absolute -inset-8 -z-10 rounded-[2rem] blur-2xl"
+            style={{ background: "radial-gradient(ellipse at center, rgba(15,61,46,0.10), transparent 60%)" }}
+          />
+          <div
+            className="relative rounded-2xl bg-white shadow-2xl overflow-hidden"
+            style={{ border: `1px solid ${RULE}` }}
+          >
+            <div
+              className="flex items-center gap-2 px-4 py-2.5"
+              style={{ borderBottom: `1px solid ${RULE}`, background: SOFT_FIELD }}
+            >
+              <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+              <span
+                className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate"
+                style={{ background: "#FFF", border: `1px solid ${RULE}`, color: SUBINK }}
+              >
+                sam.ai/deals/mystartup/summary
+              </span>
+            </div>
+            {/* 2:1 viewport — top-aligned so the executive summary header
+                lands above the fold; soft white-fade edge at the bottom so
+                the crop reads as intentional. */}
+            <div className="relative aspect-[2/1] overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/design/dashboard-summary.png"
+                alt="Sam dashboard — executive summary with score, scorecard and Ask Sam co-pilot"
+                className="absolute inset-0 w-full h-auto object-cover object-top"
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
+                style={{ background: "linear-gradient(to top, rgba(255,255,255,0.95), transparent)" }}
+              />
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>
