@@ -49,8 +49,14 @@ function TwoFactorSetup() {
       await supabase.auth.mfa.unenroll({ factorId: f.id })
     }
 
+    // Pass an explicit `issuer` so the authenticator app (Google Authenticator,
+    // 1Password, etc.) shows "Sam VC" as the account label rather than the
+    // Supabase project URL or whatever the previous deploy domain was. Without
+    // this, after a domain change the existing GoTrue default leaks an old
+    // hostname into the QR / otpauth URL, which is what users see in their app.
     const { data, error } = await supabase.auth.mfa.enroll({
       factorType: "totp",
+      issuer: "Sam VC",
       friendlyName: `Sam · ${Date.now()}`,
     })
 

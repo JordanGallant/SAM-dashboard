@@ -2,12 +2,13 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import { ExternalLink, Loader2, Check, X, AlertTriangle, Sparkles, CreditCard } from "lucide-react"
+import { ExternalLink, Loader2, Check, X, AlertTriangle, Sparkles, CreditCard, ArrowRight, ArrowDown, ArrowUp } from "lucide-react"
 import { useTier } from "@/lib/tier-context"
 import { TIER_CONFIG } from "@/lib/tier-config"
 import type { Tier } from "@/lib/types/user"
 import { createClient } from "@/lib/supabase/client"
 import { SectionLabel } from "@/components/dashboard/section-label"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
 const TIER_ORDER: Tier[] = ["starter", "professional", "fund"]
@@ -25,6 +26,14 @@ function BillingContent() {
   // Pilot #18: usage count vs cap so users know when they're approaching the
   // tier limit. Counted as analyses started this calendar month.
   const [memosUsed, setMemosUsed] = useState<number | null>(null)
+
+  // In-page confirmation modal for upgrades/downgrades. Replaces the
+  // browser-native window.confirm() / alert() pair which (a) looks unprofessional,
+  // (b) gives no proration context, (c) renders the page unable to display
+  // failures inline.
+  const [switchDialog, setSwitchDialog] = useState<Tier | null>(null)
+  const [switchError, setSwitchError] = useState<string | null>(null)
+  const [switchSubmitting, setSwitchSubmitting] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -58,35 +67,16 @@ function BillingContent() {
   const memoAtLimit = memoCap > 0 && memosUsed !== null && memosUsed >= memoCap
 
   async function handleSubscribe(targetTier: Tier) {
+    // Active sub -> open the in-page switch dialog. Inactive/trial -> straight
+    // to Stripe Checkout (no confirmation needed; Checkout itself confirms).
+    if (subStatus === "active") {
+      setSwitchError(null)
+      setSwitchDialog(targetTier)
+      return
+    }
+
     setLoading(targetTier)
     try {
-      // If the user is already on an active subscription, switch the existing
-      // sub in place rather than running a fresh checkout — the latter would
-      // create a parallel subscription and double-bill them.
-      if (subStatus === "active") {
-        const direction =
-          TIER_ORDER.indexOf(targetTier) > TIER_ORDER.indexOf(tier) ? "Upgrade" : "Downgrade"
-        const ok = window.confirm(
-          `${direction} to ${TIER_CONFIG[targetTier].label} (€${TIER_CONFIG[targetTier].price}/mo)?\n\nProrated charges or credits will appear on your next invoice.`
-        )
-        if (!ok) return
-
-        const res = await fetch("/api/stripe/switch", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tier: targetTier }),
-        })
-        const data = await res.json()
-        if (!res.ok) {
-          console.error("Switch failed:", data.error)
-          alert(`Switch failed: ${data.error ?? "unknown error"}`)
-          return
-        }
-        // Reload so TierProvider picks up the new tier from profiles.
-        window.location.reload()
-        return
-      }
-
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -98,6 +88,36 @@ function BillingContent() {
       console.error(err)
     } finally {
       setLoading(null)
+    }
+  }
+
+  async function confirmSwitch() {
+    if (!switchDialog) return
+    setSwitchSubmitting(true)
+    setSwitchError(null)
+    try {
+      // Fund tier requires a sales conversation — surface that inline instead
+      // of crashing with a 400.
+      if (switchDialog === "fund") {
+        setSwitchError("Fund tier requires a walkthrough — book one via 'Manage subscription' or contact us.")
+        return
+      }
+      const res = await fetch("/api/stripe/switch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier: switchDialog }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setSwitchError(data.error ?? "Couldn't switch plan. Please try again or use 'Manage subscription'.")
+        return
+      }
+      // Reload so TierProvider, sidebar, and tier-gated UI pick up the new tier.
+      window.location.reload()
+    } catch (err) {
+      setSwitchError(err instanceof Error ? err.message : "Network error — please retry.")
+    } finally {
+      setSwitchSubmitting(false)
     }
   }
 
@@ -351,7 +371,160 @@ function BillingContent() {
           })}
         </div>
       </div>
+
+      {/* Switch confirmation dialog. Replaces window.confirm() so users see
+          tier-diff context (current -> new, prorated billing note) instead of
+          a stark browser modal, and so failures render inline rather than
+          via window.alert. */}
+      <SwitchDialog
+        targetTier={switchDialog}
+        currentTier={tier}
+        submitting={switchSubmitting}
+        error={switchError}
+        onCancel={() => {
+          if (!switchSubmitting) {
+            setSwitchDialog(null)
+            setSwitchError(null)
+          }
+        }}
+        onConfirm={confirmSwitch}
+      />
     </div>
+  )
+}
+
+function SwitchDialog({
+  targetTier,
+  currentTier,
+  submitting,
+  error,
+  onCancel,
+  onConfirm,
+}: {
+  targetTier: Tier | null
+  currentTier: Tier
+  submitting: boolean
+  error: string | null
+  onCancel: () => void
+  onConfirm: () => void
+}) {
+  const open = targetTier !== null
+  const isUpgrade = targetTier
+    ? TIER_ORDER.indexOf(targetTier) > TIER_ORDER.indexOf(currentTier)
+    : false
+  const direction = isUpgrade ? "Upgrade" : "Downgrade"
+  const tc = targetTier ? TIER_CONFIG[targetTier] : null
+  const cc = TIER_CONFIG[currentTier]
+  const DirectionIcon = isUpgrade ? ArrowUp : ArrowDown
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onCancel()
+      }}
+    >
+      <DialogContent className="sm:max-w-md">
+        {tc && (
+          <>
+            <div className="flex items-start gap-3">
+              <div
+                className={cn(
+                  "grid place-items-center h-10 w-10 rounded-xl shrink-0 ring-1",
+                  isUpgrade
+                    ? "bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/10 ring-[#0F3D2E]/10 text-[#0F3D2E]"
+                    : "bg-amber-50 ring-amber-200 text-amber-700",
+                )}
+              >
+                <DirectionIcon className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+                  {direction}
+                </p>
+                <h2 className="mt-1 font-heading text-[17px] font-bold tracking-[-0.01em] text-[#0A2E22]">
+                  {direction} to {tc.label}?
+                </h2>
+              </div>
+            </div>
+
+            <div className="rounded-xl ring-1 ring-foreground/10 overflow-hidden text-sm">
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3 bg-muted/30">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                    From
+                  </p>
+                  <p className="mt-0.5 font-heading font-bold text-[15px] truncate">{cc.label}</p>
+                  <p className="text-[12px] text-muted-foreground tabular-nums">
+                    {cc.price === 0 ? "Custom" : `EUR ${cc.price} / mo`}
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                <div className="min-w-0 text-right">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                    To
+                  </p>
+                  <p className="mt-0.5 font-heading font-bold text-[15px] truncate text-[#0A2E22]">
+                    {tc.label}
+                  </p>
+                  <p className="text-[12px] text-muted-foreground tabular-nums">
+                    {tc.price === 0 ? "Custom" : `EUR ${tc.price} / mo`}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-px bg-foreground/10 ring-t ring-foreground/10">
+                {[
+                  ["Analyses / mo", cc.dealsPerMonth, tc.dealsPerMonth],
+                  ["Seats", cc.users, tc.users],
+                ].map(([label, from, to]) => (
+                  <div key={label as string} className="bg-card px-4 py-3">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                      {label}
+                    </p>
+                    <p className="mt-1 font-mono text-[13px] tabular-nums">
+                      {from === -1 ? "Custom" : from} <ArrowRight className="inline h-3 w-3 mx-1 text-muted-foreground" />
+                      <span className="font-bold">{to === -1 ? "Custom" : to}</span>
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <p className="text-[12.5px] text-muted-foreground leading-relaxed">
+              {isUpgrade
+                ? "Stripe will charge a prorated amount today for the rest of this billing period and bill the new monthly rate from your next invoice onwards."
+                : "Stripe will apply a prorated credit to your account for the unused portion of this billing period; the new lower rate kicks in on your next invoice."}
+            </p>
+
+            {error && (
+              <div className="rounded-md bg-red-50 ring-1 ring-red-200 p-3 text-[13px] text-red-700">
+                {error}
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={onCancel}
+                disabled={submitting}
+                className="inline-flex items-center rounded-full ring-1 ring-foreground/15 hover:ring-foreground/30 hover:bg-foreground/5 px-4 py-2 text-[13px] font-semibold transition-colors disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={onConfirm}
+                disabled={submitting}
+                className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2 text-[13px] font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:hover:translate-y-0"
+              >
+                {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                Confirm {direction.toLowerCase()}
+              </button>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }
 
