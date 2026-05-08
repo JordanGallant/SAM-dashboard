@@ -217,7 +217,23 @@ const parseFounders = (text: string | undefined): FounderRow[] => {
       grabSection(rawLines, /^KEY\s+CONCERN\s*:?$/i) ||
       grabBulletAfter(rawLines, /^\*?\s*key\s+concern\s*:/i)
 
-    out.push({ name, role, background, strength, keyConcern })
+    // Pull a LinkedIn URL from anywhere inside this founder's block. Tolerant
+    // of however the upstream LLMs phrase it ("* LinkedIn: <url>", "LinkedIn:
+    // <url>", inline mention in background prose). Accepts any
+    // linkedin.com/in/<handle> with optional www / locale subdomain, then
+    // canonicalises to https://www.linkedin.com/in/<handle>/ so the team-card
+    // icon link is consistent. Falls back to undefined when no URL appears at
+    // all — the team page already has a Google "site:linkedin.com" search
+    // fallback for that case.
+    let linkedinUrl: string | undefined
+    const linkedInMatch = block.match(
+      /https?:\/\/(?:[a-z]{2,3}\.)?linkedin\.com\/in\/([A-Za-z0-9_\-%.]+)\/?/i,
+    )
+    if (linkedInMatch) {
+      linkedinUrl = `https://www.linkedin.com/in/${linkedInMatch[1].replace(/\/$/, "")}/`
+    }
+
+    out.push({ name, role, background, strength, keyConcern, linkedinUrl })
   }
   return out
 }
