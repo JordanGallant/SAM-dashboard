@@ -57,11 +57,26 @@ export async function POST(request: Request) {
         ? { customer: profile.stripe_customer_id }
         : { customer_email: user.email }),
       allow_promotion_codes: true,
+      // 14-day Stripe-native trial. Card is NOT collected at signup so users
+      // get immediate access with a real (trialing) Stripe subscription from
+      // day 1 — that means switch / portal / coupon flows all work without
+      // the previous "no Stripe customer" edge cases. If they don't add a
+      // payment method by trial end, missing_payment_method: 'cancel' tells
+      // Stripe to auto-cancel rather than transition to past_due, which the
+      // webhook surfaces as subscription_status: 'canceled' and middleware
+      // routes back to /settings/billing.
+      payment_method_collection: "if_required",
       metadata: {
         supabase_user_id: user.id,
         tier,
       },
       subscription_data: {
+        trial_period_days: 14,
+        trial_settings: {
+          end_behavior: {
+            missing_payment_method: "cancel",
+          },
+        },
         metadata: {
           supabase_user_id: user.id,
           tier,

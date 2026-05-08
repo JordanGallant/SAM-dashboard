@@ -59,13 +59,34 @@ export async function POST(request: Request) {
       }
 
       if (userId && tier) {
+        // Mirror Stripe's actual trial state: with payment_method_collection
+        // 'if_required' + trial_period_days 14 the sub here is `trialing`, so
+        // we want subscription_status: 'trial' and trial_ends_at synced to
+        // Stripe's trial_end. If a card was collected (paid path), sub is
+        // 'active' immediately and trial_ends_at is null.
+        let status = "active"
+        let trialEndsAt: string | null = null
+        if (typeof session.subscription === "string") {
+          try {
+            const sub = await getStripe().subscriptions.retrieve(session.subscription)
+            if (sub.status === "trialing") {
+              status = "trial"
+              if (sub.trial_end) {
+                trialEndsAt = new Date(sub.trial_end * 1000).toISOString()
+              }
+            }
+          } catch (err) {
+            console.error("Failed to retrieve subscription for trial state:", err)
+          }
+        }
+
         await supabaseAdmin
           .from("profiles")
           .update({
             tier,
-            subscription_status: "active",
+            subscription_status: status,
             stripe_customer_id: session.customer as string,
-            trial_ends_at: null,
+            trial_ends_at: trialEndsAt,
             pending_tier: null,
           })
           .eq("id", userId)
@@ -79,20 +100,47 @@ export async function POST(request: Request) {
       const tier = subscription.metadata?.tier
 
       if (userId) {
-        const status =
-          subscription.status === "active" || subscription.status === "trialing"
-            ? "active"
-            : subscription.status === "past_due"
-              ? "past_due"
-              : subscription.status === "canceled"
-                ? "canceled"
-                : "inactive"
+        let status: string
+        let trialEndsAt: string | null = null
+        if (subscription.status === "trialing") {
+          status = "trial"
+          if (subscription.trial_end) {
+            trialEndsAt = new Date(subscription.trial_end * 1000).toISOString()
+          }
+        } else if (subscription.status === "active") {
+          status = "active"
+        } else if (subscription.status === "past_due") {
+          status = "past_due"
+        } else if (subscription.status === "canceled") {
+          status = "canceled"
+        } else {
+          status = "inactive"
+        }
 
-        const update: Record<string, unknown> = { subscription_status: status }
-        if (tier && status === "active") update.tier = tier
+        const update: Record<string, unknown> = {
+          subscription_status: status,
+          trial_ends_at: trialEndsAt,
+        }
+        // Tier mirrors only when the sub is in a "user has access" state.
+        // Past-due / inactive / canceled keep whatever tier we last knew so
+        // dashboards don't silently flip to Starter when a card declines.
+        if (tier && (status === "active" || status === "trial")) update.tier = tier
 
         await supabaseAdmin.from("profiles").update(update).eq("id", userId)
       }
+      break
+    }
+
+    case "customer.subscription.trial_will_end": {
+      // Stripe fires this 3 days before trial ends. Logging only for now —
+      // the dashboard already shows a "trial ends in N days" banner via
+      // useTier().trialDaysLeft (computed from profiles.trial_ends_at, which
+      // we kept in sync above). Wire in a reminder email here when ready.
+      const subscription = event.data.object as Stripe.Subscription
+      const userId = subscription.metadata?.supabase_user_id
+      console.log(
+        `[stripe-webhook] trial_will_end userId=${userId} sub=${subscription.id} trial_end=${subscription.trial_end}`,
+      )
       break
     }
 
