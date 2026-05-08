@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Shield, MapPin } from "lucide-react"
 
 const RULE = "rgba(255,255,255,0.08)"
-const LIME = "#D7FE3F"
+const LIME = "#C9E63B"
 const INK = "#0A0A0A"
 
 export function Footer() {

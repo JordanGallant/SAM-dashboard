@@ -17,7 +17,7 @@ const INK = "#0A0A0A"
 const SUBINK = "rgba(10,10,10,0.62)"
 const RULE = "rgba(10,10,10,0.10)"
 const ACCENT = "#0F3D2E"
-const LIME = "#D7FE3F"
+const LIME = "#C9E63B"
 
 const steps = [
   {
