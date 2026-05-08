@@ -22,7 +22,14 @@ function BillingContent() {
   const { tier, config, isTrialing, trialDaysLeft } = useTier()
   const [loading, setLoading] = useState<Tier | null>(null)
   const [portalLoading, setPortalLoading] = useState(false)
+  const [portalError, setPortalError] = useState<string | null>(null)
   const [subStatus, setSubStatus] = useState<string | null>(null)
+  // Whether we have a Stripe customer ID at all. A profile can be marked
+  // active without one (legacy migrations, manual flips, 100% coupon paths
+  // that never round-tripped the webhook) — when that happens, we have to
+  // route through fresh Checkout instead of Switch / Portal because Stripe
+  // has no customer to operate on.
+  const [hasStripeCustomer, setHasStripeCustomer] = useState<boolean | null>(null)
   // Pilot #18: usage count vs cap so users know when they're approaching the
   // tier limit. Counted as analyses started this calendar month.
   const [memosUsed, setMemosUsed] = useState<number | null>(null)
@@ -45,7 +52,7 @@ function BillingContent() {
       const [{ data }, { count }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("subscription_status")
+          .select("subscription_status, stripe_customer_id")
           .eq("id", user.id)
           .maybeSingle(),
         supabase
@@ -55,6 +62,7 @@ function BillingContent() {
           .gte("created_at", startOfMonth.toISOString()),
       ])
       setSubStatus(data?.subscription_status ?? "inactive")
+      setHasStripeCustomer(Boolean(data?.stripe_customer_id))
       setMemosUsed(count ?? 0)
     })
   }, [])
@@ -67,9 +75,12 @@ function BillingContent() {
   const memoAtLimit = memoCap > 0 && memosUsed !== null && memosUsed >= memoCap
 
   async function handleSubscribe(targetTier: Tier) {
-    // Active sub -> open the in-page switch dialog. Inactive/trial -> straight
-    // to Stripe Checkout (no confirmation needed; Checkout itself confirms).
-    if (subStatus === "active") {
+    // Switch path requires both an active sub AND an actual Stripe customer
+    // to operate on. If either is missing (legacy state, manual flip, coupon
+    // path that never linked a customer), fall through to fresh Checkout —
+    // otherwise /api/stripe/switch errors with "No active subscription" and
+    // the user is stuck.
+    if (subStatus === "active" && hasStripeCustomer) {
       setSwitchError(null)
       setSwitchDialog(targetTier)
       return
@@ -123,12 +134,24 @@ function BillingContent() {
 
   async function handleManage() {
     setPortalLoading(true)
+    setPortalError(null)
     try {
       const res = await fetch("/api/stripe/portal", { method: "POST" })
       const data = await res.json()
-      if (data.url) window.location.href = data.url
+      if (res.ok && data.url) {
+        window.location.href = data.url
+        return
+      }
+      // Portal needs a Stripe customer to attach to. If we don't have one yet
+      // (legacy/manual/coupon-without-webhook), surface a clear inline error
+      // rather than the previous silent no-op.
+      setPortalError(
+        data.error === "No subscription found"
+          ? "We can't open the Stripe portal because your account isn't linked to a Stripe customer yet. Pick a plan below to subscribe — that will create the link."
+          : data.error ?? "Couldn't open the Stripe portal. Try again or use the plan picker below.",
+      )
     } catch (err) {
-      console.error(err)
+      setPortalError(err instanceof Error ? err.message : "Network error — try again.")
     } finally {
       setPortalLoading(false)
     }
@@ -264,7 +287,7 @@ function BillingContent() {
           )}
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            {isActive && (
+            {isActive && hasStripeCustomer && (
               <button
                 onClick={handleManage}
                 disabled={portalLoading}
@@ -289,6 +312,12 @@ function BillingContent() {
               </button>
             )}
           </div>
+
+          {portalError && (
+            <div className="mt-4 rounded-md bg-amber-50 ring-1 ring-amber-200 p-3 text-[13px] text-amber-800">
+              {portalError}
+            </div>
+          )}
         </section>
       )}
 
@@ -359,7 +388,7 @@ function BillingContent() {
                     className="mt-5 group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-4 py-2 text-[13px] font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                   >
                     {loading === t && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                    {isInactive || isExpiredTrial
+                    {isInactive || isExpiredTrial || !hasStripeCustomer
                       ? "Subscribe"
                       : TIER_ORDER.indexOf(t) > TIER_ORDER.indexOf(tier)
                       ? "Upgrade"
