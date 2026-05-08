@@ -7,7 +7,7 @@ import { ArrowRight, Menu, X } from "lucide-react"
 // Light-field navbar matching mockup4 aesthetic. Off-white when scrolled,
 // transparent at the top, hairline border, tight Geist-style typography.
 const RULE = "rgba(10,10,10,0.10)"
-const LIME = "#C9E63B"
+const LIME = "#B5D33C"
 const INK = "#0A0A0A"
 
 const navLinks = [

@@ -121,7 +121,7 @@ export default function SamplePage() {
                 </div>
               </div>
               <figcaption className="mt-3.5 px-1 max-w-2xl">
-                <p className="text-[11px] font-mono uppercase tracking-widest text-[#C9E63B]/80">
+                <p className="text-[11px] font-mono uppercase tracking-widest text-[#B5D33C]/80">
                   Executive summary
                 </p>
                 <p className="mt-1 text-[13px] md:text-[14px] text-white/70 leading-relaxed">
@@ -161,7 +161,7 @@ export default function SamplePage() {
                     </div>
                   </div>
                   <figcaption className="mt-3 px-1">
-                    <p className="text-[10px] font-mono uppercase tracking-widest text-[#C9E63B]/80">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-[#B5D33C]/80">
                       {m.label}
                     </p>
                     <p className="mt-1 text-[12.5px] text-white/70 leading-relaxed">{m.desc}</p>
@@ -353,21 +353,21 @@ export default function SamplePage() {
               <div
                 aria-hidden
                 className="absolute -top-20 -right-20 h-56 w-56 rounded-full opacity-25 pointer-events-none"
-                style={{ background: "radial-gradient(closest-side, #C9E63B, transparent 70%)" }}
+                style={{ background: "radial-gradient(closest-side, #B5D33C, transparent 70%)" }}
               />
-              <Quote className="h-8 w-8 mb-4" style={{ color: "#C9E63B", opacity: 0.7 }} />
+              <Quote className="h-8 w-8 mb-4" style={{ color: "#B5D33C", opacity: 0.7 }} />
               <blockquote
                 className="relative text-lg md:text-2xl leading-snug tracking-tight font-medium"
                 style={{ color: "#FFF" }}
               >
                 &ldquo;This is not investable in its current form — not necessarily because the
                 opportunity is bad, but because there is virtually{" "}
-                <span className="font-serif italic font-normal" style={{ color: "#C9E63B" }}>
+                <span className="font-serif italic font-normal" style={{ color: "#B5D33C" }}>
                   no information
                 </span>{" "}
                 upon which to base an investment decision.&rdquo;
               </blockquote>
-              <figcaption className="mt-6 flex items-center gap-3 text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: "rgba(201,230,59,0.85)" }}>
+              <figcaption className="mt-6 flex items-center gap-3 text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: "rgba(181,211,60,0.85)" }}>
                 <span>Investment thesis</span>
                 <span style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
                 <span>Company X · 24/100 · Decline</span>
@@ -431,7 +431,7 @@ export default function SamplePage() {
                 style={{ background: "radial-gradient(ellipse 60% 40% at 30% 30%, rgba(0,168,107,0.35), transparent 70%)" }}
               />
               <div className="relative text-center">
-                <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: "#C9E63B" }}>
+                <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: "#B5D33C" }}>
                   Your assessment
                 </p>
                 <h2
@@ -439,7 +439,7 @@ export default function SamplePage() {
                   style={{ fontSize: "clamp(32px, 4.5vw, 56px)" }}
                 >
                   Run the same analysis on{" "}
-                  <span className="font-serif italic font-normal" style={{ color: "#C9E63B" }}>
+                  <span className="font-serif italic font-normal" style={{ color: "#B5D33C" }}>
                     your next deck.
                   </span>
                 </h2>
@@ -451,7 +451,7 @@ export default function SamplePage() {
                   <Link
                     href="/register?tier=professional"
                     className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-[14px] font-semibold transition hover:scale-[1.02]"
-                    style={{ background: "#C9E63B", color: "#0A0A0A" }}
+                    style={{ background: "#B5D33C", color: "#0A0A0A" }}
                   >
                     Analyse a deck
                     <ArrowRight className="h-3.5 w-3.5" />

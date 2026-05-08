@@ -12,7 +12,7 @@ const SUBINK = "rgba(10,10,10,0.62)"
 const RULE = "rgba(10,10,10,0.10)"
 const ACCENT = "#0F3D2E"
 const ACCENT_HI = "#00A86B"
-const LIME = "#C9E63B"
+const LIME = "#B5D33C"
 
 const bullets = [
   "Partner-ready first screens your team can actually compare.",
@@ -129,7 +129,7 @@ export default function ForVCFundsPage() {
                 <div className="flex items-center gap-3 mb-6 mt-2">
                   <div
                     className="flex h-10 w-10 items-center justify-center rounded-xl"
-                    style={{ background: "rgba(201,230,59,0.10)", border: "1px solid rgba(201,230,59,0.25)" }}
+                    style={{ background: "rgba(181,211,60,0.10)", border: "1px solid rgba(181,211,60,0.25)" }}
                   >
                     <Check className="h-5 w-5 stroke-[2.5]" style={{ color: LIME }} />
                   </div>
@@ -235,7 +235,7 @@ export default function ForVCFundsPage() {
                     <li key={b} className="flex items-start gap-2.5 text-[13.5px] text-white/80 leading-snug">
                       <span
                         className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
-                        style={{ background: "rgba(201,230,59,0.12)", border: "1px solid rgba(201,230,59,0.30)" }}
+                        style={{ background: "rgba(181,211,60,0.12)", border: "1px solid rgba(181,211,60,0.30)" }}
                       >
                         <Check className="h-2.5 w-2.5 stroke-[3]" style={{ color: LIME }} />
                       </span>

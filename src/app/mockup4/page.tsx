@@ -38,7 +38,7 @@ const INK = "#0A0A0A"
 const SUBINK = "rgba(10,10,10,0.62)"
 const RULE = "rgba(10,10,10,0.10)"
 const SOFT = "rgba(10,10,10,0.06)"
-const LIME = "#C9E63B"
+const LIME = "#B5D33C"
 const ACCENT = "#0F3D2E"   // forest, used sparingly (icons, stat values)
 const ACCENT_HI = "#00A86B"
 
@@ -1337,7 +1337,7 @@ function AgentStream() {
           >
             <span className="text-white/40 tabular-nums">{e.t}</span>
             <span className="text-[10px] uppercase tracking-widest px-1.5 py-0.5 rounded"
-                  style={{ background: "rgba(201,230,59,0.12)", color: LIME }}>
+                  style={{ background: "rgba(181,211,60,0.12)", color: LIME }}>
               {e.tag}
             </span>
             <span className="text-white/85 truncate">{e.msg}</span>
