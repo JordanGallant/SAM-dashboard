@@ -1576,7 +1576,7 @@ function Footer() {
             sam<span className="opacity-50">/</span>
           </div>
           <p className="mt-4 text-white/55 max-w-xs leading-[1.6]">
-            The AI investment associate for European VC funds.
+            Structured first-screening for European investors.
           </p>
         </div>
         {[
