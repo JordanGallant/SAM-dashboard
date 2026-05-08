@@ -21,7 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Sam — The decision intelligence layer for private capital",
-  description: "Sam analyses pitch decks across five investment domains and returns a scored, IC-ready memo. Built for European investors.",
+  description: "Sam analyses pitch decks across six investment domains and returns a structured, source-aware first-screen assessment. Built for European investors.",
 };
 
 export default function RootLayout({

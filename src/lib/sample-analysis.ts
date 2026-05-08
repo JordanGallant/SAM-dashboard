@@ -3,7 +3,8 @@ import type { DealAnalysis } from "./types/analysis"
 /**
  * Fully fictional sample memo used on the public /sample page.
  * Do NOT replace with real client data — this page is unauthenticated.
- * "Meridian Flow" is an invented company for demonstration.
+ * "Company X" is an anonymised stand-in for demonstration. Company details
+ * have been changed.
  */
 export const sampleAnalysis: DealAnalysis = {
   id: "sample-analysis",
@@ -11,7 +12,7 @@ export const sampleAnalysis: DealAnalysis = {
   status: "completed",
   createdAt: "2026-04-01T10:00:00Z",
   executiveSummary: {
-    companyName: "Meridian Flow",
+    companyName: "Company X",
     stage: "Seed",
     sector: "B2B SaaS / Procurement Automation",
     raising: "EUR 1.5M",
@@ -63,7 +64,7 @@ export const sampleAnalysis: DealAnalysis = {
       },
     ],
     thesis:
-      "Meridian Flow is building procurement automation for European mid-market buyers — a legitimate gap in a market currently served by expensive enterprise tools (Coupa) or generic horizontal software. The founding team has genuine domain expertise and has shipped a working product with early pilot revenue. However, the core question is whether the team can break out of the pilot phase into repeatable enterprise sales before the runway ends. The traction data does not yet support the valuation being asked, and the competitive landscape includes well-capitalised incumbents who could extend downmarket. Worth continuing conversations — particularly to understand the CTO gap and the path from pilot to expansion — but not yet a clear conviction investment at these terms.",
+      "Company X is building procurement automation for European mid-market buyers — a legitimate gap in a market currently served by expensive enterprise tools (Coupa) or generic horizontal software. The founding team has genuine domain expertise and has shipped a working product with early pilot revenue. However, the core question is whether the team can break out of the pilot phase into repeatable enterprise sales before the runway ends. The traction data does not yet support the valuation being asked, and the competitive landscape includes well-capitalised incumbents who could extend downmarket. Worth continuing conversations — particularly to understand the CTO gap and the path from pilot to expansion — but not yet a clear conviction investment at these terms.",
     strengths: [
       {
         id: 1,
@@ -95,7 +96,7 @@ export const sampleAnalysis: DealAnalysis = {
       {
         id: 3,
         severity: "Info",
-        text: "Competitive moat is thin today. Coupa and Jaggaer could extend downmarket at any time. Defensibility depends on data accumulation — which only works if Meridian wins enough pilots in the next 12 months to matter.",
+        text: "Competitive moat is thin today. Coupa and Jaggaer could extend downmarket at any time. Defensibility depends on data accumulation — which only works if Company X wins enough pilots in the next 12 months to matter.",
       },
     ],
     recommendedNextSteps: [

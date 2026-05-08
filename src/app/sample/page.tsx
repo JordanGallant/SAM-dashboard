@@ -41,7 +41,7 @@ export default function SamplePage() {
                   <span style={{ color: "rgba(10,10,10,0.18)" }}>·</span>
                   <span>source-tagged</span>
                   <span style={{ color: "rgba(10,10,10,0.18)" }}>·</span>
-                  <span>IC-ready</span>
+                  <span>IC-prep</span>
                 </div>
               </div>
 
@@ -63,7 +63,7 @@ export default function SamplePage() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/design/hero-img-new.png"
-                    alt="Sam dashboard — MyStartup memo with overall score, radar chart, and domain breakdowns"
+                    alt="Sam dashboard — MyStartup assessment with overall score, radar chart, and domain breakdowns"
                     className="block w-full h-auto"
                   />
                 </div>
@@ -125,7 +125,7 @@ export default function SamplePage() {
                   Executive summary
                 </p>
                 <p className="mt-1 text-[13px] md:text-[14px] text-white/70 leading-relaxed">
-                  Overall score, verdict, radar across the five domains, and the investment thesis at a glance.
+                  Overall score, assessment, radar across the six domains, and the investment thesis at a glance.
                 </p>
               </figcaption>
             </figure>
@@ -202,10 +202,10 @@ export default function SamplePage() {
               </CardContent>
             </Card>
 
-            {/* Verdict header */}
+            {/* Assessment header */}
             <Card>
               <CardContent className="pt-6">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-primary mb-3">Verdict</p>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-primary mb-3">Assessment</p>
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex flex-wrap items-center gap-3">
                     <div className={`inline-flex items-center rounded-md ${verdictColor.bg} ${verdictColor.border} border px-3 py-1.5`}>
@@ -336,12 +336,12 @@ export default function SamplePage() {
         <section className="py-20 border-t bg-gradient-to-b from-white to-slate-50/60">
           <div className="mx-auto max-w-4xl px-4">
             <div className="max-w-2xl">
-              <p className="text-[10px] font-mono uppercase tracking-widest text-primary">From a real memo</p>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-primary">From a sample assessment</p>
               <h2 className="mt-2 text-3xl md:text-4xl font-bold font-heading tracking-tight">
                 Sam&rsquo;s writing voice.
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Memos are written in the same disciplined style an analyst would use — direct, evidence-led, and unafraid to call a pass a pass. Below: excerpts from a real Sam memo on <span className="font-medium text-foreground">Canaaro</span>, a Seed-stage GTM productivity company that scored 24/100.
+                Assessments are written in the same disciplined style an analyst would use — direct, evidence-led, and unafraid to call a pass a pass. Below: excerpts from a Sam-generated assessment on <span className="font-medium text-foreground">Company X</span>, a Seed-stage GTM productivity company that scored 24/100. Company details have been changed.
               </p>
             </div>
 
@@ -370,7 +370,7 @@ export default function SamplePage() {
               <figcaption className="mt-6 flex items-center gap-3 text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: "rgba(215,254,63,0.85)" }}>
                 <span>Investment thesis</span>
                 <span style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-                <span>Canaaro · 24/100 · Pass</span>
+                <span>Company X · 24/100 · Decline</span>
               </figcaption>
             </figure>
 
@@ -393,7 +393,7 @@ export default function SamplePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm md:text-[15px] leading-relaxed text-foreground/85">
-                    &ldquo;The most plausible timing catalyst is the explosion of generative AI capabilities creating a window for AI-native GTM tools. However, this timing argument cuts both ways: AI enables new entrants but also enables incumbents (Outreach, Salesloft, HubSpot, Salesforce) to rapidly add AI features to existing platforms with massive distribution advantages. The window for AI-native GTM startups may be narrowing, not widening. Every competitor in the space is citing the same AI tailwind. Without an explicit, differentiated timing thesis, Canaaro has no discernible timing edge.&rdquo;
+                    &ldquo;The most plausible timing catalyst is the explosion of generative AI capabilities creating a window for AI-native GTM tools. However, this timing argument cuts both ways: AI enables new entrants but also enables incumbents (Outreach, Salesloft, HubSpot, Salesforce) to rapidly add AI features to existing platforms with massive distribution advantages. The window for AI-native GTM startups may be narrowing, not widening. Every competitor in the space is citing the same AI tailwind. Without an explicit, differentiated timing thesis, Company X has no discernible timing edge.&rdquo;
                   </p>
                 </CardContent>
               </Card>
@@ -402,7 +402,7 @@ export default function SamplePage() {
             <div className="mt-6">
               <Card>
                 <CardHeader className="pb-2">
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Traction verdict — score 12</p>
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-primary">Traction assessment — score 12</p>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm md:text-[15px] leading-relaxed text-foreground/85">
@@ -413,7 +413,7 @@ export default function SamplePage() {
             </div>
 
             <p className="mt-8 text-xs text-muted-foreground max-w-2xl">
-              Excerpted from a Sam-generated memo. Company name retained with permission. Numbers and prose are produced by the same pipeline that runs on every deck you upload.
+              Excerpted from a Sam-generated assessment. Company details have been changed. Numbers and prose are produced by the same pipeline that runs on every deck you upload.
             </p>
           </div>
         </section>

@@ -33,7 +33,7 @@ const steps = [
   {
     icon: FileText,
     title: "Structured assessment delivered",
-    body: "The assessment arrives in your account — executive summary on top, six-domain breakdown below, source-tagged claims, missing-info checklist and Ask Sam co-pilot in context. Word + PDF export available.",
+    body: "The assessment arrives in your account — executive summary on top, six-domain breakdown below, source-tagged claims, missing-info checklist and Ask Sam co-pilot in context. Export available.",
   },
   {
     icon: Scale,
@@ -44,7 +44,7 @@ const steps = [
 
 const domains = [
   { icon: Users, name: "Team", body: "Founder backgrounds, complementarity, domain expertise and execution signals. Enriched with LinkedIn and public sources where available, with founder-market fit flagged at specifics — not \"strong team\" but \"two-thirds of the team has domain tenure, the commercial lead does not.\"" },
-  { icon: Globe2, name: "Market", body: "TAM / SAM / SOM validated against independent sources, not accepted as stated. Competitive landscape mapped, market timing assessed, with a \"why now\" verdict — flagged if the thesis depends on a trend that may have already passed." },
+  { icon: Globe2, name: "Market", body: "TAM / SAM / SOM validated against independent sources, not accepted as stated. Competitive landscape mapped, market timing assessed, with a \"why now\" view — flagged if the thesis depends on a trend that may have already passed." },
   { icon: Package, name: "Product", body: "Sam runs the 10× test — meaningful improvement or marginal? PMF signals weighted (early revenue, retention curves, pilot-to-paid). Moat assessment looks for defensibility: network effects, data advantage, technical depth, distribution." },
   { icon: TrendingUp, name: "Traction", body: "Revenue figures cross-checked against deck claims. Unit economics — CAC, LTV, payback — calculated where data is available. Retention and capital efficiency evaluated against stage benchmarks. If numbers don't reconcile, Sam flags it." },
   { icon: Landmark, name: "Finance", body: "Business model, revenue quality, burn, runway, valuation, funding need and use of funds — highlighting what is clear, what is missing, and what needs further diligence." },

@@ -15,7 +15,7 @@ const ACCENT_HI = "#00A86B"
 const LIME = "#D7FE3F"
 
 const bullets = [
-  "IC-ready assessments your partners can actually compare.",
+  "Partner-ready first screens your team can actually compare.",
   "Framework consistency across every deal, every analyst.",
   "Shared assessment library so institutional knowledge stays institutional.",
   "Associates focus on the deals that matter, not the ones they'll pass.",
@@ -45,7 +45,7 @@ export default function ForVCFundsPage() {
             >
               First-screening is your bottleneck.{" "}
               <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
-                Sam handles it.
+                Sam structures the first pass.
               </span>
             </h1>
             <p className="mt-6 mx-auto max-w-2xl text-[16px] md:text-[17px] leading-[1.55]" style={{ color: SUBINK }}>
@@ -135,7 +135,7 @@ export default function ForVCFundsPage() {
                   </div>
                   <div>
                     <p className="text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: LIME }}>
-                      Triage layer
+                      First-pass layer
                     </p>
                     <p className="text-[15px] font-bold mt-0.5">Same framework, every analyst</p>
                   </div>
@@ -166,7 +166,7 @@ export default function ForVCFundsPage() {
                 className="mt-3 font-bold tracking-[-0.025em] leading-[1.04]"
                 style={{ fontSize: "clamp(36px, 5vw, 60px)" }}
               >
-                IC-ready assessments,{" "}
+                Partner-ready first screens,{" "}
                 <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
                   end-to-end consistency.
                 </span>

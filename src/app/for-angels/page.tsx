@@ -25,7 +25,7 @@ const currentState = [
   "Deck opened at 11pm, scanned in 8 minutes.",
   "\"Good team — I think?\" scribbled in a notebook.",
   "You passed on a deal last March. By September, you can't remember why.",
-  "Every partner screens slightly differently.",
+  "Every deal is screened slightly differently.",
 ]
 
 export default function ForAngelsPage() {
@@ -141,7 +141,7 @@ export default function ForAngelsPage() {
                 </div>
                 <p className="text-[15px] leading-[1.65] text-white/80">
                   Sam writes the assessment you would have written if you had time. Every deck you
-                  upload comes back with a six-domain scored verdict, source-tagged claims, red
+                  upload comes back with a six-domain scored assessment, source-tagged claims, red
                   flags, and a structured thesis. Months later, you can pull up deal nineteen and
                   know exactly why you walked away.
                 </p>
