@@ -75,12 +75,16 @@ function BillingContent() {
   const memoAtLimit = memoCap > 0 && memosUsed !== null && memosUsed >= memoCap
 
   async function handleSubscribe(targetTier: Tier) {
-    // Switch path requires both an active sub AND an actual Stripe customer
-    // to operate on. If either is missing (legacy state, manual flip, coupon
-    // path that never linked a customer), fall through to fresh Checkout —
-    // otherwise /api/stripe/switch errors with "No active subscription" and
-    // the user is stuck.
-    if (subStatus === "active" && hasStripeCustomer) {
+    // Switch path requires both a live sub AND an actual Stripe customer to
+    // operate on. "Live" means active OR trialing — the switch endpoint
+    // already accepts both (filters status === active|trialing|past_due).
+    // If either piece is missing (legacy state, manual flip, coupon path that
+    // never linked a customer), fall through to fresh Checkout — otherwise
+    // /api/stripe/switch errors with "No active subscription" and the user
+    // is stuck. Without the trial branch here, brand-new trialing users
+    // clicking Upgrade/Downgrade would silently start a second checkout.
+    const hasLiveSub = subStatus === "active" || subStatus === "trial"
+    if (hasLiveSub && hasStripeCustomer) {
       setSwitchError(null)
       setSwitchDialog(targetTier)
       return
