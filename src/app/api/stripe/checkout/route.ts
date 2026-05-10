@@ -49,7 +49,12 @@ export async function POST(request: Request) {
 
     const session = await getStripe().checkout.sessions.create({
       mode: "subscription",
-      payment_method_types: ["card", "ideal"],
+      // Don't hard-code payment_method_types. Stripe Checkout falls back to the
+      // payment methods enabled in your Stripe dashboard (Settings -> Payment
+      // methods), so you can toggle iDEAL / SEPA Debit / etc. without a deploy.
+      // The previous explicit list ["card","ideal"] worked in test mode but
+      // live mode requires sepa_debit to be activated alongside iDEAL for
+      // subscriptions — letting the dashboard drive avoids that coupling.
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/settings/billing?canceled=true`,
