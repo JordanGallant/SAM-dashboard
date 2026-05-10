@@ -180,6 +180,54 @@ function BillingContent() {
         </div>
       )}
 
+      {/* Trial countdown banner. Visible whenever the user is in their 14-day
+          trial. Tightens to amber under 3 days remaining so the urgency is
+          obvious. Hidden once the user is on a paid sub or after the trial
+          has expired (the showExpired banner above takes over for that case). */}
+      {isTrialing && (
+        <div
+          className={
+            trialDaysLeft <= 3
+              ? "rounded-xl bg-amber-50 ring-1 ring-amber-300 p-4 flex gap-3"
+              : "rounded-xl bg-primary/5 ring-1 ring-primary/30 p-4 flex gap-3"
+          }
+        >
+          <Sparkles
+            className={
+              trialDaysLeft <= 3
+                ? "h-5 w-5 text-amber-700 shrink-0 mt-0.5"
+                : "h-5 w-5 text-primary shrink-0 mt-0.5"
+            }
+          />
+          <div>
+            <p
+              className={
+                trialDaysLeft <= 3
+                  ? "font-heading font-bold text-amber-900 text-sm"
+                  : "font-heading font-bold text-primary text-sm"
+              }
+            >
+              {trialDaysLeft === 0
+                ? "Your trial ends today"
+                : trialDaysLeft === 1
+                  ? "Your trial ends tomorrow"
+                  : `${trialDaysLeft} days left in your trial`}
+            </p>
+            <p
+              className={
+                trialDaysLeft <= 3
+                  ? "text-[13px] text-amber-800/90 mt-0.5"
+                  : "text-[13px] text-primary/85 mt-0.5"
+              }
+            >
+              {hasStripeCustomer
+                ? "Add a payment method via 'Manage subscription' before the trial ends to keep your access."
+                : "Add a payment method before the trial ends to keep your access — otherwise your subscription will be cancelled automatically."}
+            </p>
+          </div>
+        </div>
+      )}
+
       {showSubscribe && isInactive && (
         <div className="rounded-xl bg-blue-50 ring-1 ring-blue-200 p-4 flex gap-3">
           <Sparkles className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
