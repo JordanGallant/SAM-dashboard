@@ -24,6 +24,13 @@ function BillingContent() {
   const [portalLoading, setPortalLoading] = useState(false)
   const [portalError, setPortalError] = useState<string | null>(null)
   const [subStatus, setSubStatus] = useState<string | null>(null)
+  // Coupon-gated trial flow. Per launch plan, trials are coupon-only — typing
+  // a code here routes the user to a 14-day Pro trial (no card upfront).
+  // Direct-pay subscribers (no coupon) take the Subscribe buttons in the tier
+  // picker below and are charged today.
+  const [coupon, setCoupon] = useState("")
+  const [couponLoading, setCouponLoading] = useState(false)
+  const [couponError, setCouponError] = useState<string | null>(null)
   // Whether we have a Stripe customer ID at all. A profile can be marked
   // active without one (legacy migrations, manual flips, 100% coupon paths
   // that never round-tripped the webhook) — when that happens, we have to
@@ -103,6 +110,36 @@ function BillingContent() {
       console.error(err)
     } finally {
       setLoading(null)
+    }
+  }
+
+  async function handleApplyCoupon() {
+    const code = coupon.trim()
+    if (!code) {
+      setCouponError("Enter a coupon code first.")
+      return
+    }
+    setCouponLoading(true)
+    setCouponError(null)
+    try {
+      // Coupon path always lands on Professional tier (server forces this) —
+      // we still pass professional here so anyone reading the network tab
+      // can see the intent.
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier: "professional", coupon: code }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setCouponError(data.error ?? "Couldn't apply that coupon. Double-check the code.")
+        return
+      }
+      if (data.url) window.location.href = data.url
+    } catch (err) {
+      setCouponError(err instanceof Error ? err.message : "Network error — try again.")
+    } finally {
+      setCouponLoading(false)
     }
   }
 
@@ -373,10 +410,71 @@ function BillingContent() {
         </section>
       )}
 
+      {/* Coupon-gated trial entry. Hidden when the user already has a live
+          sub — switching with a coupon goes through the customer portal,
+          not a fresh checkout, so this section would just confuse. */}
+      {(isInactive || isExpiredTrial) && (
+        <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="grid place-items-center h-10 w-10 rounded-xl bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/10 ring-1 ring-[#0F3D2E]/10 shrink-0">
+              <Sparkles className="h-5 w-5 text-[#0F3D2E]" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+                Have a coupon?
+              </p>
+              <h3 className="mt-1 font-heading text-[15px] font-bold leading-tight">
+                Start a 14-day Pro trial
+              </h3>
+              <p className="mt-1 text-[12.5px] text-muted-foreground max-w-md">
+                Enter a code to start a 14-day Pro trial — no card needed. Your
+                coupon applies to the first invoice. Without a code, pick a tier
+                below to subscribe directly.
+              </p>
+            </div>
+          </div>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (!couponLoading) handleApplyCoupon()
+            }}
+            className="flex flex-wrap gap-2"
+          >
+            <input
+              type="text"
+              value={coupon}
+              onChange={(e) => {
+                setCoupon(e.target.value.toUpperCase())
+                if (couponError) setCouponError(null)
+              }}
+              placeholder="Coupon code"
+              autoComplete="off"
+              spellCheck={false}
+              className="flex-1 min-w-[180px] rounded-full ring-1 ring-foreground/15 hover:ring-foreground/25 focus:ring-2 focus:ring-primary/40 px-4 py-2 text-[13.5px] font-mono uppercase tracking-wider transition-shadow outline-none bg-card"
+            />
+            <button
+              type="submit"
+              disabled={couponLoading || !coupon.trim()}
+              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2 text-[13.5px] font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+            >
+              {couponLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Start Pro trial
+            </button>
+          </form>
+
+          {couponError && (
+            <div className="mt-3 rounded-md bg-red-50 ring-1 ring-red-200 p-3 text-[13px] text-red-700">
+              {couponError}
+            </div>
+          )}
+        </section>
+      )}
+
       {/* Plan picker */}
       <div>
         <SectionLabel className="mb-4">
-          {isInactive || isExpiredTrial ? "Choose a plan" : "Switch plan"}
+          {isInactive || isExpiredTrial ? "Or subscribe directly" : "Switch plan"}
         </SectionLabel>
         <div className="grid gap-4 md:grid-cols-3">
           {TIER_ORDER.map((t) => {
