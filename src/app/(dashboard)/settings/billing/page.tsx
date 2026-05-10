@@ -199,7 +199,13 @@ function BillingContent() {
   }
 
   const isActive = subStatus === "active"
-  const isInactive = subStatus === "inactive" || !subStatus
+  // 'canceled' (Stripe-native trial auto-cancel, or user-initiated cancel
+  // via the customer portal) is functionally identical to 'inactive' for UI
+  // purposes — they need to re-subscribe. Without this branch the coupon
+  // section and tier picker stayed hidden after a cancel, leaving the user
+  // on a "Current plan: Angel" card with no obvious way to re-subscribe.
+  const isInactive =
+    subStatus === "inactive" || subStatus === "canceled" || !subStatus
   const isExpiredTrial = subStatus === "trial" && !isTrialing
 
   return (
