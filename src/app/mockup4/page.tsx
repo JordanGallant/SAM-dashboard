@@ -98,6 +98,7 @@ function Nav() {
         <nav className="hidden md:flex items-center gap-7 text-[14px]">
           <Link href="/how-it-works" className="hover:opacity-60 transition">How it works</Link>
           <Link href="/for-angels" className="hover:opacity-60 transition">For angels</Link>
+          <Link href="/for-teams" className="hover:opacity-60 transition">For teams</Link>
           <Link href="/for-vc-funds" className="hover:opacity-60 transition">For VC funds</Link>
           <Link href="/sample" className="hover:opacity-60 transition">Sample</Link>
           <Link href="/#pricing" className="hover:opacity-60 transition">Pricing</Link>
@@ -1046,7 +1047,7 @@ function Quotes() {
             className="font-bold tracking-[-0.02em] leading-[1.1]"
             style={{ fontSize: "clamp(26px, 3.2vw, 40px)" }}
           >
-            Assessments that learn from your fund.{" "}
+            Assessments shaped by your fund profile.{" "}
             <span style={{ color: SUBINK }}>
               Your mandate, thesis and ticket window inform every first screen.
             </span>
@@ -1771,11 +1772,11 @@ function Audiences() {
     },
     {
       label: "For syndicates & scouts",
-      badge: "Best for shared notes",
-      workflow: "Shared notes · supporting docs",
+      badge: "Best for shared deal review",
+      workflow: "Shared workspace · deal comparison · team memory",
       body: "Your deal notes live across three tools and two heads. Sam produces a consistent memo per deal that your syndicate partners can actually compare and reference.",
-      cta: "See the Pro workflow",
-      href: "/sample",
+      cta: "See the Teams workflow",
+      href: "/for-teams",
       theme: "dark",
       seats: 3,
     },

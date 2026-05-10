@@ -13,6 +13,7 @@ const INK = "#0A0A0A"
 const navLinks = [
   { href: "/how-it-works", label: "How it works" },
   { href: "/for-angels", label: "For angels" },
+  { href: "/for-teams", label: "For teams" },
   { href: "/for-vc-funds", label: "For VC funds" },
   { href: "/sample", label: "Sample" },
   { href: "/#pricing", label: "Pricing" },

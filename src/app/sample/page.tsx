@@ -5,11 +5,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Shield, AlertTriangle, ArrowRight, Quote } from "lucide-react"
 import { sampleAnalysis } from "@/lib/sample-analysis"
-import { VERDICT_COLORS, DOMAIN_VERDICT_COLORS } from "@/lib/constants"
 
 export default function SamplePage() {
   const es = sampleAnalysis.executiveSummary
-  const verdictColor = VERDICT_COLORS[es.verdict]
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -202,15 +200,15 @@ export default function SamplePage() {
               </CardContent>
             </Card>
 
-            {/* Assessment header */}
+            {/* Assessment header — verdict-flavoured chip removed per launch
+                feedback ("framed as next-step language rather than verdict
+                language"). Score + confidence + first recommended next-step
+                replace the EXPLORE/DECLINE/PASS pill. */}
             <Card>
               <CardContent className="pt-6">
                 <p className="text-[10px] font-mono uppercase tracking-widest text-primary mb-3">Assessment</p>
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className={`inline-flex items-center rounded-md ${verdictColor.bg} ${verdictColor.border} border px-3 py-1.5`}>
-                      <span className={`text-lg font-bold font-heading ${verdictColor.text}`}>{es.verdict.toUpperCase()}</span>
-                    </div>
                     <span className="inline-flex items-center rounded-md bg-white border px-2.5 py-1 text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider">
                       Confidence · {es.confidence}
                     </span>
@@ -220,6 +218,14 @@ export default function SamplePage() {
                     <span className="text-sm font-mono text-muted-foreground">/100</span>
                   </div>
                 </div>
+                {es.recommendedNextSteps?.[0] && (
+                  <p className="mt-4 text-sm text-foreground/80 leading-relaxed">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mr-2">
+                      Recommended next step
+                    </span>
+                    {es.recommendedNextSteps[0]}
+                  </p>
+                )}
               </CardContent>
             </Card>
 
@@ -230,19 +236,15 @@ export default function SamplePage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 font-mono text-xs">
-                  {es.scorecard.map((row) => {
-                    const dv = DOMAIN_VERDICT_COLORS[row.verdict]
-                    return (
-                      <div key={row.domain} className="grid grid-cols-[6rem_1fr_2.5rem_5rem] items-center gap-4">
-                        <span className="text-muted-foreground tracking-wider uppercase">{row.domain}</span>
-                        <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                          <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${row.score}%` }} />
-                        </div>
-                        <span className="font-semibold text-primary text-right tabular-nums">{row.score}</span>
-                        <span className={`${dv.text} uppercase tracking-wider text-[10px]`}>{row.verdict}</span>
+                  {es.scorecard.map((row) => (
+                    <div key={row.domain} className="grid grid-cols-[6rem_1fr_2.5rem] items-center gap-4">
+                      <span className="text-muted-foreground tracking-wider uppercase">{row.domain}</span>
+                      <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                        <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${row.score}%` }} />
                       </div>
-                    )
-                  })}
+                      <span className="font-semibold text-primary text-right tabular-nums">{row.score}</span>
+                    </div>
+                  ))}
                 </div>
                 <div className="mt-6 space-y-3 border-t pt-5">
                   {es.scorecard.map((row) => (
@@ -341,7 +343,7 @@ export default function SamplePage() {
                 Sam&rsquo;s writing voice.
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Assessments are written in the same disciplined style an analyst would use — direct, evidence-led, and unafraid to call a pass a pass. Below: excerpts from a Sam-generated assessment on <span className="font-medium text-foreground">Company X</span>, a Seed-stage GTM productivity company that scored 24/100. Company details have been changed.
+                Assessments are written in the same disciplined style an analyst would use — direct, evidence-led, and frank about gaps. Below: excerpts from a Sam-generated assessment on <span className="font-medium text-foreground">MyStartup</span>, a Seed-stage GTM productivity company that scored 24/100. Company details have been changed.
               </p>
             </div>
 
@@ -370,7 +372,7 @@ export default function SamplePage() {
               <figcaption className="mt-6 flex items-center gap-3 text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: "rgba(181,211,60,0.85)" }}>
                 <span>Investment thesis</span>
                 <span style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-                <span>Company X · 24/100 · Decline</span>
+                <span>MyStartup · 24/100 · Pass with feedback</span>
               </figcaption>
             </figure>
 
@@ -393,7 +395,7 @@ export default function SamplePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm md:text-[15px] leading-relaxed text-foreground/85">
-                    &ldquo;The most plausible timing catalyst is the explosion of generative AI capabilities creating a window for AI-native GTM tools. However, this timing argument cuts both ways: AI enables new entrants but also enables incumbents (Outreach, Salesloft, HubSpot, Salesforce) to rapidly add AI features to existing platforms with massive distribution advantages. The window for AI-native GTM startups may be narrowing, not widening. Every competitor in the space is citing the same AI tailwind. Without an explicit, differentiated timing thesis, Company X has no discernible timing edge.&rdquo;
+                    &ldquo;The most plausible timing catalyst is the explosion of generative AI capabilities creating a window for AI-native GTM tools. However, this timing argument cuts both ways: AI enables new entrants but also enables incumbents (Outreach, Salesloft, HubSpot, Salesforce) to rapidly add AI features to existing platforms with massive distribution advantages. The window for AI-native GTM startups may be narrowing, not widening. Every competitor in the space is citing the same AI tailwind. Without an explicit, differentiated timing thesis, MyStartup has no discernible timing edge.&rdquo;
                   </p>
                 </CardContent>
               </Card>
