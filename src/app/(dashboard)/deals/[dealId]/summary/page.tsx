@@ -354,22 +354,53 @@ function ThesisCard({ thesis }: { thesis: string }) {
   const HIGHLIGHT_RE =
     /(\b(?:USD|EUR|GBP|CHF)\s?\d[\d,.]*\s?(?:[KMB]|trillion|billion|million)?\b|[\$€£]\s?\d[\d,.]*\s?(?:[KMB]|trillion|billion|million)?\b|\b\d+(?:\.\d+)?%\b|\b\d{4}\b|\b\d+(?:\.\d+)?[KMB]?\s?(?:CAGR|ARR|MRR|TAM|SAM|SOM)\b)/g
 
-  function emphasize(text: string) {
+  // Source tags: "[Source: <whatever>]". Rendered as small chips inline so
+  // the citation reads as metadata, not as prose. UNVALIDATED variants get
+  // amber styling so the eye registers them as caveats.
+  const SOURCE_RE = /\[Source:\s*([^\]]+)\]/g
+
+  function renderInline(text: string) {
     if (!text) return null
-    const parts = text.split(HIGHLIGHT_RE)
-    return parts.map((part, i) =>
-      i % 2 === 0 ? (
-        <span key={i}>{part}</span>
-      ) : (
-        <span
-          key={i}
-          className="font-semibold text-foreground bg-primary/8 rounded px-0.5"
-        >
-          {part}
-        </span>
+
+    // First split on source tags so we can render those as chips.
+    const sourceParts = text.split(SOURCE_RE)
+    return sourceParts.map((part, i) => {
+      if (i % 2 === 1) {
+        // Captured group from SOURCE_RE — the inner label of a [Source: ...]
+        const label = part.trim()
+        const isUnvalidated = /UNVALIDATED/i.test(label)
+        return (
+          <span
+            key={`s${i}`}
+            className={
+              isUnvalidated
+                ? "inline-flex items-center align-baseline ml-1 mr-0.5 px-1.5 py-0 rounded text-[9.5px] font-mono uppercase tracking-[0.06em] bg-amber-50 text-amber-800 ring-1 ring-amber-200"
+                : "inline-flex items-center align-baseline ml-1 mr-0.5 px-1.5 py-0 rounded text-[9.5px] font-mono uppercase tracking-[0.06em] bg-muted/60 text-muted-foreground ring-1 ring-foreground/10"
+            }
+            title={`Source: ${label}`}
+          >
+            {label}
+          </span>
+        )
+      }
+      // Non-source portion: apply numeric/currency emphasis.
+      const parts = part.split(HIGHLIGHT_RE)
+      return parts.map((p, j) =>
+        j % 2 === 0 ? (
+          <span key={`t${i}-${j}`}>{p}</span>
+        ) : (
+          <span
+            key={`t${i}-${j}`}
+            className="font-semibold text-foreground bg-primary/8 rounded px-0.5"
+          >
+            {p}
+          </span>
+        ),
       )
-    )
+    })
   }
+  // Keep the old name so the JSX below stays a one-line change.
+  const emphasize = renderInline
 
   return (
     <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-6 md:p-7">

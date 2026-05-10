@@ -43,8 +43,15 @@ const trim = (s: string | undefined) => (s ?? "").trim()
 // we don't want that bleeding into the user-facing memo. Cheap regex sweep —
 // pure string in, pure string out, no behavioural change if the pattern is
 // absent.
+// Catches LLM "I'm showing my working" rubric narration in any of its observed
+// shapes — the original Pilot #13 regex required a parenthetical immediately
+// after "Weighting applied" and missed phrasings like
+//   "Weighting applied per Seed stage default (no override needed):."
+// so the rubric leaked through as a stray colon-period and an empty `[]`.
+// Pattern is now: leading phrase, then anything up to the next sentence end
+// (period, newline, or end of string), then optional trailing brackets/colons.
 const RUBRIC_RE =
-  /\s*(?:Weighting applied|Per[- ]?stage rubric|Stage rubric)\s*\([^)]{0,300}\)\s*(?:yields|gives|produces|results in)?[^.]{0,200}\./gi
+  /\s*(?:Weighting applied|Per[- ]?stage rubric|Stage rubric)[^.\n]{0,400}(?:\.|$)/gi
 
 function stripRubricNarration(s: string | undefined): string {
   if (!s) return ""
@@ -57,6 +64,9 @@ function stripRubricNarration(s: string | undefined): string {
     /\s*(?:Team|Market|Product|Traction|Finance)\s+\d{1,3}%\s*(?:\/\s*(?:Team|Market|Product|Traction|Finance)\s+\d{1,3}%\s*){2,}/gi,
     " ",
   )
+  // Third pass: empty placeholder brackets like "[]" or "[ ]" that the LLM
+  // leaves behind when it removes a citation it couldn't fill in.
+  out = out.replace(/\[\s*\]/g, "")
   // Collapse double-spaces from removals + restore leading capital if needed.
   out = out.replace(/\s{2,}/g, " ").replace(/\s+([.,;:])/g, "$1").trim()
   return out
