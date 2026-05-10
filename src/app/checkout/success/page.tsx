@@ -32,7 +32,15 @@ function SuccessContent() {
         .eq("id", user.id)
         .single()
 
-      if (profile?.subscription_status === "active" && profile.tier) {
+      // Accept both `active` (paid path) and `trial` (Stripe-native trial path
+      // — webhook writes 'trial' when no card was collected, and the user still
+      // has full dashboard access for 14 days). Without the trial branch this
+      // poll would always time out for trialing users and bail to the
+      // "taking longer than expected" copy even though their sub was healthy.
+      const ready =
+        (profile?.subscription_status === "active" || profile?.subscription_status === "trial") &&
+        profile.tier
+      if (ready) {
         setStatus("active")
         clearInterval(interval)
         // Wait a moment so user sees the success state
