@@ -45,6 +45,7 @@ export async function updateSession(request: NextRequest) {
       "/for-teams",
       "/for-vc-funds",
       "/privacy",
+      "/terms",
       "/sample",
       "/mockup1",
       "/mockup2",

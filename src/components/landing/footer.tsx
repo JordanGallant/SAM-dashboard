@@ -63,6 +63,10 @@ export function Footer() {
               Privacy
             </Link>
             <span aria-hidden className="text-white/25">·</span>
+            <Link href="/terms" className="hover:text-white transition-colors">
+              Terms
+            </Link>
+            <span aria-hidden className="text-white/25">·</span>
             <span>Built in Europe · Hosted in Europe</span>
           </div>
         </div>
