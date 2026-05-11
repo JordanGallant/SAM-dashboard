@@ -128,44 +128,146 @@ export default function SamplePage() {
               </figcaption>
             </figure>
 
-            {/* Supporting tiles — all five remaining domain tabs */}
-            <div className="grid gap-5 md:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Supporting domain previews — alternating left/right rows.
+                Each domain gets a full-width row so the screenshot reads at
+                ~600px wide (vs the previous ~370px cropped tiles). The flip
+                via `lg:flex-row-reverse` on even-indexed rows gives the page
+                a scanning rhythm — similar to Stripe / Linear / Vercel. */}
+            <div className="space-y-16 md:space-y-24">
               {[
-                { src: "/design/dashboard-team.png", slug: "team", label: "Team analysis", desc: "Founder cards with backgrounds, strengths, concerns, and red flags." },
-                { src: "/design/dashboard-market.png", slug: "market", label: "Market analysis", desc: "TAM / SAM / SOM validated, competitive landscape, market timing." },
-                { src: "/design/dashboard-product.png", slug: "product", label: "Product analysis", desc: "Problem fit, '10x better' test, PMF signals, moat assessment." },
-                { src: "/design/dashboard-traction.png", slug: "traction", label: "Traction analysis", desc: "Revenue, growth, unit economics, retention, engagement signals." },
-                { src: "/design/dashboard-finance.png", slug: "finance", label: "Financial analysis", desc: "Cash, burn, runway, valuation methods, investor signals." },
-              ].map((m) => (
-                <figure key={m.src} className="group">
-                  <div className="rounded-2xl bg-[#0F1B17]/80 ring-1 ring-white/10 shadow-2xl shadow-black/40 overflow-hidden transition-transform group-hover:-translate-y-0.5">
-                    <div className="flex items-center gap-1.5 border-b border-white/10 bg-[#0A1A14]/80 px-3 py-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-red-400/70" />
-                      <span className="h-1.5 w-1.5 rounded-full bg-amber-400/70" />
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/70" />
-                      <span className="ml-2 text-[9px] font-mono text-white/35 truncate">
-                        sam.ai/deals/nexicon/{m.slug}
-                      </span>
-                    </div>
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={m.src}
-                        alt={`Sam dashboard — ${m.label}`}
-                        className="absolute inset-0 w-full h-full object-cover object-top"
-                        loading="lazy"
-                      />
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#0F1B17] to-transparent" />
+                {
+                  src: "/design/dashboard-team.png",
+                  slug: "team",
+                  label: "Team analysis",
+                  heading: "Read the team like an analyst.",
+                  desc: "Founder cards with backgrounds, strengths, key concerns, and red flags — surfaced explicitly, not buried in prose.",
+                  bullets: [
+                    "Per-founder background depth + tenure",
+                    "Founder-market fit assessed against the deal",
+                    "Red flags flagged with severity, not hidden",
+                  ],
+                },
+                {
+                  src: "/design/dashboard-market.png",
+                  slug: "market",
+                  label: "Market analysis",
+                  heading: "Sanity-check the market in seconds.",
+                  desc: "TAM / SAM / SOM validated against public sources, competitive landscape, and the 'why now' that has to hold up.",
+                  bullets: [
+                    "Founder claims vs. validated estimates side-by-side",
+                    "Variance flagged when numbers don't reconcile",
+                    "Competitor threat level per direct rival",
+                  ],
+                },
+                {
+                  src: "/design/dashboard-product.png",
+                  slug: "product",
+                  label: "Product analysis",
+                  heading: "Test the moat narrative.",
+                  desc: "Problem fit, the '10× better' test, PMF signals, and a structured moat assessment — not a vibe check.",
+                  bullets: [
+                    "Evidence of pain (real or asserted)",
+                    "PMF signals: usage, retention, willingness to pay",
+                    "Moat sources scored: data, network, switching cost, regulation",
+                  ],
+                },
+                {
+                  src: "/design/dashboard-traction.png",
+                  slug: "traction",
+                  label: "Traction analysis",
+                  heading: "Hold the metrics to the stage.",
+                  desc: "Revenue, growth, unit economics, retention — benchmarked against typical numbers for the stage being raised.",
+                  bullets: [
+                    "Revenue + growth metrics with status icons",
+                    "Unit economics: CAC, payback, LTV when disclosed",
+                    "Retention cohorts surfaced when data is there",
+                  ],
+                },
+                {
+                  src: "/design/dashboard-finance.png",
+                  slug: "finance",
+                  label: "Financial analysis",
+                  heading: "See the cash math, not just the ask.",
+                  desc: "Cash on hand, burn, runway, three valuation methods, and the investor-signal read — laid out side-by-side.",
+                  bullets: [
+                    "Runway computed from disclosed cash + burn",
+                    "Valuation: conservative / moderate / aggressive bands",
+                    "Deal terms surfaced verbatim from the deck",
+                  ],
+                },
+              ].map((m, i) => {
+                const flip = i % 2 === 1
+                return (
+                  <div
+                    key={m.src}
+                    className="grid items-center gap-8 md:gap-12 lg:grid-cols-2 lg:gap-16"
+                  >
+                    {/* Screenshot side */}
+                    <figure className={`group ${flip ? "lg:order-2" : ""}`}>
+                      <div className="rounded-2xl bg-[#0F1B17]/85 ring-1 ring-white/10 shadow-2xl shadow-black/40 overflow-hidden transition-transform group-hover:-translate-y-0.5">
+                        <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1A14]/80 px-4 py-2.5">
+                          <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+                          <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+                          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+                          <span className="ml-3 flex-1 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] font-mono text-white/40 truncate">
+                            sam.ai/deals/nexicon/{m.slug}
+                          </span>
+                        </div>
+                        <div className="relative aspect-[16/10] overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={m.src}
+                            alt={`Sam dashboard — ${m.label}`}
+                            className="absolute inset-0 w-full h-full object-cover object-top"
+                            loading="lazy"
+                          />
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0F1B17] to-transparent" />
+                        </div>
+                      </div>
+                    </figure>
+
+                    {/* Info side */}
+                    <div className={flip ? "lg:order-1" : ""}>
+                      <p
+                        className="text-[11px] font-mono uppercase tracking-[0.2em]"
+                        style={{ color: "#0F3D2E" }}
+                      >
+                        {m.label}
+                      </p>
+                      <h3
+                        className="mt-3 font-bold tracking-[-0.02em] leading-[1.08]"
+                        style={{
+                          fontSize: "clamp(26px, 3.2vw, 36px)",
+                          color: "#0A0A0A",
+                        }}
+                      >
+                        {m.heading}
+                      </h3>
+                      <p
+                        className="mt-4 text-[15.5px] leading-[1.6]"
+                        style={{ color: "rgba(10,10,10,0.62)" }}
+                      >
+                        {m.desc}
+                      </p>
+                      <ul className="mt-5 space-y-2.5">
+                        {m.bullets.map((b) => (
+                          <li
+                            key={b}
+                            className="flex items-start gap-2.5 text-[14px] leading-[1.55]"
+                            style={{ color: "rgba(10,10,10,0.78)" }}
+                          >
+                            <span
+                              className="mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                              style={{ background: "#0F3D2E" }}
+                            />
+                            <span>{b}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-                  <figcaption className="mt-3 px-1">
-                    <p className="text-[10px] font-mono uppercase tracking-widest text-[#B5D33C]/80">
-                      {m.label}
-                    </p>
-                    <p className="mt-1 text-[12.5px] text-white/70 leading-relaxed">{m.desc}</p>
-                  </figcaption>
-                </figure>
-              ))}
+                )
+              })}
             </div>
           </div>
         </section>
