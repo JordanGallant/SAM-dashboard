@@ -54,11 +54,17 @@ export function Footer() {
           </div>
         </div>
         <div
-          className="mt-12 pt-6 text-[10.5px] font-mono uppercase tracking-[0.2em] text-white/45 flex flex-col sm:flex-row items-center justify-between gap-2"
+          className="mt-12 pt-6 text-[10.5px] font-mono uppercase tracking-[0.2em] text-white/45 flex flex-col sm:flex-row items-center justify-between gap-3"
           style={{ borderTop: `1px solid ${RULE}` }}
         >
           <p>&copy; {new Date().getFullYear()} Sam · All rights reserved</p>
-          <p>Built in Europe · Hosted in Europe</p>
+          <div className="flex items-center gap-4">
+            <Link href="/privacy" className="hover:text-white transition-colors">
+              Privacy
+            </Link>
+            <span aria-hidden className="text-white/25">·</span>
+            <span>Built in Europe · Hosted in Europe</span>
+          </div>
         </div>
       </div>
     </footer>
