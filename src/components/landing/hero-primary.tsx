@@ -101,7 +101,7 @@ export function HeroPrimary() {
                   <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
                 </div>
                 <div className="ml-3 flex-1 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] font-mono text-white/40 truncate">
-                  sam.ai/deals/mystartup/summary
+                  sam.ai/deals/nexicon/summary
                 </div>
               </div>
 
@@ -109,7 +109,7 @@ export function HeroPrimary() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={HERO_LAPTOP_IMAGE}
-                alt="Sam dashboard — MyStartup memo with overall score, radar chart, and domain breakdowns"
+                alt="Sam dashboard — Nexicon memo with overall score, radar chart, and domain breakdowns"
                 className="block w-full h-auto"
               />
             </div>

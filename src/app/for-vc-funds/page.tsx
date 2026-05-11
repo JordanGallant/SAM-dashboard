@@ -55,7 +55,9 @@ export default function ForVCFundsPage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
-                href="/register?tier=fund"
+                href="https://calendly.com/samvc"
+                target="_blank"
+                rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition hover:scale-[1.02]"
                 style={{ background: INK, color: "#FFF" }}
               >
@@ -246,7 +248,9 @@ export default function ForVCFundsPage() {
 
                 <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link
-                    href="/register?tier=fund"
+                    href="https://calendly.com/samvc"
+                target="_blank"
+                rel="noreferrer"
                     className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-[14px] font-semibold transition hover:scale-[1.02]"
                     style={{ background: LIME, color: INK }}
                   >

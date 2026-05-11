@@ -56,6 +56,8 @@ export interface TeamAnalysis {
   founderMarketFit: string
   teamDynamics: string
   redFlags: FindingItem[]
+  /** Deduped list of `[Source: ...]` citations extracted from the prose. */
+  sources?: string[]
 }
 
 export interface MarketSizeRow {
@@ -83,6 +85,7 @@ export interface MarketAnalysis {
   whyNowScore: DomainVerdict
   competitors: CompetitorRow[]
   redFlags: FindingItem[]
+  sources?: string[]
 }
 
 export interface MetricRow {
@@ -114,6 +117,7 @@ export interface ProductAnalysis {
   pmfDetails: string
   moat: MoatRow[]
   redFlags: FindingItem[]
+  sources?: string[]
 }
 
 export interface TractionAnalysis {

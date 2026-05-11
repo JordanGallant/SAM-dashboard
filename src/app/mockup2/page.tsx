@@ -409,7 +409,7 @@ function Hero() {
                   <span className="flex h-5 w-5 items-center justify-center rounded" style={{ background: ACCENT_SOFT }}>
                     <span className="font-bold text-[10px]" style={{ color: ACCENT }}>S</span>
                   </span>
-                  Memo · MyStartup · Series A
+                  Memo · Nexicon · Series A
                 </span>
                 <span style={{ color: ACCENT }}>#0042</span>
               </header>
@@ -460,7 +460,7 @@ function Hero() {
               </div>
             </figure>
             <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.22em]" style={{ color: MUTED }}>
-              Specimen · sam.ai/deals/mystartup/summary
+              Specimen · sam.ai/deals/nexicon/summary
             </p>
           </div>
         </aside>
@@ -621,9 +621,9 @@ function Position() {
         <aside className="lg:col-span-5">
           <div className="rounded-2xl p-7" style={{ border: `1px solid ${RULE}`, background: SURFACE_HI }}>
             <p className="font-mono text-[10px] uppercase tracking-[0.22em]" style={{ color: ACCENT }}>From the dashboard</p>
-            <h3 className="mt-3 font-bold text-[22px] tracking-[-0.01em]">MyStartup · pitch_deck.pdf → IC-ready memo</h3>
+            <h3 className="mt-3 font-bold text-[22px] tracking-[-0.01em]">Nexicon · pitch_deck.pdf → IC-ready memo</h3>
             <p className="mt-3 text-[14px] leading-relaxed" style={{ color: "rgba(250,250,250,0.72)" }}>
-              The dashboard at <span className="font-mono" style={{ color: FG }}>sam.ai/deals/mystartup/summary</span> renders the memo with overall score, radar, domain breakdowns, top risks and questions. The memo travels through your IC and lives in your archive — answering the question your future self will ask: <em>why did we pass on this</em>?
+              The dashboard at <span className="font-mono" style={{ color: FG }}>sam.ai/deals/nexicon/summary</span> renders the memo with overall score, radar, domain breakdowns, top risks and questions. The memo travels through your IC and lives in your archive — answering the question your future self will ask: <em>why did we pass on this</em>?
             </p>
             <div className="mt-5 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-[0.22em]">
               {["Strong Buy", "Explore", "Deny"].map((v) => (

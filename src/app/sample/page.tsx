@@ -55,13 +55,13 @@ export default function SamplePage() {
                     <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
                     <span className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate" style={{ background: "#FFF", border: "1px solid rgba(10,10,10,0.10)", color: "rgba(10,10,10,0.55)" }}>
-                      sam.ai/deals/mystartup/summary
+                      sam.ai/deals/nexicon/summary
                     </span>
                   </div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/design/hero-img-new.png"
-                    alt="Sam dashboard — MyStartup assessment with overall score, radar chart, and domain breakdowns"
+                    alt="Sam dashboard — Nexicon assessment with overall score, radar chart, and domain breakdowns"
                     className="block w-full h-auto"
                   />
                 </div>
@@ -103,7 +103,7 @@ export default function SamplePage() {
                   <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
                   <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
                   <span className="ml-3 flex-1 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] font-mono text-white/40 truncate">
-                    sam.ai/deals/mystartup/summary
+                    sam.ai/deals/nexicon/summary
                   </span>
                 </div>
                 <div className="relative aspect-[16/10] overflow-hidden">
@@ -144,7 +144,7 @@ export default function SamplePage() {
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-400/70" />
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/70" />
                       <span className="ml-2 text-[9px] font-mono text-white/35 truncate">
-                        sam.ai/deals/mystartup/{m.slug}
+                        sam.ai/deals/nexicon/{m.slug}
                       </span>
                     </div>
                     <div className="relative aspect-[4/3] overflow-hidden">
@@ -343,7 +343,7 @@ export default function SamplePage() {
                 Sam&rsquo;s writing voice.
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Assessments are written in the same disciplined style an analyst would use — direct, evidence-led, and frank about gaps. Below: excerpts from a Sam-generated assessment on <span className="font-medium text-foreground">MyStartup</span>, a Seed-stage GTM productivity company that scored 24/100. Company details have been changed.
+                Assessments are written in the same disciplined style an analyst would use — direct, evidence-led, and frank about gaps. Below: excerpts from a Sam-generated assessment on <span className="font-medium text-foreground">Nexicon</span>, a Seed-stage GTM productivity company that scored 24/100. Company details have been changed.
               </p>
             </div>
 
@@ -372,7 +372,7 @@ export default function SamplePage() {
               <figcaption className="mt-6 flex items-center gap-3 text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: "rgba(181,211,60,0.85)" }}>
                 <span>Investment thesis</span>
                 <span style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-                <span>MyStartup · 24/100 · Pass with feedback</span>
+                <span>Nexicon · 24/100 · Pass with feedback</span>
               </figcaption>
             </figure>
 
@@ -395,7 +395,7 @@ export default function SamplePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm md:text-[15px] leading-relaxed text-foreground/85">
-                    &ldquo;The most plausible timing catalyst is the explosion of generative AI capabilities creating a window for AI-native GTM tools. However, this timing argument cuts both ways: AI enables new entrants but also enables incumbents (Outreach, Salesloft, HubSpot, Salesforce) to rapidly add AI features to existing platforms with massive distribution advantages. The window for AI-native GTM startups may be narrowing, not widening. Every competitor in the space is citing the same AI tailwind. Without an explicit, differentiated timing thesis, MyStartup has no discernible timing edge.&rdquo;
+                    &ldquo;The most plausible timing catalyst is the explosion of generative AI capabilities creating a window for AI-native GTM tools. However, this timing argument cuts both ways: AI enables new entrants but also enables incumbents (Outreach, Salesloft, HubSpot, Salesforce) to rapidly add AI features to existing platforms with massive distribution advantages. The window for AI-native GTM startups may be narrowing, not widening. Every competitor in the space is citing the same AI tailwind. Without an explicit, differentiated timing thesis, Nexicon has no discernible timing edge.&rdquo;
                   </p>
                 </CardContent>
               </Card>

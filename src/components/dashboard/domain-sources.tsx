@@ -1,12 +1,32 @@
 "use client"
 
 import { FileText, ExternalLink } from "lucide-react"
-import type { DealDocument } from "@/lib/types/deal"
+import type { Deal, DealDocument } from "@/lib/types/deal"
 
 export type ExternalSource = {
   label: string
   url: string
   kind?: "linkedin" | "web" | "search"
+}
+
+/**
+ * Founder-LinkedIn extractor — shared by every deal-detail tab so the
+ * Sources block at the bottom renders the same data set on Summary, Team,
+ * Market, Product, Traction, Finance, Exit, and Fund-fit.
+ *
+ * Previously only Summary + Team called this inline; the other six tabs
+ * passed documents only, which made Sources look thinner on those pages
+ * even though the underlying analysis cited the same founders.
+ */
+export function getFounderLinks(deal: Deal | undefined): ExternalSource[] {
+  const founders = deal?.analysis?.team?.founders ?? []
+  return founders
+    .filter((f) => f.linkedinUrl)
+    .map<ExternalSource>((f) => ({
+      label: `${f.name} — LinkedIn`,
+      url: f.linkedinUrl as string,
+      kind: "linkedin",
+    }))
 }
 
 const DOC_KIND_LABELS: Record<DealDocument["docType"], string> = {
