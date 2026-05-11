@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import { ExternalLink, Loader2, Check, X, AlertTriangle, Sparkles, CreditCard, ArrowRight, ArrowDown, ArrowUp } from "lucide-react"
+import { ExternalLink, Loader2, Check, X, AlertTriangle, Sparkles, CreditCard, ArrowRight, ArrowDown, ArrowUp, Calendar, Mail, Building2 } from "lucide-react"
 import { useTier } from "@/lib/tier-context"
 import { TIER_CONFIG } from "@/lib/tier-config"
 import type { Tier } from "@/lib/types/user"
@@ -49,6 +49,12 @@ function BillingContent() {
   const [switchError, setSwitchError] = useState<string | null>(null)
   const [switchSubmitting, setSwitchSubmitting] = useState(false)
 
+  // Fund-tier dialog. Fund pricing is sales-only — clicking the tier opens a
+  // book-a-call / email-us modal instead of routing through Stripe Checkout.
+  // Used by both fresh-subscribe (`handleSubscribe`) and active-sub upgrade
+  // (`confirmSwitch`) so the experience is consistent.
+  const [fundDialog, setFundDialog] = useState(false)
+
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data: { user } }) => {
@@ -82,6 +88,14 @@ function BillingContent() {
   const memoAtLimit = memoCap > 0 && memosUsed !== null && memosUsed >= memoCap
 
   async function handleSubscribe(targetTier: Tier) {
+    // Fund tier is sales-only — surface the contact dialog instead of trying
+    // to start Stripe Checkout (which returns a 400 the previous flow silently
+    // swallowed, so the user clicked the button and nothing happened).
+    if (targetTier === "fund") {
+      setFundDialog(true)
+      return
+    }
+
     // Switch path requires both a live sub AND an actual Stripe customer to
     // operate on. "Live" means active OR trialing — the switch endpoint
     // already accepts both (filters status === active|trialing|past_due).
@@ -105,9 +119,16 @@ function BillingContent() {
         body: JSON.stringify({ tier: targetTier }),
       })
       const data = await res.json()
+      if (!res.ok) {
+        // Previously this branch was silent — any 400 from checkout (e.g.
+        // misconfigured price ID) just disappeared. Surface it so the user
+        // knows the click did something.
+        setPortalError(data.error ?? "Couldn't start checkout. Try again or contact us.")
+        return
+      }
       if (data.url) window.location.href = data.url
     } catch (err) {
-      console.error(err)
+      setPortalError(err instanceof Error ? err.message : "Network error — try again.")
     } finally {
       setLoading(null)
     }
@@ -148,10 +169,13 @@ function BillingContent() {
     setSwitchSubmitting(true)
     setSwitchError(null)
     try {
-      // Fund tier requires a sales conversation — surface that inline instead
-      // of crashing with a 400.
+      // Fund tier is sales-only — close the switch dialog and open the
+      // contact dialog so the user has clickable Calendly + email options
+      // instead of being told to "contact us" with no actual contact button.
       if (switchDialog === "fund") {
-        setSwitchError("Fund tier requires a walkthrough — book one via 'Manage subscription' or contact us.")
+        setSwitchDialog(null)
+        setSwitchError(null)
+        setFundDialog(true)
         return
       }
       const res = await fetch("/api/stripe/switch", {
@@ -574,7 +598,72 @@ function BillingContent() {
         }}
         onConfirm={confirmSwitch}
       />
+
+      <FundContactDialog open={fundDialog} onClose={() => setFundDialog(false)} />
     </div>
+  )
+}
+
+function FundContactDialog({
+  open,
+  onClose,
+}: {
+  open: boolean
+  onClose: () => void
+}) {
+  return (
+    <Dialog open={open} onOpenChange={(next) => { if (!next) onClose() }}>
+      <DialogContent className="sm:max-w-md">
+        <div className="flex items-start gap-3">
+          <div className="grid place-items-center h-10 w-10 rounded-xl shrink-0 ring-1 bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/10 ring-[#0F3D2E]/10 text-[#0F3D2E]">
+            <Building2 className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+              Fund tier
+            </p>
+            <h2 className="mt-1 font-heading text-[17px] font-bold tracking-[-0.01em] text-[#0F3D2E]">
+              Let&apos;s set up your fund.
+            </h2>
+          </div>
+        </div>
+
+        <p className="text-[13.5px] text-muted-foreground leading-relaxed">
+          Fund pricing is bespoke — seats, SSO, audit log, dedicated onboarding.
+          Book a 15-minute call and we&apos;ll scope it together, or send a note
+          and we&apos;ll get back to you within the day.
+        </p>
+
+        <div className="grid gap-2 sm:grid-cols-2 pt-1">
+          <a
+            href="https://calendly.com/samvc"
+            target="_blank"
+            rel="noreferrer"
+            className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-4 py-2.5 text-[13px] font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
+          >
+            <Calendar className="h-3.5 w-3.5" />
+            Book a 15-min call
+          </a>
+          <a
+            href="mailto:hello@samvc.ai?subject=SAM%20Fund%20tier%20-%20walkthrough%20request"
+            className="inline-flex items-center justify-center gap-2 rounded-full ring-1 ring-foreground/15 hover:ring-foreground/30 hover:bg-foreground/5 px-4 py-2.5 text-[13px] font-semibold transition-colors"
+          >
+            <Mail className="h-3.5 w-3.5" />
+            Email us
+          </a>
+        </div>
+
+        <div className="flex items-center justify-end pt-1">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-[12.5px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 
