@@ -200,8 +200,8 @@ function CopilotPanelBody({
       {/* Header — top row + thread switcher */}
       <div className="border-b border-foreground/10">
         <div className="flex items-center gap-2.5 px-4 pt-3 pb-1">
-          <span className="grid place-items-center h-8 w-8 rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] ring-1 ring-[#D4FF6B]/20 shrink-0">
-            <MessageSquare className="h-4 w-4 text-[#D4FF6B]" />
+          <span className="grid place-items-center h-8 w-8 rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] ring-1 ring-[#B5D33C]/20 shrink-0">
+            <MessageSquare className="h-4 w-4 text-[#B5D33C]" />
           </span>
           <p className="text-[9px] font-mono uppercase tracking-widest text-primary leading-none flex-1 truncate">
             Ask Sam · {scopeLabel}
@@ -261,7 +261,7 @@ function CopilotPanelBody({
                     key={t.id}
                     className={cn(
                       "group flex items-stretch hover:bg-muted/50 transition-colors",
-                      t.id === threadId && "bg-[#F4FAF6]",
+                      t.id === threadId && "bg-[#FAFAF7]",
                     )}
                   >
                     <button
@@ -313,7 +313,7 @@ function CopilotPanelBody({
                 type="button"
                 onClick={() => send(s)}
                 disabled={sending || !dealId}
-                className="block w-full rounded-xl border border-foreground/10 bg-background px-3 py-2.5 text-left text-[12.5px] leading-snug hover:border-primary/30 hover:bg-[#F4FAF6] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="block w-full rounded-xl border border-foreground/10 bg-background px-3 py-2.5 text-left text-[12.5px] leading-snug hover:border-primary/30 hover:bg-[#FAFAF7] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {s}
               </button>
@@ -327,7 +327,7 @@ function CopilotPanelBody({
                 className={cn(
                   "max-w-[88%] rounded-2xl px-3.5 py-2 text-[12.5px] leading-[1.5] whitespace-pre-wrap",
                   m.who === "sam"
-                    ? "self-start bg-[#F4FAF6] text-[#0A2E22] ring-1 ring-[#0F3D2E]/5"
+                    ? "self-start bg-[#FAFAF7] text-[#0F3D2E] ring-1 ring-[#0F3D2E]/5"
                     : "self-end bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white shadow-sm shadow-primary/20"
                 )}
               >
@@ -335,7 +335,7 @@ function CopilotPanelBody({
               </div>
             ))}
             {sending && (
-              <div className="self-start max-w-[80%] rounded-2xl bg-[#F4FAF6] ring-1 ring-[#0F3D2E]/5 px-3.5 py-2">
+              <div className="self-start max-w-[80%] rounded-2xl bg-[#FAFAF7] ring-1 ring-[#0F3D2E]/5 px-3.5 py-2">
                 <span className="flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#0F3D2E]/50 animate-bounce" />
                   <span className="h-1.5 w-1.5 rounded-full bg-[#0F3D2E]/50 animate-bounce [animation-delay:150ms]" />
@@ -373,7 +373,7 @@ function CopilotPanelBody({
           <button
             type="submit"
             disabled={!input.trim() || sending}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-[#D4FF6B] shadow-md shadow-primary/25 hover:shadow-lg hover:shadow-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-[#B5D33C] shadow-md shadow-primary/25 hover:shadow-lg hover:shadow-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             aria-label="Send"
           >
             <Send className="h-3.5 w-3.5" />
@@ -565,7 +565,7 @@ export function AskSamInline({ dealId }: { dealId: string }) {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed right-4 bottom-20 z-30 inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] px-4 py-2.5 text-[#D4FF6B] shadow-lg shadow-primary/30 ring-1 ring-[#D4FF6B]/20 active:opacity-90 transition-opacity"
+        className="lg:hidden fixed right-4 bottom-20 z-30 inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] px-4 py-2.5 text-[#B5D33C] shadow-lg shadow-primary/30 ring-1 ring-[#B5D33C]/20 active:opacity-90 transition-opacity"
         style={{ marginBottom: "env(safe-area-inset-bottom)" }}
         aria-label="Open Ask SAM copilot"
       >

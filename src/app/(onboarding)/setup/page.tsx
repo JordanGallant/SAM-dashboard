@@ -244,7 +244,7 @@ export default function SetupPage() {
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-full font-mono text-[12px] font-bold transition-all",
                   active
-                    ? "bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-[#D4FF6B] shadow-md shadow-primary/20 ring-2 ring-primary/20 ring-offset-2"
+                    ? "bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-[#B5D33C] shadow-md shadow-primary/20 ring-2 ring-primary/20 ring-offset-2"
                     : done
                     ? "bg-primary/15 text-primary"
                     : "bg-muted text-muted-foreground"
@@ -299,7 +299,7 @@ export default function SetupPage() {
             <p className="text-[10px] font-mono uppercase tracking-widest text-primary">
               Step {step + 1} of {STEPS.length}
             </p>
-            <h1 className="font-heading text-[20px] font-bold tracking-[-0.01em] leading-tight text-[#0A2E22]">
+            <h1 className="font-heading text-[20px] font-bold tracking-[-0.01em] leading-tight text-[#0F3D2E]">
               {STEPS[step]}
             </h1>
           </div>

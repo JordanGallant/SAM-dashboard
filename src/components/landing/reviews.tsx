@@ -42,7 +42,7 @@ const metrics = [
 
 export function Reviews() {
   return (
-    <section className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-white to-[#F4FAF6]">
+    <section className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-white to-[#FAFAF7]">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(0,168,107,0.06),transparent_70%)]" />
 
       <div className="relative mx-auto max-w-6xl px-4">
@@ -52,7 +52,7 @@ export function Reviews() {
               <Star className="h-3 w-3 fill-current" />
               What investors are saying
             </div>
-            <h2 className="mt-5 text-4xl md:text-5xl font-bold font-heading tracking-[-0.025em] leading-[1.05] text-[#0A2E22]">
+            <h2 className="mt-5 text-4xl md:text-5xl font-bold font-heading tracking-[-0.025em] leading-[1.05] text-[#0F3D2E]">
               From the funds already using Sam
             </h2>
           </div>
@@ -86,7 +86,7 @@ export function Reviews() {
             <RevealItem key={i}>
               <figure className="group relative h-full rounded-2xl bg-white border border-[#0F3D2E]/10 p-6 md:p-7 shadow-sm hover:border-primary/30 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <Quote className="absolute top-5 right-5 h-4 w-4 text-[#0F3D2E]/15" />
-                <blockquote className="text-[14px] leading-relaxed text-[#0A2E22]">
+                <blockquote className="text-[14px] leading-relaxed text-[#0F3D2E]">
                   {q.quote}
                 </blockquote>
                 <figcaption className="mt-5 pt-4 border-t border-[#0F3D2E]/10 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">

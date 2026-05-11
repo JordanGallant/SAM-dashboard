@@ -45,7 +45,7 @@ function ScorecardChart({ scorecard }: { scorecard: ScorecardRow[] }) {
             type="category"
             dataKey="domain"
             width={60}
-            tick={{ fontSize: 11, fontWeight: 600, fill: "#0A2E22" }}
+            tick={{ fontSize: 11, fontWeight: 600, fill: "#0F3D2E" }}
           />
           <Tooltip
             contentStyle={{
@@ -83,7 +83,7 @@ export function ScorecardTable({ scorecard }: { scorecard: ScorecardRow[] }) {
       <div className="overflow-hidden rounded-2xl border border-[#0F3D2E]/10 bg-white">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#0F3D2E]/10 bg-[#F4FAF6]/50">
+            <tr className="border-b border-[#0F3D2E]/10 bg-[#FAFAF7]/50">
               <th className="text-left px-4 py-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">
                 Domain
               </th>
@@ -105,9 +105,9 @@ export function ScorecardTable({ scorecard }: { scorecard: ScorecardRow[] }) {
               return (
                 <tr
                   key={row.domain}
-                  className={`${i !== scorecard.length - 1 ? "border-b border-[#0F3D2E]/5" : ""} ${i % 2 === 1 ? "bg-[#F4FAF6]/30" : ""}`}
+                  className={`${i !== scorecard.length - 1 ? "border-b border-[#0F3D2E]/5" : ""} ${i % 2 === 1 ? "bg-[#FAFAF7]/30" : ""}`}
                 >
-                  <td className="px-4 py-3.5 font-heading font-semibold text-[#0A2E22]">{row.domain}</td>
+                  <td className="px-4 py-3.5 font-heading font-semibold text-[#0F3D2E]">{row.domain}</td>
                   <td className="px-3 py-3.5 text-center">
                     <span
                       className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[11px] font-mono font-bold tabular-nums ring-1 ring-black/5 ${scoreColor.bg} ${scoreColor.text}`}

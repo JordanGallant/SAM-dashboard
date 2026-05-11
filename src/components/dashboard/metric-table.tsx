@@ -21,7 +21,7 @@ export function MetricTable({
     <div className="overflow-hidden rounded-2xl border border-[#0F3D2E]/10 bg-white">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-[#0F3D2E]/10 bg-[#F4FAF6]/50">
+          <tr className="border-b border-[#0F3D2E]/10 bg-[#FAFAF7]/50">
             <th className="text-left px-4 py-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">
               Metric
             </th>
@@ -50,10 +50,10 @@ export function MetricTable({
           {rows.map((row, i) => (
             <tr
               key={i}
-              className={`${i !== rows.length - 1 ? "border-b border-[#0F3D2E]/5" : ""} ${i % 2 === 1 ? "bg-[#F4FAF6]/30" : ""}`}
+              className={`${i !== rows.length - 1 ? "border-b border-[#0F3D2E]/5" : ""} ${i % 2 === 1 ? "bg-[#FAFAF7]/30" : ""}`}
             >
-              <td className="px-4 py-3 font-heading font-semibold text-[#0A2E22]">{row.metric}</td>
-              <td className="px-4 py-3 font-mono text-[13px] text-[#0A2E22] tabular-nums">{row.value}</td>
+              <td className="px-4 py-3 font-heading font-semibold text-[#0F3D2E]">{row.metric}</td>
+              <td className="px-4 py-3 font-mono text-[13px] text-[#0F3D2E] tabular-nums">{row.value}</td>
               {showGrowth && (
                 <td className="px-4 py-3 font-mono text-[13px] text-muted-foreground tabular-nums">
                   {row.growth ?? "—"}

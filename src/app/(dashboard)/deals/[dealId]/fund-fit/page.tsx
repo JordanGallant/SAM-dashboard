@@ -50,14 +50,14 @@ export default function FundFitPage() {
         />
         <div className="rounded-2xl ring-1 ring-primary/30 bg-gradient-to-br from-primary/5 via-primary/[0.02] to-transparent p-7 md:p-9">
           <div className="flex items-start gap-4 mb-5">
-            <div className="grid place-items-center h-11 w-11 rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] shadow-md shadow-primary/20 ring-1 ring-[#D4FF6B]/20 shrink-0">
-              <Sparkles className="h-5 w-5 text-[#D4FF6B]" />
+            <div className="grid place-items-center h-11 w-11 rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] shadow-md shadow-primary/20 ring-1 ring-[#B5D33C]/20 shrink-0">
+              <Sparkles className="h-5 w-5 text-[#B5D33C]" />
             </div>
             <div>
               <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
                 Fund profile required
               </p>
-              <h2 className="mt-1.5 font-heading text-xl font-bold tracking-[-0.01em] text-[#0A2E22]">
+              <h2 className="mt-1.5 font-heading text-xl font-bold tracking-[-0.01em] text-[#0F3D2E]">
                 Add your fund info to unlock Fund Fit
               </h2>
               <p className="mt-2 text-[13.5px] text-muted-foreground max-w-md leading-relaxed">
@@ -112,7 +112,7 @@ export default function FundFitPage() {
         <div className="overflow-hidden rounded-2xl border border-[#0F3D2E]/10 bg-white">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#0F3D2E]/10 bg-[#F4FAF6]/50">
+              <tr className="border-b border-[#0F3D2E]/10 bg-[#FAFAF7]/50">
                 <th className="text-left px-4 py-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">
                   Criterion
                 </th>
@@ -133,7 +133,7 @@ export default function FundFitPage() {
                   key={c.criterion}
                   className={`${i !== fit.criteria.length - 1 ? "border-b border-[#0F3D2E]/5" : ""}`}
                 >
-                  <td className="px-4 py-3 font-heading font-semibold text-[#0A2E22]">{c.criterion}</td>
+                  <td className="px-4 py-3 font-heading font-semibold text-[#0F3D2E]">{c.criterion}</td>
                   <td className="px-4 py-3 text-[13px] text-muted-foreground leading-relaxed">
                     {c.fundProfile || <span className="text-muted-foreground/50">—</span>}
                   </td>

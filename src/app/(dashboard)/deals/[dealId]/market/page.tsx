@@ -47,7 +47,7 @@ export default function MarketPage() {
           {/* Column header (md+ only) — labels not repeated per row.
               Variance column widened to 128px (pilot #27) so long ranges like
               "-25% to -45%" don't bleed into the validated column. */}
-          <div className="hidden md:grid md:grid-cols-[64px_minmax(0,1fr)_minmax(0,1fr)_128px] items-center gap-x-4 px-4 py-3 border-b border-[#0F3D2E]/10 bg-[#F4FAF6]/50">
+          <div className="hidden md:grid md:grid-cols-[64px_minmax(0,1fr)_minmax(0,1fr)_128px] items-center gap-x-4 px-4 py-3 border-b border-[#0F3D2E]/10 bg-[#FAFAF7]/50">
             <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">Metric</span>
             <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">Founder claim</span>
             <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">Validated</span>
@@ -68,7 +68,7 @@ export default function MarketPage() {
                 key={row.metric}
                 className={`grid grid-cols-[56px_minmax(0,1fr)_112px] md:grid-cols-[64px_minmax(0,1fr)_minmax(0,1fr)_128px] items-baseline gap-x-4 gap-y-3 px-4 py-3 ${
                   i !== market.marketSize.length - 1 ? "border-b border-[#0F3D2E]/5" : ""
-                } ${i % 2 === 1 ? "bg-[#F4FAF6]/30" : ""}`}
+                } ${i % 2 === 1 ? "bg-[#FAFAF7]/30" : ""}`}
               >
                 {/* Metric tag */}
                 <div className="font-heading text-[14px] font-bold tracking-wide text-foreground">

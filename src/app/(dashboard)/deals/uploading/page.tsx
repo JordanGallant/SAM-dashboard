@@ -102,12 +102,12 @@ export default function UploadingPage() {
         <div className="rounded-3xl border border-[#0F3D2E]/10 bg-white p-8 shadow-sm">
           {/* File chip */}
           {pendingFile && (
-            <div className="mb-6 flex items-center gap-3 rounded-2xl bg-[#F4FAF6]/50 ring-1 ring-[#0F3D2E]/10 p-3">
+            <div className="mb-6 flex items-center gap-3 rounded-2xl bg-[#FAFAF7]/50 ring-1 ring-[#0F3D2E]/10 p-3">
               <div className="grid place-items-center h-10 w-10 shrink-0 rounded-xl bg-white ring-1 ring-[#0F3D2E]/10">
                 <FileText className="h-4 w-4 text-[#0F3D2E]" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-[#0A2E22]">{pendingFile.name}</p>
+                <p className="truncate text-sm font-medium text-[#0F3D2E]">{pendingFile.name}</p>
                 <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
                   {(pendingFile.size / 1024 / 1024).toFixed(1)} MB · PDF
                 </p>
@@ -134,7 +134,7 @@ export default function UploadingPage() {
           ) : (
             <>
               <div className="mb-2 text-center">
-                <h2 className="font-heading text-lg font-bold text-[#0A2E22]">
+                <h2 className="font-heading text-lg font-bold text-[#0F3D2E]">
                   {companyName ? `Preparing ${companyName}` : "Preparing your deal"}
                 </h2>
                 <p className="mt-1 text-[13px] text-muted-foreground">

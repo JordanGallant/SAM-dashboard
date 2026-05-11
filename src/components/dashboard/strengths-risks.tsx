@@ -15,7 +15,7 @@ export function StrengthsRisks({ strengths, risks }: { strengths: FindingItem[];
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Findings
             </p>
-            <p className="text-base font-heading font-bold text-[#0A2E22]">Key strengths</p>
+            <p className="text-base font-heading font-bold text-[#0F3D2E]">Key strengths</p>
           </div>
           <span className="ml-auto text-sm font-mono font-bold text-emerald-700 tabular-nums">
             {strengths.length}
@@ -46,7 +46,7 @@ export function StrengthsRisks({ strengths, risks }: { strengths: FindingItem[];
             <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               Findings
             </p>
-            <p className="text-base font-heading font-bold text-[#0A2E22]">Key risks</p>
+            <p className="text-base font-heading font-bold text-[#0F3D2E]">Key risks</p>
           </div>
           <span className="ml-auto text-sm font-mono font-bold text-red-700 tabular-nums">
             {risks.length}

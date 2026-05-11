@@ -56,7 +56,7 @@ export function FAQ() {
   const [open, setOpen] = useState<number | null>(0)
 
   return (
-    <section className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-white via-[#F4FAF6] to-white">
+    <section className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-white via-[#FAFAF7] to-white">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_50%_40%_at_80%_40%,rgba(0,168,107,0.08),transparent_70%)]" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_40%_30%_at_20%_70%,rgba(127,217,170,0.10),transparent_70%)]" />
 
@@ -68,7 +68,7 @@ export function FAQ() {
               <HelpCircle className="h-3 w-3" />
               Reference
             </div>
-            <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0A2E22]">
+            <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0F3D2E]">
               Questions,
               <br />
               <span className="bg-gradient-to-r from-[#0F3D2E] via-[#1A6B47] to-[#00A86B] bg-clip-text text-transparent">
@@ -81,7 +81,7 @@ export function FAQ() {
 
             <a
               href="mailto:hello@sam.ai"
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-4 py-2.5 text-sm font-semibold text-[#0A2E22] shadow-sm hover:border-[#0F3D2E]/30 hover:shadow-md transition-all"
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-4 py-2.5 text-sm font-semibold text-[#0F3D2E] shadow-sm hover:border-[#0F3D2E]/30 hover:shadow-md transition-all"
             >
               <Mail className="h-3.5 w-3.5" />
               hello@sam.ai
@@ -115,7 +115,7 @@ export function FAQ() {
                       </span>
                       <div className="flex-1 min-w-0">
                         <h3 className={`font-heading text-base md:text-lg font-semibold leading-snug transition-colors ${
-                          isOpen ? "text-[#0A2E22]" : "text-[#0A2E22]/80 group-hover:text-[#0A2E22]"
+                          isOpen ? "text-[#0F3D2E]" : "text-[#0F3D2E]/80 group-hover:text-[#0F3D2E]"
                         }`}>
                           {item.q}
                         </h3>
@@ -138,10 +138,10 @@ export function FAQ() {
                       </div>
                       <span className={`shrink-0 flex h-8 w-8 items-center justify-center rounded-full transition-all ${
                         isOpen
-                          ? "bg-[#D4FF6B] rotate-45"
+                          ? "bg-[#B5D33C] rotate-45"
                           : "bg-[#0F3D2E]/5 group-hover:bg-[#0F3D2E]/10"
                       }`}>
-                        <Plus className={`h-4 w-4 stroke-[2.5] ${isOpen ? "text-[#0A2E22]" : "text-[#0F3D2E]/70"}`} />
+                        <Plus className={`h-4 w-4 stroke-[2.5] ${isOpen ? "text-[#0F3D2E]" : "text-[#0F3D2E]/70"}`} />
                       </span>
                     </button>
                   </motion.div>

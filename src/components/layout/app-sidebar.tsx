@@ -32,10 +32,10 @@ export function AppSidebar() {
     <Sidebar className="border-r border-[#0F3D2E]/10 bg-white">
       <SidebarHeader className="border-b border-[#0F3D2E]/10 px-4 py-3.5">
         <Link href="/deals" className="group flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] shadow-md shadow-primary/20 ring-1 ring-[#D4FF6B]/20 group-hover:shadow-lg group-hover:shadow-primary/30 transition-all">
-            <BarChart3 className="h-4 w-4 text-[#D4FF6B]" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] shadow-md shadow-primary/20 ring-1 ring-[#B5D33C]/20 group-hover:shadow-lg group-hover:shadow-primary/30 transition-all">
+            <BarChart3 className="h-4 w-4 text-[#B5D33C]" />
           </div>
-          <span className="text-lg font-bold font-heading tracking-tight text-[#0A2E22]">Sam</span>
+          <span className="text-lg font-bold font-heading tracking-tight text-[#0F3D2E]">Sam</span>
         </Link>
       </SidebarHeader>
       <SidebarContent>
@@ -76,7 +76,7 @@ export function AppSidebar() {
                         className={`h-auto py-2.5 rounded-xl transition-colors ${
                           isActive
                             ? "bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/5 ring-1 ring-primary/30"
-                            : "hover:bg-[#F4FAF6]"
+                            : "hover:bg-[#FAFAF7]"
                         }`}
                       >
                         <div className="flex w-full items-start justify-between gap-2">
@@ -87,7 +87,7 @@ export function AppSidebar() {
                                   verdict ? verdictDotColors[verdict] ?? "bg-gray-300" : "bg-gray-300"
                                 }`}
                               />
-                              <span className="truncate font-heading font-semibold text-[13px] text-[#0A2E22]">
+                              <span className="truncate font-heading font-semibold text-[13px] text-[#0F3D2E]">
                                 {deal.companyName}
                               </span>
                               {score !== undefined && (

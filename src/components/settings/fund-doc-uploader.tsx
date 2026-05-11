@@ -266,7 +266,7 @@ export function FundDocUploader({
               <UploadCloud className="h-5 w-5 text-[#0F3D2E]" />
             )}
           </div>
-          <p className="mt-3 font-heading text-[14px] font-bold text-[#0A2E22]">
+          <p className="mt-3 font-heading text-[14px] font-bold text-[#0F3D2E]">
             {status.kind === "uploading"
               ? "Reading your document…"
               : "Drop a fund 1-pager here"}

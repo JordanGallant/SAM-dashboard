@@ -42,7 +42,7 @@ export default function ResetPasswordPage() {
         <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
           Email sent
         </p>
-        <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0A2E22]">
+        <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0F3D2E]">
           Check your email
         </h1>
         <p className="mt-1.5 text-center text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ export default function ResetPasswordPage() {
       <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
         Reset password
       </p>
-      <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0A2E22]">
+      <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0F3D2E]">
         Forgot your password?
       </h1>
       <p className="mt-1.5 text-center text-sm text-muted-foreground">

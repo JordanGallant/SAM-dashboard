@@ -301,7 +301,7 @@ function BillingContent() {
                 Current plan
               </p>
               <div className="mt-1 flex flex-wrap items-baseline gap-3">
-                <h3 className="font-heading text-[18px] font-bold tracking-[-0.01em] text-[#0A2E22]">
+                <h3 className="font-heading text-[18px] font-bold tracking-[-0.01em] text-[#0F3D2E]">
                   {config.label}
                 </h3>
                 <p className="font-mono text-[13px] text-muted-foreground tabular-nums">
@@ -337,7 +337,7 @@ function BillingContent() {
                 <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                   {label}
                 </p>
-                <p className="mt-1.5 font-heading font-bold text-[15px] text-[#0A2E22]">
+                <p className="mt-1.5 font-heading font-bold text-[15px] text-[#0F3D2E]">
                   {value}
                 </p>
               </div>
@@ -495,7 +495,7 @@ function BillingContent() {
                 )}
               >
                 <div className="flex items-baseline justify-between gap-2">
-                  <h3 className="font-heading font-bold text-[16px] text-[#0A2E22]">
+                  <h3 className="font-heading font-bold text-[16px] text-[#0F3D2E]">
                     {tc.label}
                   </h3>
                   {isCurrent && (
@@ -627,7 +627,7 @@ function SwitchDialog({
                 <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
                   {direction}
                 </p>
-                <h2 className="mt-1 font-heading text-[17px] font-bold tracking-[-0.01em] text-[#0A2E22]">
+                <h2 className="mt-1 font-heading text-[17px] font-bold tracking-[-0.01em] text-[#0F3D2E]">
                   {direction} to {tc.label}?
                 </h2>
               </div>
@@ -649,7 +649,7 @@ function SwitchDialog({
                   <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                     To
                   </p>
-                  <p className="mt-0.5 font-heading font-bold text-[15px] truncate text-[#0A2E22]">
+                  <p className="mt-0.5 font-heading font-bold text-[15px] truncate text-[#0F3D2E]">
                     {tc.label}
                   </p>
                   <p className="text-[12px] text-muted-foreground tabular-nums">

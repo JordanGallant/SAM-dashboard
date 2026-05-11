@@ -41,11 +41,11 @@ function DeckSlide({ label, tone }: { label: string; tone: "a" | "b" | "c" }) {
         <div className="h-1.5 w-full rounded bg-white/10" />
         <div className="h-1.5 w-5/6 rounded bg-white/10" />
         <div className="flex gap-1 mt-3">
-          <div className="h-8 w-4 rounded bg-[#D4FF6B]/40" />
-          <div className="h-6 w-4 rounded bg-[#D4FF6B]/30" />
-          <div className="h-10 w-4 rounded bg-[#D4FF6B]/50" />
-          <div className="h-7 w-4 rounded bg-[#D4FF6B]/30" />
-          <div className="h-9 w-4 rounded bg-[#D4FF6B]/40" />
+          <div className="h-8 w-4 rounded bg-[#B5D33C]/40" />
+          <div className="h-6 w-4 rounded bg-[#B5D33C]/30" />
+          <div className="h-10 w-4 rounded bg-[#B5D33C]/50" />
+          <div className="h-7 w-4 rounded bg-[#B5D33C]/30" />
+          <div className="h-9 w-4 rounded bg-[#B5D33C]/40" />
         </div>
       </div>
     </div>
@@ -62,7 +62,7 @@ function ScoreMedallion({ score = 82, size = 260 }: { score?: number; size?: num
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       {/* Ambient glow behind medallion */}
-      <div className="absolute inset-0 -z-10 rounded-full bg-gradient-radial from-[#D4FF6B]/25 via-primary/15 to-transparent blur-2xl" style={{ background: "radial-gradient(circle, rgba(212,255,107,0.35) 0%, rgba(0,168,107,0.12) 40%, transparent 70%)" }} />
+      <div className="absolute inset-0 -z-10 rounded-full bg-gradient-radial from-[#B5D33C]/25 via-primary/15 to-transparent blur-2xl" style={{ background: "radial-gradient(circle, rgba(212,255,107,0.35) 0%, rgba(0,168,107,0.12) 40%, transparent 70%)" }} />
 
       <svg width={size} height={size} className="-rotate-90 relative">
         {/* Track */}
@@ -111,7 +111,7 @@ function ScoreMedallion({ score = 82, size = 260 }: { score?: number; size?: num
         })}
         <defs>
           <linearGradient id="hero-medallion-grad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#D4FF6B" />
+            <stop offset="0" stopColor="#B5D33C" />
             <stop offset="0.5" stopColor="#C8F25F" />
             <stop offset="1" stopColor="#00A86B" />
           </linearGradient>
@@ -123,7 +123,7 @@ function ScoreMedallion({ score = 82, size = 260 }: { score?: number; size?: num
         <CountUp
           to={score}
           duration={1.8}
-          className="text-[88px] md:text-[96px] font-mono font-bold bg-gradient-to-br from-white via-white to-[#D4FF6B] bg-clip-text text-transparent tabular-nums leading-none"
+          className="text-[88px] md:text-[96px] font-mono font-bold bg-gradient-to-br from-white via-white to-[#B5D33C] bg-clip-text text-transparent tabular-nums leading-none"
         />
         <p className="mt-1 text-[11px] font-mono uppercase tracking-[0.2em] text-white/50">/ 100</p>
       </div>
@@ -133,10 +133,10 @@ function ScoreMedallion({ score = 82, size = 260 }: { score?: number; size?: num
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#133F2E] text-white">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#0F3D2E] via-[#0F3D2E] to-[#133F2E] text-white">
       {/* Ambient glows */}
       <div className="absolute -top-48 -right-48 h-[32rem] w-[32rem] rounded-full bg-primary/25 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -left-32 h-[28rem] w-[28rem] rounded-full bg-[#D4FF6B]/15 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -left-32 h-[28rem] w-[28rem] rounded-full bg-[#B5D33C]/15 blur-3xl pointer-events-none" />
       <div
         className="absolute inset-0 opacity-[0.04] pointer-events-none"
         style={{
@@ -233,9 +233,9 @@ export function Hero() {
                 transition={{ duration: 0.6, delay: 1.4, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute top-0 right-6 md:right-10 z-20"
               >
-                <div className="rounded-full bg-[#D4FF6B] shadow-xl shadow-[#D4FF6B]/30 px-3.5 py-1.5 flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-[#0A2E22]" />
-                  <span className="text-[11px] font-mono uppercase tracking-widest text-[#0A2E22] font-bold">
+                <div className="rounded-full bg-[#B5D33C] shadow-xl shadow-[#B5D33C]/30 px-3.5 py-1.5 flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#0F3D2E]" />
+                  <span className="text-[11px] font-mono uppercase tracking-widest text-[#0F3D2E] font-bold">
                     High Priority
                   </span>
                 </div>
@@ -248,8 +248,8 @@ export function Hero() {
                 transition={{ duration: 0.6, delay: 1.5, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute top-24 md:top-32 -right-2 md:right-0 z-20 hidden sm:flex"
               >
-                <div className="rounded-full bg-[#0A2E22] ring-1 ring-[#D4FF6B]/20 shadow-xl px-3 py-1.5 flex items-center gap-1.5">
-                  <ShieldCheck className="h-3 w-3 text-[#D4FF6B]" />
+                <div className="rounded-full bg-[#0F3D2E] ring-1 ring-[#B5D33C]/20 shadow-xl px-3 py-1.5 flex items-center gap-1.5">
+                  <ShieldCheck className="h-3 w-3 text-[#B5D33C]" />
                   <span className="text-[10px] font-mono uppercase tracking-widest text-white font-semibold">IC-ready</span>
                 </div>
               </motion.div>
@@ -275,17 +275,17 @@ export function Hero() {
                 className="absolute top-[58%] left-[28%] flex items-center gap-1.5"
               >
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4FF6B] opacity-60" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#D4FF6B]" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#B5D33C] opacity-60" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#B5D33C]" />
                 </span>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">Sam analyses</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#B5D33C]/80">Sam analyses</span>
               </motion.div>
             </div>
           </motion.div>
 
           {/* RIGHT — copy stack */}
           <motion.div variants={item} className="order-1 md:order-2">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#D4FF6B]/30 bg-[#D4FF6B]/10 backdrop-blur px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B] shadow-sm">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#B5D33C]/30 bg-[#B5D33C]/10 backdrop-blur px-3 py-1 text-[11px] font-mono uppercase tracking-widest text-[#B5D33C] shadow-sm">
               <Sparkles className="h-3 w-3" />
               Benefits
             </div>
@@ -293,7 +293,7 @@ export function Hero() {
             <motion.h1 variants={item} className="mt-5 text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.02em] font-heading leading-[1.05] text-white">
               Saves time, reduces risk,
               <br />
-              drives smarter <span className="bg-gradient-to-r from-[#D4FF6B] to-[#C8F25F] bg-clip-text text-transparent">decisions.</span>
+              drives smarter <span className="bg-gradient-to-r from-[#B5D33C] to-[#C8F25F] bg-clip-text text-transparent">decisions.</span>
             </motion.h1>
 
             <motion.p variants={item} className="mt-5 text-base md:text-lg text-white/70 max-w-xl leading-relaxed">
@@ -303,8 +303,8 @@ export function Hero() {
             <motion.ul variants={container} className="mt-8 space-y-3">
               {bullets.map((b) => (
                 <motion.li key={b} variants={item} className="flex items-start gap-3 text-white/85 text-sm md:text-base">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#D4FF6B]">
-                    <Check className="h-3 w-3 text-[#0A2E22] stroke-[3]" />
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#B5D33C]">
+                    <Check className="h-3 w-3 text-[#0F3D2E] stroke-[3]" />
                   </span>
                   <span>{b}</span>
                 </motion.li>
@@ -314,7 +314,7 @@ export function Hero() {
             <motion.div variants={item} className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Link
                 href="/register?tier=professional"
-                className="group inline-flex items-center gap-2 rounded-full bg-[#D4FF6B] hover:bg-[#E0FF80] text-[#0A2E22] px-6 py-3.5 text-sm font-semibold shadow-xl shadow-[#D4FF6B]/20 hover:shadow-2xl hover:shadow-[#D4FF6B]/30 transition-all hover:-translate-y-0.5"
+                className="group inline-flex items-center gap-2 rounded-full bg-[#B5D33C] hover:bg-[#E0FF80] text-[#0F3D2E] px-6 py-3.5 text-sm font-semibold shadow-xl shadow-[#B5D33C]/20 hover:shadow-2xl hover:shadow-[#B5D33C]/30 transition-all hover:-translate-y-0.5"
               >
                 Get started
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

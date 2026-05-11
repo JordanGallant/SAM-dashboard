@@ -66,11 +66,11 @@ function RegisterContent() {
       <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
         Create account
       </p>
-      <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0A2E22]">
+      <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0F3D2E]">
         Get started with Sam
       </h1>
       <div className="mt-3 flex items-center justify-center gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.04] ring-1 ring-foreground/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-[#0A2E22]/75">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.04] ring-1 ring-foreground/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E]/75">
           {tier.label}
         </span>
         <span className="text-[12px] font-mono tabular-nums text-muted-foreground">

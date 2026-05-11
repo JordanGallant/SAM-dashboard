@@ -118,7 +118,7 @@ function TwoFactorSetup() {
         <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
           Set up
         </p>
-        <h1 className="mt-1 font-heading text-2xl font-bold tracking-[-0.01em] text-[#0A2E22]">
+        <h1 className="mt-1 font-heading text-2xl font-bold tracking-[-0.01em] text-[#0F3D2E]">
           Two-factor authentication
         </h1>
         <p className="mt-1.5 text-sm text-muted-foreground max-w-md">
@@ -256,7 +256,7 @@ function TwoFactorSetup() {
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 ring-1 ring-emerald-200">
             <Shield className="h-6 w-6 text-emerald-600" />
           </div>
-          <h2 className="font-heading font-bold text-lg text-[#0A2E22]">
+          <h2 className="font-heading font-bold text-lg text-[#0F3D2E]">
             Two-factor authentication active
           </h2>
           <p className="mt-1 text-sm text-muted-foreground max-w-xs">

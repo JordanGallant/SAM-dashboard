@@ -21,9 +21,9 @@ export function TierGate({ feature, requiredTier, children }: TierGateProps) {
   const label = requiredTier === "professional" ? "Pro" : "Fund"
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#1A6B47] text-white py-14 px-6 text-center shadow-xl shadow-[#0F3D2E]/20">
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0F3D2E] via-[#0F3D2E] to-[#1A6B47] text-white py-14 px-6 text-center shadow-xl shadow-[#0F3D2E]/20">
       <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
-        <div className="absolute -top-24 -right-24 h-56 w-56 rounded-full bg-[#D4FF6B]/15 blur-3xl" />
+        <div className="absolute -top-24 -right-24 h-56 w-56 rounded-full bg-[#B5D33C]/15 blur-3xl" />
         <div className="absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-primary/20 blur-3xl" />
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -36,10 +36,10 @@ export function TierGate({ feature, requiredTier, children }: TierGateProps) {
       </div>
 
       <div className="relative inline-flex flex-col items-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#D4FF6B]/15 ring-1 ring-[#D4FF6B]/30 mb-4">
-          <Lock className="h-5 w-5 text-[#D4FF6B]" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#B5D33C]/15 ring-1 ring-[#B5D33C]/30 mb-4">
+          <Lock className="h-5 w-5 text-[#B5D33C]" />
         </div>
-        <span className="inline-flex items-center gap-1 rounded-full bg-[#D4FF6B] px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-widest text-[#0A2E22] shadow-md shadow-[#D4FF6B]/30 mb-3">
+        <span className="inline-flex items-center gap-1 rounded-full bg-[#B5D33C] px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-widest text-[#0F3D2E] shadow-md shadow-[#B5D33C]/30 mb-3">
           {label} plan
         </span>
         <h3 className="font-heading font-bold text-xl md:text-2xl text-white tracking-[-0.02em]">
@@ -50,7 +50,7 @@ export function TierGate({ feature, requiredTier, children }: TierGateProps) {
         </p>
         <Link
           href="/settings/billing"
-          className="group mt-6 inline-flex items-center gap-1.5 rounded-full bg-[#D4FF6B] hover:bg-[#E0FF80] text-[#0A2E22] px-5 py-2.5 text-xs font-semibold shadow-md shadow-[#D4FF6B]/25 hover:shadow-lg transition-all"
+          className="group mt-6 inline-flex items-center gap-1.5 rounded-full bg-[#B5D33C] hover:bg-[#E0FF80] text-[#0F3D2E] px-5 py-2.5 text-xs font-semibold shadow-md shadow-[#B5D33C]/25 hover:shadow-lg transition-all"
         >
           Upgrade plan
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />

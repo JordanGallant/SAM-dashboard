@@ -30,7 +30,7 @@ export function HeroPrimary() {
     <section className="relative overflow-hidden bg-gradient-to-br from-[#050B15] via-[#0A1A14] to-[#0F3D2E] text-white">
       {/* Ambient glow */}
       <div className="absolute -top-48 -right-48 h-[36rem] w-[36rem] rounded-full bg-primary/20 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 -left-40 h-96 w-96 rounded-full bg-[#D4FF6B]/08 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 -left-40 h-96 w-96 rounded-full bg-[#B5D33C]/08 blur-3xl pointer-events-none" />
 
       <div className="relative mx-auto max-w-6xl px-4 pt-14 md:pt-20 pb-20 md:pb-24">
         <motion.div
@@ -47,7 +47,7 @@ export function HeroPrimary() {
             >
               Time is money.
               <br />
-              <span className="bg-gradient-to-r from-[#D4FF6B] via-[#C8F25F] to-[#7FD9AA] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#B5D33C] via-[#C8F25F] to-[#7FD9AA] bg-clip-text text-transparent">
                 Save both.
               </span>
             </motion.h1>
@@ -56,10 +56,10 @@ export function HeroPrimary() {
               Structured investment memos, scored across five domains — IC-ready in twelve minutes.
             </motion.p>
 
-            <motion.p variants={item} className="mt-4 inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-[#D4FF6B]/80">
+            <motion.p variants={item} className="mt-4 inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-[#B5D33C]/80">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4FF6B] opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#D4FF6B]" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#B5D33C] opacity-60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#B5D33C]" />
               </span>
               1.000+ memos generated
             </motion.p>
@@ -68,7 +68,7 @@ export function HeroPrimary() {
             <motion.form
               variants={item}
               onSubmit={onSubmit}
-              className="mt-8 flex flex-col sm:flex-row items-stretch gap-2 rounded-2xl bg-white/[0.04] backdrop-blur border border-white/10 p-1.5 max-w-lg focus-within:border-[#D4FF6B]/40 focus-within:bg-white/[0.06] transition-all"
+              className="mt-8 flex flex-col sm:flex-row items-stretch gap-2 rounded-2xl bg-white/[0.04] backdrop-blur border border-white/10 p-1.5 max-w-lg focus-within:border-[#B5D33C]/40 focus-within:bg-white/[0.06] transition-all"
             >
               <input
                 type="email"
@@ -79,7 +79,7 @@ export function HeroPrimary() {
               />
               <button
                 type="submit"
-                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#D4FF6B] hover:bg-[#E0FF80] text-[#050B15] px-5 py-3 text-sm font-semibold shadow-lg shadow-[#D4FF6B]/20 hover:shadow-xl hover:shadow-[#D4FF6B]/30 transition-all"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#B5D33C] hover:bg-[#E0FF80] text-[#050B15] px-5 py-3 text-sm font-semibold shadow-lg shadow-[#B5D33C]/20 hover:shadow-xl hover:shadow-[#B5D33C]/30 transition-all"
               >
                 Get started for free
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

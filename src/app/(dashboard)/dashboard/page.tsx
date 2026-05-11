@@ -81,7 +81,7 @@ export default function DashboardLanding() {
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
             Overview
           </p>
-          <h1 className="mt-2 text-3xl md:text-4xl font-bold font-heading tracking-[-0.025em] text-[#0A2E22]">
+          <h1 className="mt-2 text-3xl md:text-4xl font-bold font-heading tracking-[-0.025em] text-[#0F3D2E]">
             Your dealroom at a glance.
           </h1>
           <p className="mt-2 text-[13px] text-muted-foreground">
@@ -144,7 +144,7 @@ export default function DashboardLanding() {
         {/* Pipeline distribution */}
         <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
           <div className="flex items-baseline justify-between mb-4">
-            <h2 className="font-heading text-[14px] font-bold uppercase tracking-widest text-[#0A2E22]">
+            <h2 className="font-heading text-[14px] font-bold uppercase tracking-widest text-[#0F3D2E]">
               Pipeline distribution
             </h2>
             <Link
@@ -186,7 +186,7 @@ export default function DashboardLanding() {
         {/* Fund profile health */}
         <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
           <div className="flex items-baseline justify-between mb-4">
-            <h2 className="font-heading text-[14px] font-bold uppercase tracking-widest text-[#0A2E22]">
+            <h2 className="font-heading text-[14px] font-bold uppercase tracking-widest text-[#0F3D2E]">
               Fund profile
             </h2>
             <Link
@@ -243,7 +243,7 @@ export default function DashboardLanding() {
       {/* Recent activity */}
       <section className="rounded-2xl bg-card ring-1 ring-foreground/10 p-5 md:p-6">
         <div className="flex items-baseline justify-between mb-4">
-          <h2 className="font-heading text-[14px] font-bold uppercase tracking-widest text-[#0A2E22]">
+          <h2 className="font-heading text-[14px] font-bold uppercase tracking-widest text-[#0F3D2E]">
             Recent activity
           </h2>
           <Link
@@ -274,7 +274,7 @@ export default function DashboardLanding() {
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-heading font-bold text-[14px] text-[#0A2E22] truncate">
+                      <p className="font-heading font-bold text-[14px] text-[#0F3D2E] truncate">
                         {d.companyName}
                       </p>
                       <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -332,7 +332,7 @@ function KPI({
           {label}
         </p>
       </div>
-      <p className="mt-3 font-heading font-bold text-[22px] md:text-[26px] tabular-nums tracking-[-0.01em] text-[#0A2E22]">
+      <p className="mt-3 font-heading font-bold text-[22px] md:text-[26px] tabular-nums tracking-[-0.01em] text-[#0F3D2E]">
         {value}
       </p>
       {sub && (

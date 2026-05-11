@@ -12,7 +12,7 @@ export default function Setup2FAPage() {
       <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
         Two-factor authentication
       </p>
-      <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0A2E22]">
+      <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0F3D2E]">
         Set up your authenticator
       </h1>
       <p className="mt-1.5 text-center text-sm text-muted-foreground">

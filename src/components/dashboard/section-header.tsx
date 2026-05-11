@@ -20,7 +20,7 @@ export function SectionHeader({
             <div className="inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E] shadow-sm">
               Analysis
             </div>
-            <h2 className="mt-2 text-2xl md:text-3xl font-bold font-heading tracking-[-0.02em] text-[#0A2E22]">
+            <h2 className="mt-2 text-2xl md:text-3xl font-bold font-heading tracking-[-0.02em] text-[#0F3D2E]">
               {title}
             </h2>
           </div>

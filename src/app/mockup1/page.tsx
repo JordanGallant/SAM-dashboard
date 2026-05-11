@@ -3,15 +3,15 @@ import { ArrowRight, Check, X, Plus, Sparkles, Shield, MapPin, Lock, UserCheck, 
 
 // Mockup 1 — Queercom merge.
 // SAM content, queercom skeleton (grid hero, accent-underline, tile grids,
-// dark inverted band, marquee tickers). Dark navy ink #0A2E22 + lime
-// accent #D4FF6B on warm paper #ECE8DC. Geist + JetBrains Mono.
+// dark inverted band, marquee tickers). Dark navy ink #0F3D2E + lime
+// accent #B5D33C on warm paper #ECE8DC. Geist + JetBrains Mono.
 // Self-contained: no imports from src/components/landing.
 
 const PAPER = "#ECE8DC"
 const BONE = "#DDD8C8"
-const INK = "#0A2E22"
+const INK = "#0F3D2E"
 const FOREST = "#0F3D2E"
-const LIME = "#D4FF6B"
+const LIME = "#B5D33C"
 const RULE = "rgba(10,46,34,0.18)"
 
 // ─────────────────────────────────────────────────────────────────────────────

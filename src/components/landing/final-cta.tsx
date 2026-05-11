@@ -4,9 +4,9 @@ import { Reveal } from "@/components/motion/reveal"
 
 export function FinalCTA() {
   return (
-    <section className="py-24 px-4 border-t bg-gradient-to-b from-white to-[#F4FAF6]">
+    <section className="py-24 px-4 border-t bg-gradient-to-b from-white to-[#FAFAF7]">
       <Reveal className="mx-auto max-w-5xl">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#1A6B47] px-8 py-16 md:px-16 md:py-20 shadow-2xl shadow-[#0F3D2E]/30">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0F3D2E] via-[#0F3D2E] to-[#1A6B47] px-8 py-16 md:px-16 md:py-20 shadow-2xl shadow-[#0F3D2E]/30">
           {/* Ambient glow */}
           <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl" />
           <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#00A86B]/20 blur-3xl" />
@@ -36,7 +36,7 @@ export function FinalCTA() {
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/register?tier=professional"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#D4FF6B] hover:bg-[#E0FF80] text-[#0A2E22] px-7 py-3.5 text-sm font-semibold shadow-xl shadow-[#D4FF6B]/25 hover:shadow-2xl hover:shadow-[#D4FF6B]/40 transition-all hover:-translate-y-0.5"
+                className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#B5D33C] hover:bg-[#E0FF80] text-[#0F3D2E] px-7 py-3.5 text-sm font-semibold shadow-xl shadow-[#B5D33C]/25 hover:shadow-2xl hover:shadow-[#B5D33C]/40 transition-all hover:-translate-y-0.5"
               >
                 Analyse a deck
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

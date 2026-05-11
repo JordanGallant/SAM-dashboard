@@ -14,7 +14,7 @@ export function RedFlagsList({ items }: { items: FindingItem[] }) {
           <p className="text-[10px] font-mono uppercase tracking-widest text-red-700/80">
             Attention
           </p>
-          <p className="text-base font-heading font-bold text-[#0A2E22]">Red flags</p>
+          <p className="text-base font-heading font-bold text-[#0F3D2E]">Red flags</p>
         </div>
         <span className="ml-auto text-sm font-mono font-bold text-red-700 tabular-nums">
           {items.length}

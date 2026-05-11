@@ -174,7 +174,7 @@ function DealsContent() {
     <div className="space-y-6">
       <FundProfileBanner />
 
-      <div className="relative overflow-hidden rounded-3xl border border-[#0F3D2E]/10 bg-gradient-to-br from-white via-[#F4FAF6] to-white p-6 md:p-8 shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl border border-[#0F3D2E]/10 bg-gradient-to-br from-white via-[#FAFAF7] to-white p-6 md:p-8 shadow-sm">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_50%_60%_at_100%_0%,rgba(212,255,107,0.15),transparent_70%)]" />
 
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
@@ -183,7 +183,7 @@ function DealsContent() {
               <Briefcase className="h-3 w-3" />
               Your deals
             </div>
-            <h1 className="mt-3 text-3xl md:text-4xl font-bold font-heading tracking-[-0.025em] text-[#0A2E22]">
+            <h1 className="mt-3 text-3xl md:text-4xl font-bold font-heading tracking-[-0.025em] text-[#0F3D2E]">
               Dealroom
             </h1>
             <p className="mt-2 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
@@ -242,7 +242,7 @@ function DealsContent() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by company name…"
-                  className="w-full rounded-full border border-[#0F3D2E]/10 bg-[#F4FAF6]/40 pl-9 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full rounded-full border border-[#0F3D2E]/10 bg-[#FAFAF7]/40 pl-9 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
 
@@ -307,7 +307,7 @@ function DealsContent() {
             {/* Pilot #34: list ↔ phase view toggle */}
             <div className="mt-3 pt-3 border-t border-[#0F3D2E]/5 flex items-center gap-2">
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">View</span>
-              <div className="inline-flex items-center rounded-full bg-[#F4FAF6]/60 ring-1 ring-[#0F3D2E]/10 p-0.5">
+              <div className="inline-flex items-center rounded-full bg-[#FAFAF7]/60 ring-1 ring-[#0F3D2E]/10 p-0.5">
                 <button
                   type="button"
                   onClick={() => setViewMode("list")}
@@ -367,7 +367,7 @@ function DealsContent() {
                     <div className="flex-1 h-px bg-[#0F3D2E]/10" />
                   </div>
                   {stageDeals.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-[#0F3D2E]/10 bg-[#F4FAF6]/30 px-4 py-3 text-[12px] text-muted-foreground">
+                    <div className="rounded-2xl border border-dashed border-[#0F3D2E]/10 bg-[#FAFAF7]/30 px-4 py-3 text-[12px] text-muted-foreground">
                       No deals in this phase.
                     </div>
                   ) : (
@@ -415,18 +415,18 @@ function DealsContent() {
             className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl ring-1 ring-[#0F3D2E]/10"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 id="delete-confirm-title" className="font-heading text-lg font-bold text-[#0A2E22]">
+            <h2 id="delete-confirm-title" className="font-heading text-lg font-bold text-[#0F3D2E]">
               Delete this deal?
             </h2>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              <span className="font-semibold text-[#0A2E22]">{confirmDelete.companyName}</span> and its analysis, documents, and history will be permanently removed. This cannot be undone.
+              <span className="font-semibold text-[#0F3D2E]">{confirmDelete.companyName}</span> and its analysis, documents, and history will be permanently removed. This cannot be undone.
             </p>
 
             <div className="mt-6 flex justify-end gap-2">
               <button
                 onClick={() => setConfirmDelete(null)}
                 disabled={deletingId !== null}
-                className="rounded-full border border-[#0F3D2E]/15 bg-white px-4 py-2 text-sm font-medium text-[#0A2E22] hover:bg-[#F4FAF6] transition-colors disabled:opacity-50"
+                className="rounded-full border border-[#0F3D2E]/15 bg-white px-4 py-2 text-sm font-medium text-[#0F3D2E] hover:bg-[#FAFAF7] transition-colors disabled:opacity-50"
                 autoFocus
               >
                 Cancel
@@ -479,7 +479,7 @@ function DealSection({
   return (
     <section>
       <div className="flex items-baseline gap-3 mb-2 px-1">
-        <h2 className="font-heading text-[13px] font-bold uppercase tracking-widest text-[#0A2E22]">
+        <h2 className="font-heading text-[13px] font-bold uppercase tracking-widest text-[#0F3D2E]">
           {title}
         </h2>
         <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground tabular-nums">
@@ -519,7 +519,7 @@ function DealRow({
   const isRunning = deal.latestAnalysisStatus === "pending" || deal.latestAnalysisStatus === "processing"
 
   return (
-    <li className="group relative flex items-stretch hover:bg-[#F4FAF6]/40 transition-colors">
+    <li className="group relative flex items-stretch hover:bg-[#FAFAF7]/40 transition-colors">
       <Link href={`/deals/${deal.id}/summary`} className="flex-1 min-w-0 flex items-center gap-3 px-4 py-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/10 ring-1 ring-[#0F3D2E]/10">
           <span className="text-[11px] font-mono font-bold text-[#0F3D2E]">
@@ -528,7 +528,7 @@ function DealRow({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-heading font-bold text-[14px] text-[#0A2E22] truncate">
+            <h3 className="font-heading font-bold text-[14px] text-[#0F3D2E] truncate">
               {deal.companyName}
             </h3>
             {/* Pilot #11: only render stage once analysis confirms it. */}

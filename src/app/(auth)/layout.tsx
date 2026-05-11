@@ -2,7 +2,7 @@ import Link from "next/link"
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen bg-[#F8F8F9] text-[#0A2E22]">
+    <div className="relative min-h-screen bg-[#F8F8F9] text-[#0F3D2E]">
       <div
         aria-hidden
         className="pointer-events-none absolute -top-40 right-[-10rem] h-[36rem] w-[36rem] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(0,168,107,0.12),transparent_60%)] blur-2xl"
@@ -16,7 +16,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <header className="px-6 pt-6 md:px-10 md:pt-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#0A2E22]/70 hover:text-[#0A2E22] transition-colors"
+            className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E]/70 hover:text-[#0F3D2E] transition-colors"
           >
             <span className="grid h-6 w-6 place-items-center rounded-md bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white text-[11px] font-bold">S</span>
             Sam · Investment intelligence

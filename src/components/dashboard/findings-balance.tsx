@@ -82,7 +82,7 @@ function SeverityBreakdown({ kind, groups }: { kind: "strengths" | "risks"; grou
             <div className="flex-1 h-1 rounded-full bg-[#0F3D2E]/5 overflow-hidden">
               <div className={color} style={{ width: `${Math.min(100, count * 20)}%`, height: "100%" }} />
             </div>
-            <span className="w-4 text-right tabular-nums font-bold text-[#0A2E22]">{count}</span>
+            <span className="w-4 text-right tabular-nums font-bold text-[#0F3D2E]">{count}</span>
           </div>
         )
       })}

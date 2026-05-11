@@ -34,11 +34,11 @@ import {
 
 // ----- design tokens -----
 const FIELD = "#F7F7F2" // off-white field
-const INK = "#0A2E22" // primary text
+const INK = "#0F3D2E" // primary text
 const NEAR_BLACK = "#0A0E14"
 const ACCENT = "#0F3D2E" // forest
 const ACCENT_HI = "#00A86B" // bright
-const ACCENT_LIME = "#D4FF6B"
+const ACCENT_LIME = "#B5D33C"
 const RULE = "rgba(10,46,34,0.10)"
 
 const EASE = [0.22, 1, 0.36, 1] as [number, number, number, number]
@@ -147,7 +147,7 @@ function Nav() {
           </Link>
           <Link
             href="/register"
-            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-[#0A2E22] hover:scale-[1.02] transition"
+            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-[#0F3D2E] hover:scale-[1.02] transition"
             style={{ background: ACCENT_LIME }}
           >
             Get started
@@ -191,7 +191,7 @@ function Hero() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
-              className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/55"
+              className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0F3D2E]/55"
             >
               The investment memo, generated.
             </motion.p>
@@ -215,7 +215,7 @@ function Hero() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: EASE, delay: 0.18 }}
-              className="mt-7 max-w-[540px] text-[17px] leading-[1.55] text-[#0A2E22]/70"
+              className="mt-7 max-w-[540px] text-[17px] leading-[1.55] text-[#0F3D2E]/70"
             >
               SAM reads pitch decks the way an analyst would — five domains, scorecards,
               a partner-ready memo with verdict and next steps. Five minutes, not five hours.
@@ -228,7 +228,7 @@ function Hero() {
             >
               <Link
                 href="/register"
-                className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold text-[#0A2E22] hover:scale-[1.02] transition shadow-sm"
+                className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold text-[#0F3D2E] hover:scale-[1.02] transition shadow-sm"
                 style={{ background: ACCENT_LIME }}
               >
                 Try Sam free
@@ -293,13 +293,13 @@ function FloatingCard() {
           <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
-          <span className="ml-3 text-[11px] font-mono text-[#0A2E22]/50">canaaro · executive summary</span>
+          <span className="ml-3 text-[11px] font-mono text-[#0F3D2E]/50">canaaro · executive summary</span>
         </div>
         {/* card body */}
         <div className="p-5 space-y-4">
           <div className="flex items-baseline justify-between">
             <div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-[#0A2E22]/55">Verdict</p>
+              <p className="text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E]/55">Verdict</p>
               <p className="font-bold text-[20px] tracking-tight mt-1" style={{ color: ACCENT }}>
                 Strong Buy
               </p>
@@ -365,10 +365,10 @@ function ScorecardRows() {
           transition={{ duration: 0.4, ease: EASE, delay: 0.05 * i + 0.5 }}
           className="grid grid-cols-[80px_1fr_36px] items-center gap-3 text-[12px]"
         >
-          <span className="font-mono uppercase tracking-widest text-[10px] text-[#0A2E22]/55">
+          <span className="font-mono uppercase tracking-widest text-[10px] text-[#0F3D2E]/55">
             {r.label}
           </span>
-          <span className="text-[#0A2E22]/85 truncate">{r.finding}</span>
+          <span className="text-[#0F3D2E]/85 truncate">{r.finding}</span>
           <span className="font-bold tabular-nums text-right" style={{ color: ACCENT }}>
             {r.score}
           </span>
@@ -415,7 +415,7 @@ function LogoWall() {
   return (
     <section className="border-y" style={{ borderColor: RULE }}>
       <div className="mx-auto max-w-[1200px] px-6 py-12">
-        <p className="text-center text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/55">
+        <p className="text-center text-[11px] font-mono uppercase tracking-[0.18em] text-[#0F3D2E]/55">
           Trusted by European VC funds
         </p>
         <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 items-center gap-8">
@@ -497,7 +497,7 @@ function BentoGrid() {
     <section className="py-24 md:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
         <div className="max-w-2xl mb-12">
-          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/55">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0F3D2E]/55">
             What you get
           </p>
           <h2 className="mt-3 font-bold tracking-[-0.025em] leading-[1.05]"
@@ -562,10 +562,10 @@ function BentoTile({
       }}
     >
       <div className="flex items-start justify-between">
-        <p className="text-[10px] font-mono uppercase tracking-widest text-[#0A2E22]/55">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E]/55">
           {eyebrow}
         </p>
-        <Icon className="h-4 w-4 text-[#0A2E22]/40 group-hover:text-[#0A2E22] transition" />
+        <Icon className="h-4 w-4 text-[#0F3D2E]/40 group-hover:text-[#0F3D2E] transition" />
       </div>
       <p className={`mt-2 font-bold tracking-tight ${dense ? "text-[15px]" : "text-[18px] md:text-[22px]"}`}>
         {title}
@@ -593,7 +593,7 @@ function FounderRows() {
           </span>
           <div className="flex-1 min-w-0">
             <p className="font-semibold truncate">{f.name}</p>
-            <p className="text-[10.5px] font-mono uppercase tracking-widest text-[#0A2E22]/55">
+            <p className="text-[10.5px] font-mono uppercase tracking-widest text-[#0F3D2E]/55">
               {f.role}
             </p>
           </div>
@@ -616,7 +616,7 @@ function MarketBars() {
     <div className="space-y-2">
       {data.map((d) => (
         <div key={d.l} className="flex items-center gap-3 text-[12px]">
-          <span className="w-9 font-mono uppercase text-[10px] tracking-widest text-[#0A2E22]/55">
+          <span className="w-9 font-mono uppercase text-[10px] tracking-widest text-[#0F3D2E]/55">
             {d.l}
           </span>
           <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "rgba(10,46,34,0.06)" }}>
@@ -652,10 +652,10 @@ function MoatList() {
             </span>
           ) : (
             <span className="grid place-items-center h-4 w-4 rounded-full" style={{ background: "rgba(10,46,34,0.06)" }}>
-              <X className="h-2.5 w-2.5 text-[#0A2E22]/40 stroke-[2.5]" />
+              <X className="h-2.5 w-2.5 text-[#0F3D2E]/40 stroke-[2.5]" />
             </span>
           )}
-          <span className={i.on ? "" : "text-[#0A2E22]/40"}>{i.l}</span>
+          <span className={i.on ? "" : "text-[#0F3D2E]/40"}>{i.l}</span>
         </li>
       ))}
     </ul>
@@ -698,11 +698,11 @@ function FundFitMini() {
     <div className="space-y-2.5">
       {rows.map((r) => (
         <div key={r.l} className="flex items-center justify-between text-[12.5px]">
-          <span className={r.on ? "" : "text-[#0A2E22]/40 line-through"}>{r.l}</span>
+          <span className={r.on ? "" : "text-[#0F3D2E]/40 line-through"}>{r.l}</span>
           {r.on ? (
             <Check className="h-4 w-4" style={{ color: ACCENT_HI }} />
           ) : (
-            <X className="h-4 w-4 text-[#0A2E22]/40" />
+            <X className="h-4 w-4 text-[#0F3D2E]/40" />
           )}
         </div>
       ))}
@@ -862,7 +862,7 @@ function FeatureSlab({
                 style={{ fontSize: "clamp(34px, 4.8vw, 60px)", color: INK }}>
               {title}
             </h3>
-            <p className="mt-6 text-[16px] leading-[1.65] text-[#0A2E22]/70 max-w-xl">{body}</p>
+            <p className="mt-6 text-[16px] leading-[1.65] text-[#0F3D2E]/70 max-w-xl">{body}</p>
             <ul className="mt-7 space-y-2.5">
               {bullets.map((b) => (
                 <li key={b} className="flex items-center gap-2.5 text-[14px]">
@@ -904,7 +904,7 @@ function ScreenshotIntake() {
            style={{ borderColor: RULE }}>
         <FileText className="h-6 w-6 mx-auto mb-3" style={{ color: ACCENT }} />
         <p className="font-bold text-[15px]">Drop your pitch deck</p>
-        <p className="text-[12px] text-[#0A2E22]/55 mt-1">PDF, DOCX, up to 25MB</p>
+        <p className="text-[12px] text-[#0F3D2E]/55 mt-1">PDF, DOCX, up to 25MB</p>
       </div>
       <div className="mt-4 space-y-2 text-[12px] font-mono">
         {["✓ canaaro_deck.pdf · 24 pages", "✓ Founders extracted (3)", "✓ Stage: Seed · Raising €1.2M"].map((l, i) => (
@@ -914,7 +914,7 @@ function ScreenshotIntake() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.35, delay: 0.15 * i }}
-            className="text-[#0A2E22]/75"
+            className="text-[#0F3D2E]/75"
           >
             {l}
           </motion.div>
@@ -935,7 +935,7 @@ function ScreenshotScorecard() {
   return (
     <div className="rounded-2xl bg-white border p-6 shadow-[0_20px_60px_-20px_rgba(10,46,34,0.20)]"
          style={{ borderColor: RULE }}>
-      <p className="text-[10px] font-mono uppercase tracking-widest text-[#0A2E22]/55">Scorecard</p>
+      <p className="text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E]/55">Scorecard</p>
       <div className="mt-3 space-y-3">
         {rows.map((r, i) => (
           <motion.div
@@ -946,7 +946,7 @@ function ScreenshotScorecard() {
             transition={{ delay: 0.06 * i }}
             className="grid grid-cols-[80px_1fr_60px_28px] items-center gap-3 text-[13px]"
           >
-            <span className="font-mono uppercase tracking-widest text-[10px] text-[#0A2E22]/55">{r.l}</span>
+            <span className="font-mono uppercase tracking-widest text-[10px] text-[#0F3D2E]/55">{r.l}</span>
             <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(10,46,34,0.06)" }}>
               <motion.div
                 className="h-full rounded-full"
@@ -971,7 +971,7 @@ function ScreenshotFundFit() {
     <div className="rounded-2xl bg-white border p-6 shadow-[0_20px_60px_-20px_rgba(10,46,34,0.20)]"
          style={{ borderColor: RULE }}>
       <div className="flex items-baseline justify-between mb-4">
-        <p className="text-[10px] font-mono uppercase tracking-widest text-[#0A2E22]/55">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E]/55">
           Fund Fit · canaaro
         </p>
         <p className="font-bold text-[16px]" style={{ color: ACCENT }}>4 / 5 match</p>
@@ -988,11 +988,11 @@ function QuoteSpotlight() {
   return (
     <section className="py-24 md:py-32" style={{ background: ACCENT_LIME }}>
       <div className="mx-auto max-w-[1100px] px-6">
-        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/65">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0F3D2E]/65">
           What investors say
         </p>
         <blockquote className="mt-6 font-bold tracking-[-0.025em] leading-[1.08]"
-                    style={{ fontSize: "clamp(30px, 4.4vw, 56px)", color: "#0A2E22" }}>
+                    style={{ fontSize: "clamp(30px, 4.4vw, 56px)", color: "#0F3D2E" }}>
           <span className="font-serif italic font-normal opacity-50 mr-2">“</span>
           I review 40+ decks a month. Sam cuts my first-pass from hours to minutes,
           and the report gives me <span className="font-serif italic font-normal" style={{ color: ACCENT }}>
@@ -1000,7 +1000,7 @@ function QuoteSpotlight() {
           </span> before a founder call.
           <span className="font-serif italic font-normal opacity-50 ml-2">”</span>
         </blockquote>
-        <p className="mt-8 text-[12px] font-mono uppercase tracking-widest text-[#0A2E22]/65">
+        <p className="mt-8 text-[12px] font-mono uppercase tracking-widest text-[#0F3D2E]/65">
           Partner · Pre-seed fund
         </p>
       </div>
@@ -1033,7 +1033,7 @@ function CaseStudyRow() {
     <section className="py-24 md:py-28">
       <div className="mx-auto max-w-[1200px] px-6">
         <div className="max-w-2xl mb-10">
-          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/55">Stories</p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0F3D2E]/55">Stories</p>
           <h2 className="mt-3 font-bold tracking-[-0.025em] leading-[1.05]"
               style={{ fontSize: "clamp(34px, 4.4vw, 56px)" }}>
             How partners are using Sam.
@@ -1055,12 +1055,12 @@ function CaseStudyRow() {
                    style={{ fontSize: "clamp(22px, 2.4vw, 30px)", color: ACCENT }}>
                   {c.metric.value}
                 </p>
-                <p className="text-[10.5px] font-mono uppercase tracking-widest text-[#0A2E22]/55 text-right">
+                <p className="text-[10.5px] font-mono uppercase tracking-widest text-[#0F3D2E]/55 text-right">
                   {c.metric.label}
                 </p>
               </div>
-              <p className="text-[14px] leading-[1.55] text-[#0A2E22]/85">{c.quote}</p>
-              <p className="mt-5 pt-5 border-t text-[10.5px] font-mono uppercase tracking-widest text-[#0A2E22]/55"
+              <p className="text-[14px] leading-[1.55] text-[#0F3D2E]/85">{c.quote}</p>
+              <p className="mt-5 pt-5 border-t text-[10.5px] font-mono uppercase tracking-widest text-[#0F3D2E]/55"
                  style={{ borderColor: RULE }}>
                 {c.role}
               </p>
@@ -1088,7 +1088,7 @@ function Comparison() {
     <section className="py-24 md:py-28 border-t" style={{ borderColor: RULE }}>
       <div className="mx-auto max-w-[1100px] px-6">
         <div className="max-w-2xl mb-10">
-          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0A2E22]/55">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-[#0F3D2E]/55">
             Sam vs. the alternatives
           </p>
           <h2 className="mt-3 font-bold tracking-[-0.025em] leading-[1.05]"
@@ -1099,10 +1099,10 @@ function Comparison() {
         <div className="rounded-2xl border overflow-hidden" style={{ borderColor: RULE }}>
           <div className="grid grid-cols-[1fr_120px_120px_140px] text-[11px] font-mono uppercase tracking-widest"
                style={{ background: "rgba(10,46,34,0.03)" }}>
-            <div className="px-5 py-3.5 text-[#0A2E22]/55">Capability</div>
+            <div className="px-5 py-3.5 text-[#0F3D2E]/55">Capability</div>
             <div className="px-3 py-3.5 text-center font-bold" style={{ color: ACCENT }}>Sam</div>
-            <div className="px-3 py-3.5 text-center text-[#0A2E22]/55">Spreadsheets</div>
-            <div className="px-3 py-3.5 text-center text-[#0A2E22]/55">Generic LLM</div>
+            <div className="px-3 py-3.5 text-center text-[#0F3D2E]/55">Spreadsheets</div>
+            <div className="px-3 py-3.5 text-center text-[#0F3D2E]/55">Generic LLM</div>
           </div>
           {rows.map((r, i) => (
             <div key={r.feat}
@@ -1131,7 +1131,7 @@ function CheckCell({ on, accent }: { on: boolean; accent?: boolean }) {
       ) : (
         <span className="grid place-items-center h-5 w-5 rounded-full"
               style={{ background: "rgba(10,46,34,0.06)" }}>
-          <X className="h-3 w-3 text-[#0A2E22]/35 stroke-[2.5]" />
+          <X className="h-3 w-3 text-[#0F3D2E]/35 stroke-[2.5]" />
         </span>
       )}
     </div>
@@ -1163,7 +1163,7 @@ function ClosingCTA() {
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/register"
-            className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14.5px] font-semibold text-[#0A2E22] hover:scale-[1.02] transition shadow-md"
+            className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14.5px] font-semibold text-[#0F3D2E] hover:scale-[1.02] transition shadow-md"
             style={{ background: ACCENT_LIME }}
           >
             Try Sam free

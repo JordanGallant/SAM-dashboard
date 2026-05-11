@@ -106,7 +106,7 @@ export function DeckUploader({
       className={`relative overflow-hidden rounded-3xl border-2 border-dashed transition-all py-16 px-6 text-center cursor-pointer ${
         dragOver
           ? "border-primary bg-primary/5"
-          : "border-[#0F3D2E]/15 bg-white hover:border-[#0F3D2E]/30 hover:bg-[#F4FAF6]/40"
+          : "border-[#0F3D2E]/15 bg-white hover:border-[#0F3D2E]/30 hover:bg-[#FAFAF7]/40"
       }`}
     >
       <input
@@ -121,7 +121,7 @@ export function DeckUploader({
         <UploadCloud className="h-6 w-6 text-[#0F3D2E]" />
       </div>
 
-      <h3 className="text-xl font-heading font-bold text-[#0A2E22]">
+      <h3 className="text-xl font-heading font-bold text-[#0F3D2E]">
         Drop a pitch deck to get started
       </h3>
       <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">

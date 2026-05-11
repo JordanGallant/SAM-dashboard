@@ -11,7 +11,7 @@ const domains = [
 
 export function Framework() {
   return (
-    <section className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-[#F4FAF6] via-white to-[#F4FAF6]">
+    <section className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-[#FAFAF7] via-white to-[#FAFAF7]">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(0,168,107,0.10),transparent_70%)]" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_40%_30%_at_10%_100%,rgba(212,255,107,0.15),transparent_70%)]" />
 
@@ -21,7 +21,7 @@ export function Framework() {
             <Layers className="h-3 w-3" />
             The framework
           </div>
-          <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0A2E22]">
+          <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0F3D2E]">
             Five domains.
             <br />
             <span className="bg-gradient-to-r from-[#0F3D2E] via-[#1A6B47] to-[#00A86B] bg-clip-text text-transparent">
@@ -59,7 +59,7 @@ export function Framework() {
                     </div>
 
                     {/* Name */}
-                    <h3 className="font-heading font-bold text-lg mb-2 tracking-tight text-[#0A2E22]">
+                    <h3 className="font-heading font-bold text-lg mb-2 tracking-tight text-[#0F3D2E]">
                       {d.name}
                     </h3>
 

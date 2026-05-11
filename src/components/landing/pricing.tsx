@@ -96,7 +96,7 @@ export function Pricing() {
   return (
     <section
       id="pricing"
-      className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-[#F4FAF6] via-white to-[#F4FAF6]"
+      className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-[#FAFAF7] via-white to-[#FAFAF7]"
     >
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_50%_40%_at_50%_0%,rgba(0,168,107,0.10),transparent_70%)]" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_40%_30%_at_80%_100%,rgba(212,255,107,0.12),transparent_70%)]" />
@@ -107,7 +107,7 @@ export function Pricing() {
             <Tag className="h-3 w-3" />
             Pricing
           </div>
-          <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0A2E22]">
+          <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0F3D2E]">
             Priced against the value
             <br />
             <span className="bg-gradient-to-r from-[#0F3D2E] via-[#1A6B47] to-[#00A86B] bg-clip-text text-transparent">
@@ -139,23 +139,23 @@ export function Pricing() {
                 className={cn(
                   "relative flex flex-col h-full rounded-3xl transition-all duration-300 hover:-translate-y-1",
                   tier.popular
-                    ? "bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#1A6B47] text-white shadow-2xl shadow-[#0F3D2E]/30 hover:shadow-[#0F3D2E]/50"
+                    ? "bg-gradient-to-br from-[#0F3D2E] via-[#0F3D2E] to-[#1A6B47] text-white shadow-2xl shadow-[#0F3D2E]/30 hover:shadow-[#0F3D2E]/50"
                     : "bg-white border border-[#0F3D2E]/10 shadow-sm hover:border-[#0F3D2E]/25 hover:shadow-xl"
                 )}
               >
                 {tier.popular && (
                   <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
-                    <div className="absolute -top-24 -right-24 h-56 w-56 rounded-full bg-[#D4FF6B]/20 blur-3xl" />
+                    <div className="absolute -top-24 -right-24 h-56 w-56 rounded-full bg-[#B5D33C]/20 blur-3xl" />
                     <div className="absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-primary/20 blur-3xl" />
-                    <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-gradient-to-r from-transparent via-[#D4FF6B] to-transparent" />
+                    <div className="absolute inset-x-8 top-0 h-0.5 rounded-b-full bg-gradient-to-r from-transparent via-[#B5D33C] to-transparent" />
                   </div>
                 )}
 
                 {tier.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                    <div className="inline-flex items-center gap-1.5 rounded-full bg-[#D4FF6B] shadow-lg shadow-[#D4FF6B]/30 px-3 py-1">
-                      <Sparkles className="h-3 w-3 text-[#0A2E22]" />
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#0A2E22]">
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-[#B5D33C] shadow-lg shadow-[#B5D33C]/30 px-3 py-1">
+                      <Sparkles className="h-3 w-3 text-[#0F3D2E]" />
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#0F3D2E]">
                         Most popular
                       </span>
                     </div>
@@ -166,7 +166,7 @@ export function Pricing() {
                   <h3
                     className={cn(
                       "text-xl font-heading font-bold mb-1",
-                      tier.popular ? "text-white" : "text-[#0A2E22]"
+                      tier.popular ? "text-white" : "text-[#0F3D2E]"
                     )}
                   >
                     {tier.name}
@@ -187,8 +187,8 @@ export function Pricing() {
                         className={cn(
                           "text-5xl md:text-6xl font-mono font-bold tracking-tight inline-block leading-none",
                           tier.popular
-                            ? "bg-gradient-to-br from-white to-[#D4FF6B] bg-clip-text text-transparent"
-                            : "text-[#0A2E22]"
+                            ? "bg-gradient-to-br from-white to-[#B5D33C] bg-clip-text text-transparent"
+                            : "text-[#0F3D2E]"
                         )}
                       >
                         Custom
@@ -207,8 +207,8 @@ export function Pricing() {
                           className={cn(
                             "text-6xl font-mono font-bold tracking-tight inline-block leading-none",
                             tier.popular
-                              ? "bg-gradient-to-br from-white to-[#D4FF6B] bg-clip-text text-transparent"
-                              : "text-[#0A2E22]"
+                              ? "bg-gradient-to-br from-white to-[#B5D33C] bg-clip-text text-transparent"
+                              : "text-[#0F3D2E]"
                           )}
                         >
                           {tier.price}
@@ -241,7 +241,7 @@ export function Pricing() {
                       "mt-5 flex flex-col gap-1 rounded-xl px-3 py-2.5 ring-1",
                       tier.popular
                         ? "bg-white/5 ring-white/10 text-white/80"
-                        : "bg-[#0F3D2E]/[0.03] ring-[#0F3D2E]/10 text-[#0A2E22]"
+                        : "bg-[#0F3D2E]/[0.03] ring-[#0F3D2E]/10 text-[#0F3D2E]"
                     )}
                   >
                     <div className="flex items-center justify-between text-[12px]">
@@ -275,8 +275,8 @@ export function Pricing() {
                     className={cn(
                       "group/cta inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all hover:-translate-y-0.5",
                       tier.popular
-                        ? "bg-[#D4FF6B] hover:bg-[#E0FF80] text-[#0A2E22] shadow-xl shadow-[#D4FF6B]/25 hover:shadow-2xl hover:shadow-[#D4FF6B]/40"
-                        : "bg-[#0F3D2E] hover:bg-[#0A2E22] text-white shadow-md shadow-[#0F3D2E]/15 hover:shadow-lg hover:shadow-[#0F3D2E]/25"
+                        ? "bg-[#B5D33C] hover:bg-[#E0FF80] text-[#0F3D2E] shadow-xl shadow-[#B5D33C]/25 hover:shadow-2xl hover:shadow-[#B5D33C]/40"
+                        : "bg-[#0F3D2E] hover:bg-[#0F3D2E] text-white shadow-md shadow-[#0F3D2E]/15 hover:shadow-lg hover:shadow-[#0F3D2E]/25"
                     )}
                   >
                     {tier.cta}
@@ -321,14 +321,14 @@ export function Pricing() {
                           className={cn(
                             "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full",
                             tier.popular
-                              ? "bg-[#D4FF6B] shadow-sm shadow-[#D4FF6B]/20"
+                              ? "bg-[#B5D33C] shadow-sm shadow-[#B5D33C]/20"
                               : "bg-[#0F3D2E]/10"
                           )}
                         >
                           <Check
                             className={cn(
                               "h-2.5 w-2.5 stroke-[3]",
-                              tier.popular ? "text-[#0A2E22]" : "text-[#0F3D2E]"
+                              tier.popular ? "text-[#0F3D2E]" : "text-[#0F3D2E]"
                             )}
                           />
                         </span>
@@ -352,7 +352,7 @@ export function Pricing() {
                           feature.included
                             ? tier.popular
                               ? "text-white/90"
-                              : "text-[#0A2E22]"
+                              : "text-[#0F3D2E]"
                             : tier.popular
                             ? "text-white/35"
                             : "text-muted-foreground/55"

@@ -44,7 +44,7 @@ const audiences = [
 
 export function Audiences() {
   return (
-    <section className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-white via-[#F4FAF6] to-white">
+    <section className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-white via-[#FAFAF7] to-white">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_50%_40%_at_100%_50%,rgba(0,168,107,0.08),transparent_70%)]" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_40%_30%_at_10%_10%,rgba(212,255,107,0.15),transparent_70%)]" />
 
@@ -54,7 +54,7 @@ export function Audiences() {
             <Users className="h-3 w-3" />
             Who it&apos;s for
           </div>
-          <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0A2E22]">
+          <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-bold font-heading tracking-[-0.025em] leading-[1.02] text-[#0F3D2E]">
             Different roles.
             <br />
             <span className="bg-gradient-to-r from-[#0F3D2E] via-[#1A6B47] to-[#00A86B] bg-clip-text text-transparent">
@@ -77,15 +77,15 @@ export function Audiences() {
                   href={a.href}
                   className={`group relative flex flex-col h-full rounded-3xl p-7 md:p-8 transition-all duration-300 hover:-translate-y-1 ${
                     featured
-                      ? "bg-gradient-to-br from-[#0A2E22] via-[#0F3D2E] to-[#1A6B47] text-white shadow-2xl shadow-[#0F3D2E]/30 hover:shadow-[#0F3D2E]/50 md:-translate-y-2 md:scale-[1.02]"
+                      ? "bg-gradient-to-br from-[#0F3D2E] via-[#0F3D2E] to-[#1A6B47] text-white shadow-2xl shadow-[#0F3D2E]/30 hover:shadow-[#0F3D2E]/50 md:-translate-y-2 md:scale-[1.02]"
                       : "bg-white border border-[#0F3D2E]/10 shadow-sm hover:border-[#0F3D2E]/25 hover:shadow-xl"
                   }`}
                 >
                   {featured && (
                     <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
-                      <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-[#D4FF6B]/20 blur-3xl" />
+                      <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-[#B5D33C]/20 blur-3xl" />
                       <div className="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
-                      <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full bg-gradient-to-r from-transparent via-[#D4FF6B] to-transparent" />
+                      <div className="absolute inset-x-6 top-0 h-0.5 rounded-b-full bg-gradient-to-r from-transparent via-[#B5D33C] to-transparent" />
                     </div>
                   )}
 
@@ -94,20 +94,20 @@ export function Audiences() {
                     <div
                       className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
                         featured
-                          ? "bg-[#D4FF6B]/15 ring-1 ring-[#D4FF6B]/30"
+                          ? "bg-[#B5D33C]/15 ring-1 ring-[#B5D33C]/30"
                           : "bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/5 ring-1 ring-[#0F3D2E]/10 group-hover:from-[#0F3D2E]/10 group-hover:to-[#00A86B]/10"
                       }`}
                     >
                       <Icon
                         className={`h-6 w-6 ${
-                          featured ? "text-[#D4FF6B]" : "text-[#0F3D2E]"
+                          featured ? "text-[#B5D33C]" : "text-[#0F3D2E]"
                         }`}
                       />
                     </div>
                     <span
                       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest shadow-md ${
                         featured
-                          ? "bg-[#D4FF6B] text-[#0A2E22] shadow-[#D4FF6B]/30"
+                          ? "bg-[#B5D33C] text-[#0F3D2E] shadow-[#B5D33C]/30"
                           : "bg-[#0F3D2E]/8 text-[#0F3D2E] shadow-[#0F3D2E]/10 ring-1 ring-[#0F3D2E]/15"
                       }`}
                     >
@@ -118,7 +118,7 @@ export function Audiences() {
                   {/* Label */}
                   <p
                     className={`relative text-[11px] font-mono font-semibold uppercase tracking-widest mb-3 ${
-                      featured ? "text-[#D4FF6B]/90" : "text-primary"
+                      featured ? "text-[#B5D33C]/90" : "text-primary"
                     }`}
                   >
                     {a.label}
@@ -148,7 +148,7 @@ export function Audiences() {
                     >
                       <WorkflowIcon
                         className={`h-4 w-4 ${
-                          featured ? "text-[#D4FF6B]" : "text-[#0F3D2E]"
+                          featured ? "text-[#B5D33C]" : "text-[#0F3D2E]"
                         }`}
                       />
                     </div>
@@ -156,8 +156,8 @@ export function Audiences() {
                       <p
                         className={`font-mono text-xl font-bold leading-tight ${
                           featured
-                            ? "bg-gradient-to-br from-white to-[#D4FF6B] bg-clip-text text-transparent"
-                            : "text-[#0A2E22]"
+                            ? "bg-gradient-to-br from-white to-[#B5D33C] bg-clip-text text-transparent"
+                            : "text-[#0F3D2E]"
                         }`}
                       >
                         {a.bigStat}
@@ -183,7 +183,7 @@ export function Audiences() {
                   <div
                     className={`relative flex items-center justify-between text-sm font-semibold transition-colors ${
                       featured
-                        ? "text-[#D4FF6B] group-hover:text-white"
+                        ? "text-[#B5D33C] group-hover:text-white"
                         : "text-[#0F3D2E] group-hover:text-primary"
                     }`}
                   >

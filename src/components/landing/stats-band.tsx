@@ -14,7 +14,7 @@ export function StatsBand() {
   return (
     <section className="relative overflow-hidden bg-white border-b border-[#0F3D2E]/10">
       {/* Subtle mint wash + radial glow */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#F4FAF6] via-white to-white" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#FAFAF7] via-white to-white" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_40%_60%_at_50%_0%,rgba(212,255,107,0.18),transparent_70%)]" />
 
       <div className="relative mx-auto max-w-6xl px-4 py-10 md:py-12">
@@ -29,14 +29,14 @@ export function StatsBand() {
                 }`}
               >
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] ring-1 ring-[#0F3D2E]/10 shadow-sm mb-3 md:mb-0">
-                  <Icon className="h-5 w-5 text-[#D4FF6B]" />
+                  <Icon className="h-5 w-5 text-[#B5D33C]" />
                 </div>
                 <div>
                   <div className="flex items-baseline gap-0.5 justify-center md:justify-start">
                     <CountUp
                       to={s.value}
                       duration={1.4}
-                      className="text-3xl md:text-4xl font-mono font-bold bg-gradient-to-br from-[#0A2E22] to-[#00A86B] bg-clip-text text-transparent tabular-nums"
+                      className="text-3xl md:text-4xl font-mono font-bold bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] bg-clip-text text-transparent tabular-nums"
                     />
                     <span className="text-xl md:text-2xl font-mono font-bold text-primary">
                       {s.suffix}

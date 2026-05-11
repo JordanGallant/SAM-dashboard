@@ -167,7 +167,7 @@ function FounderCard({
           <div
             className={`shrink-0 grid place-items-center h-12 w-12 rounded-full bg-gradient-to-br ${grad} ring-1 ring-black/5 shadow-sm`}
           >
-            <span className="font-mono text-[13px] font-bold tracking-wider text-[#D4FF6B]">
+            <span className="font-mono text-[13px] font-bold tracking-wider text-[#B5D33C]">
               {initials(f.name)}
             </span>
           </div>
