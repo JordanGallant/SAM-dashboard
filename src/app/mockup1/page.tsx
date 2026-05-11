@@ -214,7 +214,7 @@ const tiers = [
     seats: "Unlimited seats",
     description: "For fund teams running first-screening at scale, with shared memory.",
     cta: "Book a walkthrough",
-    ctaHref: "mailto:hello@sam.ai?subject=SAM%20Fund%20-%20Walkthrough%20request",
+    ctaHref: "mailto:hello@samvc.ai?subject=SAM%20Fund%20-%20Walkthrough%20request",
     popular: false,
     subtitle: "Talk to a founder, not a sales rep",
     features: customFeatures
@@ -495,7 +495,7 @@ function Hero() {
               </div>
             </div>
             <figcaption className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.22em] opacity-50">
-              Specimen · sam.ai/deals/nexicon/summary
+              Specimen · samvc.ai/deals/nexicon/summary
             </figcaption>
           </figure>
         </div>
@@ -653,7 +653,7 @@ function SamSits() {
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] opacity-65">From the dashboard</p>
             <h3 className="mt-3 font-bold text-[24px] leading-tight">Nexicon · pitch_deck.pdf → IC-ready memo</h3>
             <p className="mt-3 text-[13.5px] leading-relaxed opacity-80">
-              The dashboard at <span className="font-mono opacity-90">sam.ai/deals/nexicon/summary</span> renders the memo with overall score, radar, domain breakdowns, top risks and questions. The memo travels through your IC and lives in your archive — answer your future self&apos;s question: <em>why did we pass on this</em>?
+              The dashboard at <span className="font-mono opacity-90">samvc.ai/deals/nexicon/summary</span> renders the memo with overall score, radar, domain breakdowns, top risks and questions. The memo travels through your IC and lives in your archive — answer your future self&apos;s question: <em>why did we pass on this</em>?
             </p>
             <div className="mt-5 flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-[0.22em]">
               {["Strong Buy", "Explore", "Deny"].map((v) => (
@@ -1036,12 +1036,12 @@ function FAQ() {
             Everything investors have asked us during pilots and preview calls. If your question isn&apos;t here, we&apos;ll answer it personally.
           </p>
           <a
-            href="mailto:hello@sam.ai"
+            href="mailto:hello@samvc.ai"
             className="mt-6 inline-flex items-center gap-2 rounded-full border px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.22em] font-semibold hover:scale-[1.02] transition"
             style={{ borderColor: RULE, background: PAPER }}
           >
             <Mail className="h-3 w-3" />
-            hello@sam.ai
+            hello@samvc.ai
           </a>
         </div>
 

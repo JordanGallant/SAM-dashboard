@@ -108,12 +108,12 @@ export default function PrivacyPage() {
               </span>
             </h2>
             <a
-              href="mailto:privacy@sam.ai"
+              href="mailto:privacy@samvc.ai"
               className="mt-7 inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition hover:scale-[1.02]"
               style={{ background: INK, color: "#FFF" }}
             >
               <Mail className="h-3.5 w-3.5" />
-              privacy@sam.ai
+              privacy@samvc.ai
             </a>
             <p className="mt-4 text-[13px]" style={{ color: SUBINK }}>
               Response time: five business days or fewer.

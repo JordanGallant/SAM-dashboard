@@ -101,7 +101,7 @@ export function HeroPrimary() {
                   <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
                 </div>
                 <div className="ml-3 flex-1 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1 text-[11px] font-mono text-white/40 truncate">
-                  sam.ai/deals/nexicon/summary
+                  samvc.ai/deals/nexicon/summary
                 </div>
               </div>
 

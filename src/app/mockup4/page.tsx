@@ -223,7 +223,7 @@ function Hero() {
                 className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate"
                 style={{ background: "#FFF", border: `1px solid ${RULE}`, color: SUBINK }}
               >
-                sam.ai/deals/nexicon/summary
+                samvc.ai/deals/nexicon/summary
               </span>
             </div>
             {/* 2:1 viewport — top-aligned so the executive summary header
@@ -2223,7 +2223,7 @@ function SourceAttribution() {
                 className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate"
                 style={{ background: "#FFF", border: `1px solid ${RULE}`, color: SUBINK }}
               >
-                sam.ai/deals/nexicon/team
+                samvc.ai/deals/nexicon/team
               </span>
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
