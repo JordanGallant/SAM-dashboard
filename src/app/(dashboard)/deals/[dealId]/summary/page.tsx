@@ -3,6 +3,7 @@
 
 import Link from "next/link"
 import { useParams } from "next/navigation"
+import { useEffect, useState } from "react"
 import { useDeal } from "@/hooks/use-deal"
 import { ScoreGauge } from "@/components/dashboard/score-gauge"
 import { DomainRadar } from "@/components/dashboard/domain-radar"
@@ -24,6 +25,7 @@ import {
   Lightbulb,
   ArrowRight,
   FileUp,
+  X,
   type LucideIcon,
 } from "lucide-react"
 
@@ -45,18 +47,45 @@ function scoreText(score: number) {
 
 export default function SummaryPage() {
   const params = useParams()
-  const { deal, loading, refetch, analysisStatus, analysisError } = useDeal(params.dealId as string)
+  const dealId = params.dealId as string
+  const { deal, loading, refetch, analysisStatus, analysisError } = useDeal(dealId)
+
+  // Dismissal is keyed to (dealId, errorMessage). When a fresh analysis attempt
+  // produces a different error the banner reappears — only the *same* error
+  // the user already dismissed stays hidden.
+  const dismissKey = `sam:failed-banner-dismissed:${dealId}`
+  const [dismissedError, setDismissedError] = useState<string | null>(null)
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    setDismissedError(window.localStorage.getItem(dismissKey))
+  }, [dismissKey])
+  function dismissFailedBanner() {
+    const v = analysisError ?? ""
+    window.localStorage.setItem(dismissKey, v)
+    setDismissedError(v)
+  }
+
   if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>
   if (!deal) return <p className="text-sm text-muted-foreground">Deal not found.</p>
   if (!deal.analysis) {
     const isAnalyzing = analysisStatus === "pending" || analysisStatus === "processing"
     const isFailed = analysisStatus === "failed"
+    const showFailed = isFailed && dismissedError !== (analysisError ?? "")
     return (
       <div className="max-w-4xl space-y-5">
-        {isFailed ? (() => {
+        {showFailed ? (() => {
           const fe = friendlyError(analysisError, "analysis")
           return (
-            <div className="rounded-2xl border border-red-200 bg-red-50/60 p-8 text-center">
+            <div className="relative rounded-2xl border border-red-200 bg-red-50/60 p-8 text-center">
+              <button
+                type="button"
+                onClick={dismissFailedBanner}
+                aria-label="Dismiss"
+                title="Dismiss"
+                className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full text-red-900/60 hover:bg-red-100 hover:text-red-900 transition-colors"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
               <AlertCircle className="mx-auto h-6 w-6 text-red-700" />
               <h2 className="mt-3 font-heading text-lg font-bold text-red-900">
                 {fe.title}
