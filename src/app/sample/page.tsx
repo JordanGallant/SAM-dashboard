@@ -119,10 +119,21 @@ export default function SamplePage() {
                 </div>
               </div>
               <figcaption className="mt-3.5 px-1 max-w-2xl">
-                <p className="text-[11px] font-mono uppercase tracking-widest text-[#B5D33C]/80">
+                {/* Section is on a LIGHT (#F7F7F2) background — the original
+                    lime + white-text styling here was a holdover from when
+                    this section was dark and read as muddy/invisible on
+                    paper. Forest + ink-at-62% match the alternating rows
+                    below. */}
+                <p
+                  className="text-[11px] font-mono uppercase tracking-widest"
+                  style={{ color: "#0F3D2E" }}
+                >
                   Executive summary
                 </p>
-                <p className="mt-1 text-[13px] md:text-[14px] text-white/70 leading-relaxed">
+                <p
+                  className="mt-1 text-[13px] md:text-[14px] leading-relaxed"
+                  style={{ color: "rgba(10,10,10,0.62)" }}
+                >
                   Overall score, assessment, radar across the six domains, and the investment thesis at a glance.
                 </p>
               </figcaption>
