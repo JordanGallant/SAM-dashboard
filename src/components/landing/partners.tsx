@@ -30,7 +30,7 @@ export function Partners() {
       <div className="mx-auto max-w-6xl px-4">
         <Reveal>
           <p className="text-center text-[11px] font-mono uppercase tracking-[0.2em] text-muted-foreground/80">
-            Trusted by European VC funds
+            Trusted by venture capital
           </p>
         </Reveal>
 

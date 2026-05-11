@@ -72,7 +72,7 @@ const tiers: Tier[] = [
     price: 299,
     signalsLabel: "30 memos / month",
     seats: "3 seats",
-    description: "For syndicates, scouts, and solo GPs running a meaningful pipeline.",
+    description: "For syndicates, family offices and small investment teams.",
     cta: "Start free trial",
     ctaHref: "/register?tier=professional",
     popular: true,

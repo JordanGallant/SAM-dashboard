@@ -5,7 +5,7 @@ import { CountUp } from "@/components/motion/count-up"
 
 const stats = [
   { icon: FileCheck, value: 2400, suffix: "+", label: "Decks analysed" },
-  { icon: Users, value: 180, suffix: "+", label: "European investors" },
+  { icon: Users, value: 180, suffix: "+", label: "Investors" },
   { icon: Timer, value: 12, suffix: " min", label: "Avg. deck → memo" },
   { icon: Globe2, value: 24, suffix: "", label: "EU countries served" },
 ]

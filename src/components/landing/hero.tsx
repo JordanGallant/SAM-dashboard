@@ -297,7 +297,7 @@ export function Hero() {
             </motion.h1>
 
             <motion.p variants={item} className="mt-5 text-base md:text-lg text-white/70 max-w-xl leading-relaxed">
-              Sam analyses pitch decks across five investment domains and returns a scored, IC-ready memo — built for European investors who need consistent, defensible evaluation.
+              Sam analyses pitch decks across five investment domains and returns a scored, IC-ready memo — built for investors who need consistent, defensible evaluation.
             </motion.p>
 
             <motion.ul variants={container} className="mt-8 space-y-3">

@@ -16,7 +16,7 @@ export function Footer() {
             </Link>
             <p className="mt-4 max-w-sm text-[14px] leading-[1.6] text-white/60">
               From deck to decision.<br />
-              Built in Europe, for European investors.
+              Built in Europe, for investors worldwide.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-4 text-[10.5px] font-mono uppercase tracking-[0.2em] text-white/55">
               <span className="inline-flex items-center gap-1.5">

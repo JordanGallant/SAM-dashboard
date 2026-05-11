@@ -30,7 +30,7 @@ const teamGets = [
   {
     icon: Users,
     title: "Shared workspace",
-    body: "Every assessment lands in a shared library. Your team reads the same memo, in the same structure, regardless of who handled intake.",
+    body: "Every assessment lands in a shared library. Your team reads the same assessment, in the same structure, regardless of who handled intake.",
   },
   {
     icon: GitCompare,
@@ -57,7 +57,7 @@ const proWorkflow = [
   },
   {
     icon: FileText,
-    title: "Your team gets the same memo",
+    title: "Your team gets the same assessment",
     body: "The assessment arrives in your shared workspace. Source-tagged claims, missing-info checklist and Ask Sam co-pilot — all in context.",
   },
   {
@@ -86,7 +86,7 @@ export default function ForTeamsPage() {
         <section className="relative pt-16 md:pt-24 pb-20">
           <div className="mx-auto max-w-[1100px] px-6 text-center">
             <p className="text-[11px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
-              For syndicates &amp; small teams
+              For syndicates, family offices &amp; small investment teams
             </p>
             <h1
               className="mt-5 font-bold leading-[0.96] tracking-[-0.04em]"
@@ -190,7 +190,7 @@ export default function ForTeamsPage() {
                 </div>
                 <p className="text-[15px] leading-[1.65] text-white/80">
                   Sam turns every pitch deck into a six-domain structured assessment your whole
-                  team can read, compare and build on. The discussion starts where the memo ends —
+                  team can read, compare and build on. The discussion starts where the assessment ends —
                   not at the beginning.
                 </p>
               </div>

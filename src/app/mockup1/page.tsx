@@ -141,7 +141,7 @@ const trustPillars = [
 
 const stats = [
   { icon: FileCheck, value: "2400+", label: "Decks analysed" },
-  { icon: Users, value: "180+", label: "European investors" },
+  { icon: Users, value: "180+", label: "Investors" },
   { icon: Timer, value: "12 min", label: "Avg. deck → memo" },
   { icon: Globe2, value: "24", label: "EU countries served" }
 ]
@@ -386,7 +386,7 @@ function Hero() {
         <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-14">
           <div className="lg:col-span-7">
             <p className="text-[18px] leading-[1.55] opacity-85 max-w-2xl">
-              Structured investment memos, scored across five domains — IC-ready in twelve minutes. Sam analyses pitch decks across five investment domains and returns a scored, IC-ready memo — built for European investors who need consistent, defensible evaluation.
+              Structured investment memos, scored across five domains — IC-ready in twelve minutes. Sam analyses pitch decks across five investment domains and returns a scored, IC-ready memo — built for investors who need consistent, defensible evaluation.
             </p>
 
             <ul className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -1135,7 +1135,7 @@ function Footer() {
             </div>
             <p className="mt-4 max-w-sm text-[13px] leading-relaxed opacity-65">
               Sam helps investors decide.<br />
-              Built in Europe, for European investors.
+              Built in Europe, for investors worldwide.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-4 font-mono text-[10px] uppercase tracking-[0.22em] opacity-65">
               <span className="inline-flex items-center gap-1.5">

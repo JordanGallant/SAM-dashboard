@@ -539,7 +539,7 @@ function LogoBand() {
       <div className="mx-auto max-w-[1240px] px-6 grid lg:grid-cols-[1.4fr_1fr] gap-10 items-center">
         <div>
           <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#0A0A0A]/55">
-            Trusted by European VC funds
+            Trusted by venture capital
           </p>
           <h2
             className="mt-4 font-bold tracking-[-0.025em] leading-[1.05] max-w-xl"
@@ -1393,7 +1393,7 @@ function Pricing() {
     {
       name: "Pro",
       price: "€299",
-      blurb: "Best for shared deal review.",
+      blurb: "Best for shared deal review — syndicates, family offices & small investment teams.",
       sublineMono: "Shared workspace · deal comparison · team memory",
       features: [
         "30 pitch deck analyses / month",

@@ -49,7 +49,7 @@ export default function PrivacyPage() {
               </span>
             </h1>
             <p className="mt-6 mx-auto max-w-2xl text-[16px] md:text-[17px] leading-[1.6]" style={{ color: SUBINK }}>
-              Sam is built for European investors, on European infrastructure. This page explains
+              Sam is built for investors, on European infrastructure. This page explains
               where your data lives, what we do with it, and what rights you have over it. No
               legalese, no hedging.
             </p>

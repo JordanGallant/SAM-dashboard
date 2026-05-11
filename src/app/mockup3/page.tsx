@@ -416,7 +416,7 @@ function LogoWall() {
     <section className="border-y" style={{ borderColor: RULE }}>
       <div className="mx-auto max-w-[1200px] px-6 py-12">
         <p className="text-center text-[11px] font-mono uppercase tracking-[0.18em] text-[#0F3D2E]/55">
-          Trusted by European VC funds
+          Trusted by venture capital
         </p>
         <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 items-center gap-8">
           {partners.map((p) => (
@@ -1201,7 +1201,7 @@ function Footer() {
             Sam
           </div>
           <p className="mt-4 text-white/55 max-w-xs leading-[1.6]">
-            The AI investment associate for European VC funds.
+            The AI investment associate for venture capital.
           </p>
         </div>
         {[

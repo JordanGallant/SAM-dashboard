@@ -130,7 +130,7 @@ const stats = [
   { value: "5", unit: "domains", label: "Scored, weighted" },
   { value: "1,000+", unit: "memos", label: "Generated to date" },
   { value: "€250k", unit: "decision", label: "Average value at stake" },
-  { value: "180+", unit: "users", label: "European investors" },
+  { value: "180+", unit: "users", label: "Investors" },
   { value: "24", unit: "EU", label: "Countries served" }
 ]
 
@@ -363,7 +363,7 @@ function Hero() {
           </h1>
 
           <p className="mt-7 max-w-[58ch] text-[18px] leading-[1.55]" style={{ color: "rgba(250,250,250,0.72)" }}>
-            Structured investment memos, scored across five domains — IC-ready in twelve minutes. Sam analyses pitch decks across five investment domains and returns a scored, IC-ready memo, built for European investors who need consistent, defensible evaluation.
+            Structured investment memos, scored across five domains — IC-ready in twelve minutes. Sam analyses pitch decks across five investment domains and returns a scored, IC-ready memo, built for investors who need consistent, defensible evaluation.
           </p>
 
           <form action="/register" method="GET" className="mt-9 flex max-w-[480px] items-stretch overflow-hidden rounded-xl" style={{ border: `1px solid ${RULE}`, background: SURFACE }}>
@@ -1092,7 +1092,7 @@ function FootBar() {
           </div>
           <p className="mt-4 max-w-sm text-[14px] leading-relaxed" style={{ color: "rgba(250,250,250,0.65)" }}>
             Sam helps investors decide.<br />
-            Built in Europe, for European investors.
+            Built in Europe, for investors worldwide.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-4 font-mono text-[10px] uppercase tracking-[0.22em]" style={{ color: MUTED }}>
             <span className="inline-flex items-center gap-1.5">
