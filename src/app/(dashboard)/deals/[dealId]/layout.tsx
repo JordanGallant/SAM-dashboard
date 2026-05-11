@@ -206,20 +206,18 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
               </button>
             </form>
           ) : (
-            <div className="group flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setDraftName(deal.companyName)
+                setEditingName(true)
+              }}
+              title="Click to rename — extraction sometimes misses, you can fix it here"
+              className="group flex items-center gap-2 rounded-md px-1.5 -mx-1.5 py-0.5 hover:bg-muted/60 transition-colors cursor-pointer"
+            >
               <h1 className="text-2xl font-heading font-bold leading-none">{deal.companyName}</h1>
-              <button
-                type="button"
-                onClick={() => {
-                  setDraftName(deal.companyName)
-                  setEditingName(true)
-                }}
-                title="Rename deal"
-                className="grid place-items-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </button>
-            </div>
+              <Pencil className="h-3.5 w-3.5 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
+            </button>
           )}
           {/* Pilot #11: stage tag only shows once analysis confirms the stage —
               the upload-time extraction is still used as Flow 0 input but is
