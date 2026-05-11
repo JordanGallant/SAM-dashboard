@@ -5,50 +5,141 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Plus, HelpCircle, Mail } from "lucide-react"
 import { Reveal } from "@/components/motion/reveal"
 
-const questions = [
+// FAQ answers support both plain paragraphs (strings) and bulleted blocks
+// (`{ bullets: [...] }`). Iteration order is preserved so the render walks
+// the array and emits <p> or <ul> per entry. This avoids splitting answers
+// by line-magic and keeps the data shape explicit.
+type AnswerBlock = string | { bullets: string[] }
+
+const questions: { q: string; a: AnswerBlock[] }[] = [
   {
     q: "How is Sam different from using generic AI to analyse a pitch deck?",
-    a: "Sam applies a fixed five-domain evaluation framework to every deck — the same structure, scoring rubric, and severity classifications every time. Generic AI returns whatever comes out of a prompt, so the output varies, can't be compared across deals, and lacks a defensible methodology. Sam's framework is the product; the model is just the engine behind it.",
+    a: [
+      "Sam applies a fixed six-domain investment framework to every deck. Same structure, scoring rubric, and severity classifications every time.",
+      "Generic AI returns whatever comes out of a prompt, so the output varies, cannot be compared across deals, and lacks a repeatable methodology.",
+      "Sam's framework is the product; the model is just the engine.",
+    ],
+  },
+  {
+    q: "Does Sam give investment advice or replace partners?",
+    a: [
+      "No. Sam is decision support, not investment advice.",
+      "Sam handles the repetitive first-screening layer: structuring the deck, scoring the opportunity, flagging risks, identifying missing information, and preparing follow-up questions.",
+      "Partners, analysts, and investors still make the judgment. Sam helps them spend more time on the deals worth deeper work — and on the conversations only humans can run.",
+    ],
+  },
+  {
+    q: "What does source attribution actually mean?",
+    a: [
+      "Every claim in a Sam assessment is tagged with its source:",
+      {
+        bullets: [
+          "Pitch Deck — unvalidated",
+          "Source: LinkedIn",
+          "Source: Knowledge Base",
+          "Source: market report",
+          "Generated inference",
+        ],
+      },
+      "This means you can always see the basis for each claim — whether it comes from the founder's deck, an external reference, your fund context, or Sam's own reasoning.",
+      "Unvalidated claims are flagged explicitly. External references still need to be reviewed by the investor before making a decision.",
+    ],
   },
   {
     q: "Is my pitch deck data secure and confidential?",
-    a: "Yes. Sam runs on European servers only. Your deck is processed, analysed, and stored within the EU. No submitted material is used to train any model, and data is deleted on your retention schedule.",
+    a: [
+      "Yes. Sam is designed for confidential investor workflows.",
+      {
+        bullets: [
+          "Decks are processed and stored within the EU.",
+          "Submitted decks are not used to train any AI model — ours or anyone else's.",
+          "Access is controlled within your workspace.",
+          "Retention and deletion requirements can be configured for Fund customers.",
+        ],
+      },
+      "As with any investment workflow, users should only upload materials they are authorised to review and process.",
+    ],
   },
   {
-    q: "What does a Sam investment memo actually include?",
-    a: "Executive summary, overall score and confidence rating, per-domain verdicts across Team, Market, Product, Traction, and Financials, investment thesis, red flags, due diligence questionnaire, and IC-ready next steps. Structured the same way every time.",
+    q: "How does fund-fit work? What can I upload?",
+    a: [
+      "You can upload your fund one-pager or define your thesis, stage focus, sector focus, geography, and ticket size directly in Sam.",
+      "Sam then compares each deck against your mandate and shows how well the opportunity fits your criteria. Fund-fit can include:",
+      {
+        bullets: [
+          "stage match",
+          "sector match",
+          "geography match",
+          "ticket-size match",
+          "thesis alignment",
+          "portfolio conflict indication",
+        ],
+      },
+      "Full fund-fit scoring is included in the Fund tier. A lighter fund-fit view is available in Pro.",
+    ],
   },
   {
-    q: "How long does it take to generate a memo?",
-    a: "Analysis runs in the background. You can close the browser — the memo appears in your account when ready, and you'll get an email notification.",
+    q: "Can I export the assessment?",
+    a: [
+      "Yes. Every assessment can be exported as a Word or PDF record.",
+      "This helps you preserve why a deal was advanced, parked, or passed — including the score, key risks, missing information, and follow-up questions.",
+      "CRM-native pushes to tools such as Affinity and HubSpot are on the roadmap.",
+    ],
   },
   {
-    q: "Can Sam replace a human analyst or associate?",
-    a: "No. Sam handles the repetitive first-screening layer — consistent structure, scoring, red flags — so your analyst can focus on the deals worth deeper work. It is infrastructure, not a substitute for judgment.",
+    q: "What happens when information is missing from the deck?",
+    a: [
+      "Missing information is flagged separately. It does not automatically reduce the score.",
+      "A missing CAC figure, for example, is not the same as a bad CAC figure. Sam identifies the gap and turns it into a founder follow-up question — so you know exactly what to ask before spending more time on the deal.",
+    ],
   },
   {
-    q: "What stage of startups does Sam work best for?",
-    a: "Pre-seed through Series A. The framework is stage-aware: traction weighs less at pre-seed, more at Series A. Later-stage evaluation is available and benchmarked against public comparables, but pre-seed to Series A is where Sam's framework delivers the most differentiation.",
+    q: "Does a low score mean we should pass?",
+    a: [
+      "No. A low score is not an automatic pass recommendation.",
+      "It means Sam found weaknesses, missing evidence, or risk factors in the available materials. You may still decide to take the call if you have relevant context, founder knowledge, or a thesis-driven reason to explore.",
+      "Sam frames the discussion. It does not make the decision.",
+    ],
   },
   {
-    q: "Do I need any technical setup to use Sam?",
-    a: "No. Upload a PDF, or forward a deck by email. The memo appears in your account. No CRM integration required, no data warehouse, no IT project.",
+    q: "Can Sam replace our analyst or associate?",
+    a: [
+      "No. Sam supports analysts and associates — it does not replace them.",
+      "Sam helps with the repetitive first-screening work: structuring the deck, surfacing risks, checking consistency, and preparing questions. Your team still owns judgment, diligence, founder conversations, and conviction.",
+      "Sam helps analysts spend less time turning messy decks into structured notes — and more time on the deals that deserve deeper work.",
+    ],
   },
   {
-    q: "Is Sam suitable for a solo angel investor, or only for funds?",
-    a: "Both. The Angel tier is priced for individual investors handling their own deal flow. The Fund tier adds team accounts, priority processing, and shared memo libraries. Same framework, different workflow.",
+    q: "Why not build this internally with ChatGPT?",
+    a: [
+      "You can build a simple AI summary workflow internally. The harder part is making it consistent, fund-specific, source-aware, and usable across a team.",
+      "Sam combines:",
+      {
+        bullets: [
+          "a fixed six-domain investment framework",
+          "stage-aware scoring",
+          "source attribution",
+          "missing-information logic",
+          "Ask Sam co-pilot in context",
+          "fund-fit scoring",
+          "exportable decision records",
+        ],
+      },
+      "That is the difference between a prompt and a workflow.",
+    ],
   },
   {
-    q: "What stages and sectors does Sam support?",
-    a: "Pre-seed through Series A across most sectors. The framework is stage-aware — pre-seed is judged on team and market signal, Series A weights traction and unit economics more heavily. Deeply regulated verticals (healthtech, defence) work, but sector-specific diligence still belongs with the human.",
-  },
-  {
-    q: "Can I export memos to my CRM, Notion, or Word?",
-    a: "Yes. Memos export as a Word document and as a shareable link. CRM-native pushes (Affinity, Hubspot) are on the roadmap.",
-  },
-  {
-    q: "What happens to my pitch deck after the analysis runs?",
-    a: "It stays in your account, encrypted at rest in the EU, until you delete it or it expires under your retention policy. It is never used for model training.",
+    q: "Is Sam useful for angels and family offices, or only VC funds?",
+    a: [
+      "Sam is built for investors who review early-stage dealflow — regardless of fund size.",
+      {
+        bullets: [
+          "Angels use Sam as a structured second opinion before a first call.",
+          "Family offices and syndicates use Sam to create a shared first screen.",
+          "VC funds use Sam to make first-pass assessments more consistent across analysts, associates, and partners.",
+        ],
+      },
+    ],
   },
 ]
 
@@ -129,9 +220,25 @@ export function FAQ() {
                               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                               className="overflow-hidden"
                             >
-                              <p className="mt-3 text-sm md:text-[15px] text-muted-foreground leading-relaxed pr-8">
-                                {item.a}
-                              </p>
+                              <div className="mt-3 space-y-3 text-sm md:text-[15px] text-muted-foreground leading-relaxed pr-8">
+                                {item.a.map((block, bi) =>
+                                  typeof block === "string" ? (
+                                    <p key={bi}>{block}</p>
+                                  ) : (
+                                    <ul key={bi} className="space-y-1.5 pl-1">
+                                      {block.bullets.map((b, bj) => (
+                                        <li key={bj} className="flex items-start gap-2.5">
+                                          <span
+                                            aria-hidden
+                                            className="mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#0F3D2E]"
+                                          />
+                                          <span>{b}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ),
+                                )}
+                              </div>
                             </motion.div>
                           )}
                         </AnimatePresence>
