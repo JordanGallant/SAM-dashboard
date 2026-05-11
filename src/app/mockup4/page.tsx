@@ -9,6 +9,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { Footer } from "@/components/landing/footer"
 import { useEffect, useRef, useState } from "react"
 import {
   motion,
@@ -1360,7 +1361,19 @@ function AgentStream() {
 // ============================================================
 function Pricing() {
   // Tier names + pricing aligned to client design briefing v4 (May 2026).
-  const tiers = [
+  type Tier = {
+    name: string
+    price: string
+    blurb: string
+    sublineMono?: string
+    features: string[]
+    ctaLabel: string
+    ctaHref: string
+    secondaryCtaLabel?: string
+    secondaryCtaHref?: string
+    highlighted: boolean
+  }
+  const tiers: Tier[] = [
     {
       name: "Angel",
       price: "€149",
@@ -1380,7 +1393,8 @@ function Pricing() {
     {
       name: "Pro",
       price: "€299",
-      blurb: "For syndicates, family offices and small investment teams.",
+      blurb: "Best for shared deal review.",
+      sublineMono: "Shared workspace · deal comparison · team memory",
       features: [
         "30 pitch deck analyses / month",
         "3 seats",
@@ -1391,6 +1405,8 @@ function Pricing() {
       ],
       ctaLabel: "Start free trial",
       ctaHref: "/register?tier=professional",
+      secondaryCtaLabel: "See the Teams workflow",
+      secondaryCtaHref: "/for-teams",
       highlighted: true,
     },
     {
@@ -1486,6 +1502,14 @@ function Pricing() {
               >
                 {t.blurb}
               </p>
+              {t.sublineMono && (
+                <p
+                  className="mt-1.5 text-[10px] font-mono uppercase tracking-[0.18em]"
+                  style={{ color: t.highlighted ? LIME : ACCENT_HI }}
+                >
+                  {t.sublineMono}
+                </p>
+              )}
               <ul className="mt-6 space-y-2.5 flex-1">
                 {t.features.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-[13.5px]">
@@ -1516,6 +1540,18 @@ function Pricing() {
                 {t.ctaLabel}
                 <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
               </Link>
+              {t.secondaryCtaLabel && t.secondaryCtaHref && (
+                <Link
+                  href={t.secondaryCtaHref}
+                  className="mt-3 inline-flex items-center justify-center text-[12px] font-mono uppercase tracking-[0.18em] transition-opacity hover:opacity-80"
+                  style={{
+                    color: t.highlighted ? "rgba(255,255,255,0.75)" : SUBINK,
+                  }}
+                >
+                  {t.secondaryCtaLabel}
+                  <ArrowRight className="ml-1.5 h-3 w-3" />
+                </Link>
+              )}
             </motion.div>
           ))}
         </div>
@@ -1565,45 +1601,9 @@ function ClosingCTA() {
   )
 }
 
-// ============================================================
-// footer
-// ============================================================
-function Footer() {
-  return (
-    <footer style={{ background: INK, color: "#FFF" }}>
-      <div className="mx-auto max-w-[1240px] px-6 py-16 grid grid-cols-2 md:grid-cols-5 gap-8 text-[13px]">
-        <div className="col-span-2">
-          <div className="flex items-center gap-1.5 font-bold text-[16px]">
-            sam<span className="opacity-50">/</span>
-          </div>
-          <p className="mt-4 text-white/55 max-w-xs leading-[1.6]">
-            Structured first-screening for European investors.
-          </p>
-        </div>
-        {[
-          { h: "Product", l: ["Features", "Pricing", "Sample memo", "Changelog"] },
-          { h: "Company", l: ["About", "Customers", "Blog", "Careers"] },
-          { h: "Legal", l: ["Privacy", "Security", "GDPR", "Terms"] },
-        ].map((c) => (
-          <div key={c.h}>
-            <p className="text-[11px] font-mono uppercase tracking-widest text-white/40 mb-3">{c.h}</p>
-            <ul className="space-y-2">
-              {c.l.map((it) => (
-                <li key={it}><a className="hover:text-white transition text-white/70">{it}</a></li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-      <div className="border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-        <div className="mx-auto max-w-[1240px] px-6 py-5 flex flex-wrap items-center justify-between gap-4 text-[12px] text-white/45">
-          <p>© 2026 Sam. EU-based.</p>
-          <p className="font-mono uppercase tracking-widest">EU-hosted · GDPR by design</p>
-        </div>
-      </div>
-    </footer>
-  )
-}
+// Footer is the shared landing/footer.tsx component — same as every other
+// marketing page (for-angels, for-teams, for-vc-funds, how-it-works, sample,
+// privacy). Imported at the top of this file.
 
 // ============================================================
 // Problem — before/after split
