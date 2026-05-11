@@ -9,7 +9,7 @@
  * surface (sidebar, topbar, deal layout, etc.) and a hot path.
  */
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { TRIAL_DEAL_CAP, type TrialUsage } from "@/lib/trial-limits"
 
@@ -24,6 +24,13 @@ const EMPTY: TrialUsage & { loading: boolean } = {
 
 export function useTrialUsage() {
   const [state, setState] = useState<TrialUsage & { loading: boolean }>(EMPTY)
+  // Unique channel name per hook instance. Without this, multiple mounts
+  // (sidebar + dashboard + deal layout + uploader) all collide on a shared
+  // channel and StrictMode's double-mount triggers
+  // "cannot add postgres_changes callbacks after subscribe()".
+  const channelName = useRef<string>(
+    `trial-usage-${typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)}`,
+  )
 
   useEffect(() => {
     const supabase = createClient()
@@ -80,8 +87,13 @@ export function useTrialUsage() {
     // Realtime: re-count when the user creates / deletes a deal. The deals
     // table emits INSERT/DELETE events; we don't need the row payload, just
     // a trigger to re-run the count.
+    //
+    // Channel name is unique per hook instance (channelName.current) so
+    // multiple components mounting this hook don't collide on a shared
+    // channel, which under React StrictMode's double-mount produced
+    // "cannot add `postgres_changes` callbacks ... after `subscribe()`".
     const channel = supabase
-      .channel("trial-usage-deals")
+      .channel(channelName.current)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "deals" },
