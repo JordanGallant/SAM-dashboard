@@ -10,6 +10,16 @@
 
 const HUBSPOT_BASE = "https://api.hubapi.com"
 
+// Client-supplied pipeline / stage for the website-lead funnel. If these
+// shift, override via env vars without a redeploy.
+const HUBSPOT_PIPELINE_ID =
+  process.env.HUBSPOT_PIPELINE_ID || "t_6128dd9d6f3380e7c97402984e00da92"
+const HUBSPOT_INBOUND_SIGNUP_STAGE_ID =
+  process.env.HUBSPOT_INBOUND_SIGNUP_STAGE_ID || "5340860617"
+// HubSpot's built-in "Contact to Deal" association is association type 3
+// (HUBSPOT_DEFINED). Standard across all portals — never changes.
+const HUBSPOT_CONTACT_TO_DEAL_TYPE_ID = 3
+
 // Standard HubSpot contact properties — always exist in any portal.
 // (Custom properties like sam_signed_up_at can be added later if Mark wants
 // finer tracking; HubSpot rejects unknown property names with HTTP 400.)
@@ -79,35 +89,47 @@ async function hubspotFetch(
   url: string,
   method: "PATCH" | "POST",
   token: string,
-  properties: Record<string, string>,
-): Promise<{ ok: boolean; status: number; text: string }> {
+  body: Record<string, unknown>,
+): Promise<{ ok: boolean; status: number; text: string; data: Record<string, unknown> | null }> {
   const resp = await fetch(url, {
     method,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ properties }),
+    body: JSON.stringify(body),
   })
-  const text = resp.ok ? "" : await resp.text().catch(() => "")
-  return { ok: resp.ok, status: resp.status, text }
+  const raw = await resp.text().catch(() => "")
+  let data: Record<string, unknown> | null = null
+  try {
+    data = raw ? (JSON.parse(raw) as Record<string, unknown>) : null
+  } catch {
+    /* not JSON */
+  }
+  return { ok: resp.ok, status: resp.status, text: resp.ok ? "" : raw, data }
 }
 
-/** Public entry — never throws. Returns true on success, false on configured-off or any error. */
+export type UpsertResult = { ok: boolean; contactId: string | null }
+
+/**
+ * Public entry — never throws. Returns `{ ok, contactId }` so callers that
+ * need to do follow-up work (e.g. create + associate a Deal) can grab the
+ * ID without a second round-trip. Boolean callers can just check `ok`.
+ */
 export async function upsertHubspotContact(
   email: string,
   fields: HubspotContactFields = {}
-): Promise<boolean> {
+): Promise<UpsertResult> {
   const token = getToken()
   if (!token) {
     // Quietly no-op when HubSpot isn't configured (local dev, demo accounts, etc.)
-    return false
+    return { ok: false, contactId: null }
   }
-  if (!email || typeof email !== "string") return false
+  if (!email || typeof email !== "string") return { ok: false, contactId: null }
 
   // Pre-strip properties known to be missing in this portal (learned from
   // previous failures). Avoids a wasted round-trip + retry on every call.
-  let properties = stripEmpty({ ...fields, email })
+  const properties = stripEmpty({ ...fields, email })
   for (const name of MISSING_PROPERTIES) delete properties[name]
 
   const patchUrl = `${HUBSPOT_BASE}/crm/v3/objects/contacts/${encodeURIComponent(email)}?idProperty=email`
@@ -115,11 +137,11 @@ export async function upsertHubspotContact(
 
   try {
     // First attempt: PATCH by email.
-    let r = await hubspotFetch(patchUrl, "PATCH", token, properties)
+    let r = await hubspotFetch(patchUrl, "PATCH", token, { properties })
 
     // 404 → contact doesn't exist yet, fall through to POST-create.
     if (r.status === 404) {
-      r = await hubspotFetch(postUrl, "POST", token, properties)
+      r = await hubspotFetch(postUrl, "POST", token, { properties })
     }
 
     // 400 PROPERTY_DOESNT_EXIST → learn the missing names, strip, retry once.
@@ -134,20 +156,85 @@ export async function upsertHubspotContact(
           `HubSpot: stripped missing property(ies) ${missing.join(", ")} and retrying. ` +
           `Add them in Settings -> Properties to capture full data.`,
         )
-        // Retry — same flow, PATCH then POST on 404.
-        r = await hubspotFetch(patchUrl, "PATCH", token, properties)
+        r = await hubspotFetch(patchUrl, "PATCH", token, { properties })
         if (r.status === 404) {
-          r = await hubspotFetch(postUrl, "POST", token, properties)
+          r = await hubspotFetch(postUrl, "POST", token, { properties })
         }
       }
     }
 
-    if (r.ok) return true
+    if (r.ok) {
+      const id = typeof r.data?.id === "string" ? r.data.id : null
+      return { ok: true, contactId: id }
+    }
     console.error("HubSpot upsert failed", r.status, r.text.slice(0, 300))
-    return false
+    return { ok: false, contactId: null }
   } catch (err) {
     console.error("HubSpot upsert error:", err)
-    return false
+    return { ok: false, contactId: null }
+  }
+}
+
+/**
+ * Create a HubSpot Deal in the "Sam pipeline dashboard" / "Inbound signup"
+ * stage and associate it with the supplied contact in a single API call.
+ *
+ * Idempotency: HubSpot Deals do NOT have a natural unique key the way
+ * Contacts do (email). Calling this twice for the same lead will create
+ * two deals. Callers should track creation themselves (e.g. via a
+ * `hubspot_deal_id` on profiles) before calling. Returns the new deal's
+ * ID on success, or null on failure / configured-off.
+ */
+export async function createHubspotLeadDeal(
+  contactId: string,
+  meta: { firstname?: string; lastname?: string; company?: string },
+): Promise<string | null> {
+  const token = getToken()
+  if (!token || !contactId) return null
+
+  // Build dealname per the client's template:
+  //   "Website lead - {firstname} {lastname} - {company}"
+  // Collapse multiple spaces and clean trailing separators when fields are
+  // missing so we don't end up with "Website lead -  - Acme".
+  const name = [meta.firstname, meta.lastname].filter(Boolean).join(" ").trim()
+  const company = (meta.company ?? "").trim()
+  const rawName = `Website lead - ${name}${company ? ` - ${company}` : ""}`.replace(/\s+/g, " ").trim()
+  const dealname = rawName.endsWith("-") ? rawName.slice(0, -1).trim() : rawName
+
+  try {
+    const r = await hubspotFetch(
+      `${HUBSPOT_BASE}/crm/v3/objects/deals`,
+      "POST",
+      token,
+      {
+        properties: {
+          dealname,
+          pipeline: HUBSPOT_PIPELINE_ID,
+          dealstage: HUBSPOT_INBOUND_SIGNUP_STAGE_ID,
+        },
+        // Associate the contact at creation time — saves a follow-up call.
+        // associationTypeId=3 is HubSpot's built-in "Contact to Deal" link.
+        associations: [
+          {
+            to: { id: contactId },
+            types: [
+              {
+                associationCategory: "HUBSPOT_DEFINED",
+                associationTypeId: HUBSPOT_CONTACT_TO_DEAL_TYPE_ID,
+              },
+            ],
+          },
+        ],
+      },
+    )
+    if (!r.ok) {
+      console.error("HubSpot deal create failed", r.status, r.text.slice(0, 300))
+      return null
+    }
+    return typeof r.data?.id === "string" ? r.data.id : null
+  } catch (err) {
+    console.error("HubSpot deal create error:", err)
+    return null
   }
 }
 
