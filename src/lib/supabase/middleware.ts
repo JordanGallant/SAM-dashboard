@@ -42,6 +42,7 @@ export async function updateSession(request: NextRequest) {
       "/reset-password",
       "/how-it-works",
       "/for-angels",
+      "/for-teams",
       "/for-vc-funds",
       "/privacy",
       "/sample",
