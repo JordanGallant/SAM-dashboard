@@ -2,8 +2,10 @@
 
 import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { UploadCloud, AlertCircle } from "lucide-react"
+import { UploadCloud, AlertCircle, Sparkles } from "lucide-react"
 import { useUpload } from "@/components/upload-context"
+import { useTrialUsage } from "@/hooks/use-trial-usage"
+import { TrialPaywallDialog } from "@/components/billing/trial-paywall-dialog"
 
 type Variant = "hero" | "compact"
 
@@ -24,9 +26,19 @@ export function DeckUploader({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
+  const trial = useTrialUsage()
+  const [paywallOpen, setPaywallOpen] = useState(false)
 
   function pickFile(file: File) {
     setError(null)
+
+    // Hard block on trial cap. Open paywall instead of routing to the
+    // upload page (the server would 402 anyway, this just avoids the
+    // round trip and gives a cleaner UX).
+    if (trial.isTrialing && trial.atLimit) {
+      setPaywallOpen(true)
+      return
+    }
 
     const isPdf = file.type === ACCEPTED_MIME || file.name.toLowerCase().endsWith(".pdf")
     if (!isPdf) {
@@ -55,6 +67,8 @@ export function DeckUploader({
     if (file) pickFile(file)
   }
 
+  const atTrialCap = trial.isTrialing && trial.atLimit
+
   if (variant === "compact") {
     return (
       <>
@@ -66,16 +80,34 @@ export function DeckUploader({
           className="hidden"
         />
         <button
-          onClick={() => fileInputRef.current?.click()}
-          title="PDF only · Max 25 MB"
-          className="group inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
+          onClick={() => {
+            if (atTrialCap) {
+              setPaywallOpen(true)
+              return
+            }
+            fileInputRef.current?.click()
+          }}
+          title={atTrialCap ? "Trial cap reached — upgrade to keep going" : "PDF only · Max 25 MB"}
+          className={`group inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold transition-all ${
+            atTrialCap
+              ? "bg-muted text-muted-foreground ring-1 ring-foreground/10 hover:bg-muted/70"
+              : "bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5"
+          }`}
         >
-          <UploadCloud className="h-4 w-4" />
-          Upload pitch deck
-          <span className="ml-1 text-[10px] font-mono uppercase tracking-widest text-white/70 hidden sm:inline">
-            · PDF
+          {atTrialCap ? <Sparkles className="h-4 w-4" /> : <UploadCloud className="h-4 w-4" />}
+          {atTrialCap ? "Trial cap reached" : "Upload pitch deck"}
+          <span className={`ml-1 text-[10px] font-mono uppercase tracking-widest hidden sm:inline ${
+            atTrialCap ? "text-muted-foreground/70" : "text-white/70"
+          }`}>
+            · {atTrialCap ? "Upgrade" : "PDF"}
           </span>
         </button>
+        <TrialPaywallDialog
+          open={paywallOpen}
+          onClose={() => setPaywallOpen(false)}
+          used={trial.used}
+          cap={trial.cap}
+        />
         {error && (
           <span className="ml-2 inline-flex items-center gap-1 text-[12px] text-red-700">
             <AlertCircle className="h-3.5 w-3.5" />
@@ -86,58 +118,104 @@ export function DeckUploader({
     )
   }
 
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={() => fileInputRef.current?.click()}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault()
-          fileInputRef.current?.click()
-        }
-      }}
-      onDragOver={(e) => {
-        e.preventDefault()
-        setDragOver(true)
-      }}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={handleDrop}
-      className={`relative overflow-hidden rounded-3xl border-2 border-dashed transition-all py-16 px-6 text-center cursor-pointer ${
-        dragOver
-          ? "border-primary bg-primary/5"
-          : "border-[#0F3D2E]/15 bg-white hover:border-[#0F3D2E]/30 hover:bg-[#FAFAF7]/40"
-      }`}
-    >
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={ACCEPTED_EXT}
-        onChange={handleFileSelect}
-        className="hidden"
-      />
-
-      <div className="mb-5 mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/10 ring-1 ring-[#0F3D2E]/10">
-        <UploadCloud className="h-6 w-6 text-[#0F3D2E]" />
-      </div>
-
-      <h3 className="text-xl font-heading font-bold text-[#0F3D2E]">
-        Drop a pitch deck to get started
-      </h3>
-      <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
-        Drag a PDF here or click to browse. We&apos;ll extract the company info and start the analysis automatically.
-      </p>
-      <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-3 py-1.5 text-[11px] font-mono uppercase tracking-widest text-[#0F3D2E] shadow-sm">
-        <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
-        PDF only · Max 25 MB
-      </div>
-
-      {error && (
-        <div className="mt-5 mx-auto max-w-md rounded-xl bg-red-50 ring-1 ring-red-200 p-3 text-sm text-red-700 flex items-start gap-2">
-          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-          <span className="text-left">{error}</span>
+  // Hero variant: when atTrialCap, render a paywall card in place of the
+  // upload dropzone. Users see the wall instead of a usable upload UI.
+  if (atTrialCap) {
+    return (
+      <>
+        <div className="relative overflow-hidden rounded-3xl border-2 border-dashed border-red-200 bg-red-50/30 py-16 px-6 text-center">
+          <div className="mb-5 mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 ring-1 ring-red-200">
+            <Sparkles className="h-6 w-6 text-red-700" />
+          </div>
+          <h3 className="text-xl font-heading font-bold text-red-900">
+            {trial.cap} of {trial.cap} free decks used
+          </h3>
+          <p className="mt-2 text-sm text-red-900/80 max-w-sm mx-auto leading-relaxed">
+            Add a payment method to keep analysing decks at full Pro speed.
+          </p>
+          <button
+            onClick={() => setPaywallOpen(true)}
+            className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
+          >
+            Continue with Pro
+          </button>
         </div>
-      )}
-    </div>
+        <TrialPaywallDialog
+          open={paywallOpen}
+          onClose={() => setPaywallOpen(false)}
+          used={trial.used}
+          cap={trial.cap}
+        />
+      </>
+    )
+  }
+
+  return (
+    <>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => fileInputRef.current?.click()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            fileInputRef.current?.click()
+          }
+        }}
+        onDragOver={(e) => {
+          e.preventDefault()
+          setDragOver(true)
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        className={`relative overflow-hidden rounded-3xl border-2 border-dashed transition-all py-16 px-6 text-center cursor-pointer ${
+          dragOver
+            ? "border-primary bg-primary/5"
+            : "border-[#0F3D2E]/15 bg-white hover:border-[#0F3D2E]/30 hover:bg-[#FAFAF7]/40"
+        }`}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={ACCEPTED_EXT}
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+
+        <div className="mb-5 mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/10 ring-1 ring-[#0F3D2E]/10">
+          <UploadCloud className="h-6 w-6 text-[#0F3D2E]" />
+        </div>
+
+        <h3 className="text-xl font-heading font-bold text-[#0F3D2E]">
+          Drop a pitch deck to get started
+        </h3>
+        <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
+          Drag a PDF here or click to browse. We&apos;ll extract the company info and start the analysis automatically.
+        </p>
+        <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-3 py-1.5 text-[11px] font-mono uppercase tracking-widest text-[#0F3D2E] shadow-sm">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
+          PDF only · Max 25 MB
+        </div>
+        {trial.isTrialing && trial.remaining === 1 && (
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-50 ring-1 ring-amber-200 px-3 py-1.5 text-[11px] font-mono uppercase tracking-widest text-amber-900">
+            <Sparkles className="h-3 w-3 text-amber-700" />
+            Last free deck — 1 of {trial.cap} remaining
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-5 mx-auto max-w-md rounded-xl bg-red-50 ring-1 ring-red-200 p-3 text-sm text-red-700 flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+            <span className="text-left">{error}</span>
+          </div>
+        )}
+      </div>
+      <TrialPaywallDialog
+        open={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        used={trial.used}
+        cap={trial.cap}
+      />
+    </>
   )
 }

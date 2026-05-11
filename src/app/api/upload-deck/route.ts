@@ -5,6 +5,7 @@ import OpenAI from "openai"
 import { DEAL_STAGES } from "@/lib/constants"
 import type { DealStage } from "@/lib/types/deal"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
+import { getTrialUsage, TRIAL_DEAL_CAP } from "@/lib/trial-limits"
 
 const MAX_TEXT_CHARS = 12000
 const PRIMARY_PAGES = 6
@@ -130,6 +131,24 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser()
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    // Coupon-trial cap. Trial users get TRIAL_DEAL_CAP free deals total —
+    // after that we return 402 Payment Required so the client can route to
+    // the paywall dialog. Done BEFORE the PDF download + LLM extract so the
+    // user fails fast and we don't burn compute on a request we're going to
+    // reject. Paid Pro users skip this check entirely.
+    const trialUsage = await getTrialUsage(supabase, user.id)
+    if (trialUsage.isTrialing && trialUsage.atLimit) {
+      return NextResponse.json(
+        {
+          error: "trial_limit_reached",
+          message: `You've used ${trialUsage.used} of ${TRIAL_DEAL_CAP} free trial decks. Add a payment method to keep analysing.`,
+          used: trialUsage.used,
+          cap: TRIAL_DEAL_CAP,
+        },
+        { status: 402 },
+      )
     }
 
     const body = await request.json().catch(() => null)

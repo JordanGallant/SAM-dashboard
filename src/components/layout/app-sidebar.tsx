@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useDeals } from "@/hooks/use-deals"
 import { STAGE_BADGE_COLORS } from "@/lib/constants"
+import { TrialChip } from "@/components/billing/trial-chip"
 
 const verdictDotColors: Record<string, string> = {
   "Strong Buy": "bg-emerald-500",
@@ -53,6 +54,11 @@ export function AppSidebar() {
               <UploadCloud className="h-3.5 w-3.5" />
             </Link>
           </SidebarGroupLabel>
+          {/* Trial cap chip — only renders when user is on a coupon trial.
+              Click routes to /settings/billing (or opens paywall at cap). */}
+          <div className="px-2 pb-2">
+            <TrialChip size="sm" className="w-full justify-center" />
+          </div>
           <SidebarGroupContent>
             {loading ? (
               <p className="px-3 text-[10px] font-mono text-muted-foreground uppercase tracking-widest">

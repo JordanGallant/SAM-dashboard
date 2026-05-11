@@ -116,21 +116,52 @@ export default function UploadingPage() {
           )}
 
           {error ? (
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 rounded-2xl bg-red-50 ring-1 ring-red-200 p-4">
-                <AlertCircle className="h-5 w-5 text-red-700 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-heading text-sm font-bold text-red-900">Upload failed</p>
-                  <p className="mt-1 text-[13px] text-red-900/80">{error}</p>
+            // Detect the trial-cap 402 by error keyword. The API surfaces
+            // either `error: "trial_limit_reached"` or a human message
+            // mentioning "free trial decks" — match either.
+            error === "trial_limit_reached" || /free trial decks|trial.*cap/i.test(error) ? (
+              <div className="space-y-4">
+                <div className="rounded-2xl bg-primary/5 ring-1 ring-primary/30 p-5 text-center">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+                    Trial cap reached
+                  </p>
+                  <h2 className="mt-1 font-heading text-[17px] font-bold text-[#0F3D2E]">
+                    You&apos;ve used all your free decks.
+                  </h2>
+                  <p className="mt-2 text-[13px] text-muted-foreground">
+                    Add a payment method to continue analysing at full Pro speed.
+                  </p>
                 </div>
+                <button
+                  onClick={() => router.push("/settings/billing")}
+                  className="w-full rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white py-2.5 text-sm font-semibold hover:-translate-y-0.5 transition-all"
+                >
+                  Continue with Pro
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="w-full rounded-full ring-1 ring-foreground/15 hover:ring-foreground/30 py-2.5 text-sm font-semibold transition-colors"
+                >
+                  Back to Dealroom
+                </button>
               </div>
-              <button
-                onClick={handleCancel}
-                className="w-full rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white py-2.5 text-sm font-semibold hover:-translate-y-0.5 transition-all"
-              >
-                Back to Dealroom
-              </button>
-            </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-start gap-3 rounded-2xl bg-red-50 ring-1 ring-red-200 p-4">
+                  <AlertCircle className="h-5 w-5 text-red-700 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-heading text-sm font-bold text-red-900">Upload failed</p>
+                    <p className="mt-1 text-[13px] text-red-900/80">{error}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleCancel}
+                  className="w-full rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white py-2.5 text-sm font-semibold hover:-translate-y-0.5 transition-all"
+                >
+                  Back to Dealroom
+                </button>
+              </div>
+            )
           ) : (
             <>
               <div className="mb-2 text-center">

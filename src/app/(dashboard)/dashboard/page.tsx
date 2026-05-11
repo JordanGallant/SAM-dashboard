@@ -6,6 +6,8 @@ import { ArrowRight, Briefcase, Building2, FileText, Layers, AlertCircle, Trendi
 import { useDeals } from "@/hooks/use-deals"
 import { useFundProfile } from "@/hooks/use-fund-profile"
 import { useTier } from "@/lib/tier-context"
+import { useTrialUsage } from "@/hooks/use-trial-usage"
+import { TrialChip } from "@/components/billing/trial-chip"
 import { PIPELINE_STAGES, STATUS_BADGE_COLORS, getScoreColor } from "@/lib/constants"
 import type { PipelineStatus } from "@/lib/types/deal"
 import { DeckUploader } from "@/components/deals/deck-uploader"
@@ -14,6 +16,7 @@ export default function DashboardLanding() {
   const { deals, loading, refetch } = useDeals()
   const { fund } = useFundProfile()
   const { config, isTrialing, trialDaysLeft } = useTier()
+  const trialUsage = useTrialUsage()
 
   // Phase distribution.
   const phaseCounts = useMemo(() => {
@@ -124,19 +127,33 @@ export default function DashboardLanding() {
         />
       </div>
 
-      {/* Trial banner */}
+      {/* Trial banner — shows days countdown AND deal-cap counter side by side.
+          Tone shifts amber/red as the cap approaches; pulls the same source
+          of truth as the sidebar so they always match. */}
       {isTrialing && (
-        <div className="flex items-center gap-3 rounded-2xl bg-primary/5 ring-1 ring-primary/30 px-4 py-3">
-          <Sparkles className="h-4 w-4 text-primary shrink-0" />
-          <p className="text-[13px] text-primary/85 flex-1">
-            Trial — {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} left.
+        <div
+          className={`flex items-center gap-3 rounded-2xl ring-1 px-4 py-3 ${
+            trialUsage.atLimit
+              ? "bg-red-50 ring-red-200"
+              : trialUsage.remaining === 1
+                ? "bg-amber-50 ring-amber-200"
+                : "bg-primary/5 ring-primary/30"
+          }`}
+        >
+          <Sparkles
+            className={`h-4 w-4 shrink-0 ${
+              trialUsage.atLimit ? "text-red-700" : trialUsage.remaining === 1 ? "text-amber-700" : "text-primary"
+            }`}
+          />
+          <p className={`text-[13px] flex-1 ${
+            trialUsage.atLimit ? "text-red-900" : trialUsage.remaining === 1 ? "text-amber-900" : "text-primary/85"
+          }`}>
+            Trial — {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} left ·{" "}
+            {trialUsage.atLimit
+              ? `${trialUsage.cap} of ${trialUsage.cap} free decks used`
+              : `${trialUsage.used} of ${trialUsage.cap} free decks used`}
           </p>
-          <Link
-            href="/settings/billing"
-            className="text-[12px] font-mono uppercase tracking-widest text-primary hover:underline"
-          >
-            Add payment method →
-          </Link>
+          <TrialChip size="sm" />
         </div>
       )}
 

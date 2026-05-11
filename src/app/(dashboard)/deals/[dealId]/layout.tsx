@@ -23,6 +23,7 @@ import { friendlyError, type FriendlyError } from "@/lib/errors"
 import type { PipelineStatus } from "@/lib/types/deal"
 import { DealBottomSheet } from "@/components/layout/deal-bottom-sheet"
 import { AskSamInline } from "@/components/dashboard/asksam-inline"
+import { TrialChip } from "@/components/billing/trial-chip"
 
 export default function DealDetailLayout({ children }: { children: React.ReactNode }) {
   const params = useParams()
@@ -228,6 +229,10 @@ export default function DealDetailLayout({ children }: { children: React.ReactNo
               {analysis.executiveSummary.stage}
             </span>
           )}
+          {/* Trial chip — keeps the cap state visible while the user is
+              reading any memo tab. Returns null when not on a trial so it's
+              invisible for paid users. */}
+          <TrialChip size="sm" />
           {/* Pilot #14: status trigger now shows the same coloured chip as
               the dropdown items so the active status reads at a glance. */}
           <Select defaultValue={deal.status} onValueChange={handleStatusChange}>
