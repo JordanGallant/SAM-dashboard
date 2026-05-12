@@ -256,14 +256,14 @@ function BillingContent() {
           className={
             trialDaysLeft <= 3
               ? "rounded-xl bg-amber-50 ring-1 ring-amber-300 p-4 flex gap-3"
-              : "rounded-xl bg-primary/5 ring-1 ring-primary/30 p-4 flex gap-3"
+              : "rounded-xl bg-[#FAFAF7] ring-1 ring-[#0F3D2E]/10 p-4 flex gap-3"
           }
         >
           <Sparkles
             className={
               trialDaysLeft <= 3
                 ? "h-5 w-5 text-amber-700 shrink-0 mt-0.5"
-                : "h-5 w-5 text-primary shrink-0 mt-0.5"
+                : "h-5 w-5 text-[#0F3D2E] shrink-0 mt-0.5"
             }
           />
           <div>
@@ -271,7 +271,7 @@ function BillingContent() {
               className={
                 trialDaysLeft <= 3
                   ? "font-heading font-bold text-amber-900 text-sm"
-                  : "font-heading font-bold text-primary text-sm"
+                  : "font-heading font-bold text-[#0F3D2E] text-sm"
               }
             >
               {trialDaysLeft === 0
@@ -284,7 +284,7 @@ function BillingContent() {
               className={
                 trialDaysLeft <= 3
                   ? "text-[13px] text-amber-800/90 mt-0.5"
-                  : "text-[13px] text-primary/85 mt-0.5"
+                  : "text-[13px] text-muted-foreground mt-0.5"
               }
             >
               {hasStripeCustomer
@@ -332,7 +332,7 @@ function BillingContent() {
                   {config.price === 0 ? "Custom pricing" : `EUR ${config.price} / month`}
                 </p>
                 {isTrialing && (
-                  <span className="inline-flex items-center rounded-full bg-primary/10 ring-1 ring-primary/30 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold text-primary">
+                  <span className="inline-flex items-center rounded-full bg-[#0F3D2E]/5 ring-1 ring-[#0F3D2E]/15 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold text-[#0F3D2E]">
                     Trial · {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} left
                   </span>
                 )}
