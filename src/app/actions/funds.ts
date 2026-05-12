@@ -2,7 +2,19 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { upsertHubspotContact } from "@/lib/hubspot"
+
+// Service-role client for the fund_members bootstrap insert. The fund_members
+// RLS requires you to already be a member to insert, which is circular for
+// the very first owner row.
+function adminClient() {
+  return createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } },
+  )
+}
 
 export interface FundInput {
   name: string
@@ -80,7 +92,8 @@ export async function upsertFund(input: FundInput) {
     if (insertErr) return { error: insertErr.message }
 
     const newFundId = (newFund as { id: string }).id
-    const { error: memberErr } = await supabase
+    // Service-role insert: see adminClient() comment above.
+    const { error: memberErr } = await adminClient()
       .from("fund_members")
       .insert({ fund_id: newFundId, user_id: user.id, role: "owner" })
     if (memberErr && memberErr.code !== "23505") {

@@ -75,14 +75,17 @@ async function loadFundContext() {
 
   if (ownedFund) {
     const ownedId = (ownedFund as { id: string }).id
-    await supabase
+    // Use the admin client: the existing fund_members RLS requires you to
+    // already be a member to insert, which is circular for the very first
+    // owner row. We've already verified the caller owns the funds row above,
+    // so it's safe to bootstrap their membership here.
+    const admin = adminClient()
+    const { error: insErr } = await admin
       .from("fund_members")
       .insert({ fund_id: ownedId, user_id: user.id, role: "owner" })
-      .then(({ error }) => {
-        if (error && error.code !== "23505") {
-          console.error("[members] self-heal fund_members insert failed:", error)
-        }
-      })
+    if (insErr && insErr.code !== "23505") {
+      console.error("[members] self-heal fund_members insert failed:", insErr)
+    }
     return { supabase, user, fundId: ownedId }
   }
 

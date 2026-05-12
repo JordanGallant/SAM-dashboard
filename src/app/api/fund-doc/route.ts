@@ -9,6 +9,7 @@
 
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { extractText, getDocumentProxy } from "unpdf"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 import { upsertHubspotContact } from "@/lib/hubspot"
@@ -204,7 +205,14 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
       // Seat the creator as owner so /settings/members works for them too.
-      await supabase
+      // Uses the service role: the fund_members RLS requires existing membership,
+      // which is circular for the very first owner row.
+      const admin = createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { persistSession: false } },
+      )
+      await admin
         .from("fund_members")
         .insert({ fund_id: (newFund as { id: string }).id, user_id: user.id, role: "owner" })
         .then(({ error: memErr }) => {
