@@ -19,7 +19,7 @@ export function Topbar({ showSidebarTrigger = true }: { showSidebarTrigger?: boo
   }
 
   return (
-    <header className="flex h-14 items-center gap-3 border-b border-[#0F3D2E]/10 bg-white/90 backdrop-blur px-4 sticky top-0 z-30">
+    <header className="flex h-14 items-center gap-3 border-b border-[#0F3D2E]/10 bg-[#FAFAF7]/90 backdrop-blur px-4 sticky top-0 z-30">
       {showSidebarTrigger && (
         <>
           <SidebarTrigger className="text-[#0F3D2E] hover:bg-[#FAFAF7]" />

@@ -84,7 +84,7 @@ export default function DashboardLanding() {
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
             Overview
           </p>
-          <h1 className="mt-2 text-3xl md:text-4xl font-bold font-heading tracking-[-0.025em] text-[#0F3D2E]">
+          <h1 className="mt-2 text-3xl md:text-4xl font-bold font-heading tracking-[-0.025em] text-[#0A0A0A]">
             Your dealroom at a glance.
           </h1>
           <p className="mt-2 text-[13px] text-muted-foreground">

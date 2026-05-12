@@ -118,7 +118,7 @@ function TwoFactorSetup() {
         <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
           Set up
         </p>
-        <h1 className="mt-1 font-heading text-2xl font-bold tracking-[-0.01em] text-[#0F3D2E]">
+        <h1 className="mt-1 font-heading text-2xl font-bold tracking-[-0.01em] text-[#0A0A0A]">
           Two-factor authentication
         </h1>
         <p className="mt-1.5 text-sm text-muted-foreground max-w-md">
@@ -240,7 +240,7 @@ function TwoFactorSetup() {
               <button
                 type="submit"
                 disabled={code.length !== 6 || verifying}
-                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-3 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-3 text-sm font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
                 {verifying && <Loader2 className="h-4 w-4 animate-spin" />}
                 Verify and enable 2FA
@@ -274,7 +274,7 @@ function TwoFactorSetup() {
                 router.push("/deals")
                 router.refresh()
               }}
-              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all"
             >
               Go to dashboard
               <CheckCircle2 className="h-4 w-4" />

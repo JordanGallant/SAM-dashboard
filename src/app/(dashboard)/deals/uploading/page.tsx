@@ -134,7 +134,7 @@ export default function UploadingPage() {
                 </div>
                 <button
                   onClick={() => router.push("/settings/billing")}
-                  className="w-full rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white py-2.5 text-sm font-semibold hover:-translate-y-0.5 transition-all"
+                  className="w-full rounded-full bg-[#0A0A0A] text-white py-2.5 text-sm font-semibold hover:-translate-y-0.5 transition-all"
                 >
                   Continue with Pro
                 </button>
@@ -156,7 +156,7 @@ export default function UploadingPage() {
                 </div>
                 <button
                   onClick={handleCancel}
-                  className="w-full rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white py-2.5 text-sm font-semibold hover:-translate-y-0.5 transition-all"
+                  className="w-full rounded-full bg-[#0A0A0A] text-white py-2.5 text-sm font-semibold hover:-translate-y-0.5 transition-all"
                 >
                   Back to Dealroom
                 </button>

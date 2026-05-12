@@ -99,7 +99,7 @@ export function TrialPaywallDialog({
             type="button"
             onClick={handleUpgrade}
             disabled={loading}
-            className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-[13px] font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:hover:translate-y-0"
+            className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-2.5 text-[13px] font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:hover:translate-y-0"
           >
             {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Continue with Pro
