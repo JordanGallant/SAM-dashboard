@@ -265,11 +265,11 @@ export function FundDocUploader({
           onDrop={handleDrop}
           className={`relative rounded-2xl border-2 border-dashed transition-all py-8 px-5 text-center cursor-pointer ${
             dragOver
-              ? "border-primary bg-primary/5"
-              : "border-foreground/15 bg-muted/30 hover:border-foreground/30 hover:bg-muted/50"
+              ? "border-[#0F3D2E] bg-[#0F3D2E]/5"
+              : "border-[#0F3D2E]/20 bg-[#FAFAF7] hover:border-[#0F3D2E]/40 hover:bg-[#0F3D2E]/[0.03]"
           } ${status.kind === "uploading" ? "pointer-events-none opacity-70" : ""}`}
         >
-          <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0F3D2E]/5 to-[#00A86B]/10 ring-1 ring-[#0F3D2E]/10">
+          <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0F3D2E]/5 ring-1 ring-[#0F3D2E]/15">
             {status.kind === "uploading" ? (
               <Loader2 className="h-5 w-5 text-[#0F3D2E] animate-spin" />
             ) : (
