@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, Suspense } from "react"
+import { useEffect, useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { BarChart3, Loader2, ArrowRight, Users } from "lucide-react"
@@ -28,6 +28,28 @@ function RegisterContent() {
   const [confirm, setConfirm] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+
+  // If the invitee is already signed in (existing SAM user accepting an
+  // invite), skip the signup form and call acceptInvite immediately.
+  // Without this, the form throws "User already registered" and the user
+  // is stuck — exactly what happened on the first invite attempt.
+  useEffect(() => {
+    if (!inviteToken) return
+    let cancelled = false
+    ;(async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || cancelled) return
+      const result = await acceptInvite(inviteToken)
+      if (cancelled) return
+      if ("error" in result) {
+        setError(result.error)
+      } else {
+        router.push("/deals")
+      }
+    })()
+    return () => { cancelled = true }
+  }, [inviteToken, router])
 
   const tier = TIER_CONFIG[tierParam]
 

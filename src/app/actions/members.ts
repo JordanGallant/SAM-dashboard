@@ -99,20 +99,26 @@ export async function listMembers(): Promise<
 > {
   const ctx = await loadFundContext()
   if ("error" in ctx) return { error: String(ctx.error) }
-  const { supabase, fundId } = ctx
+  const { fundId } = ctx
+
+  // Read via admin client. Auth was already verified in loadFundContext
+  // (it checked the caller has a fund_members row OR owns the funds row).
+  // Bypassing RLS here avoids the self-reference recursion on fund_members
+  // that returns empty rosters even for legit owners.
+  const admin = adminClient()
 
   const [{ data: fund }, { data: members }, { data: invites }] = await Promise.all([
-    supabase
+    admin
       .from("funds")
       .select("id, name, user_id")
       .eq("id", fundId)
       .single(),
-    supabase
+    admin
       .from("fund_members")
       .select("user_id, role, joined_at")
       .eq("fund_id", fundId)
       .order("joined_at", { ascending: true }),
-    supabase
+    admin
       .from("fund_invitations")
       .select("id, email, created_at, expires_at")
       .eq("fund_id", fundId)
@@ -124,7 +130,7 @@ export async function listMembers(): Promise<
   if (!fund) return { error: "Fund not found" }
 
   // Owner's tier drives the seat cap. With one-fund-per-user, owner = funds.user_id.
-  const { data: ownerProfile } = await supabase
+  const { data: ownerProfile } = await admin
     .from("profiles")
     .select("tier, subscription_status")
     .eq("id", (fund as { user_id: string }).user_id)
@@ -136,8 +142,8 @@ export async function listMembers(): Promise<
   const cap = TIER_CONFIG[ownerTier]?.users ?? 1
   const seatCap = cap === -1 ? 999 : cap
 
-  // Enrich each member row with email via admin lookup
-  const admin = adminClient()
+  // Enrich each member row with email via admin lookup (reuse the
+  // admin client created above).
   const enriched: MemberRow[] = []
   for (const m of (members ?? []) as { user_id: string; role: "owner" | "member"; joined_at: string }[]) {
     const { data: au } = await admin.auth.admin.getUserById(m.user_id)
