@@ -430,12 +430,12 @@ export default function SetupPage() {
                     type="button"
                     onClick={handleScrape}
                     disabled={scraping || !looksLikeUrl(website)}
-                    className="inline-flex items-center gap-1.5 rounded-md bg-foreground/[0.04] hover:bg-foreground/[0.08] ring-1 ring-foreground/15 px-3 text-[12.5px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-4 text-[12.5px] font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {scraping ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     ) : (
-                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                      <Sparkles className="h-3.5 w-3.5" />
                     )}
                     {scraping ? "Scraping…" : "Scrape"}
                   </button>

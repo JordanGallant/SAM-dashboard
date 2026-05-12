@@ -204,7 +204,7 @@ export default function FundProfilePage() {
                     ? "Enter a valid URL first"
                     : "Read your homepage and auto-fill the fields below"
                 }
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] px-4 py-2 text-[12.5px] font-medium text-white shadow-sm transition-all hover:-translate-y-px hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm sm:shrink-0"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-4 py-2 text-[12.5px] font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed sm:shrink-0"
               >
                 {scraping ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
