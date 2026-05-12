@@ -39,7 +39,7 @@ export default function ResetPasswordPage() {
         <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white shadow-md shadow-primary/20">
           <CheckCircle2 className="h-5 w-5" />
         </div>
-        <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+        <p className="text-center text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E] font-bold">
           Email sent
         </p>
         <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0F3D2E]">
@@ -67,7 +67,7 @@ export default function ResetPasswordPage() {
       <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white shadow-md shadow-primary/20">
         <KeyRound className="h-5 w-5" />
       </div>
-      <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+      <p className="text-center text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E] font-bold">
         Reset password
       </p>
       <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0F3D2E]">
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={loading}
-          className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-3 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+          className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-3 text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           Send reset link

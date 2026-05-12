@@ -9,7 +9,7 @@ export default function Setup2FAPage() {
       <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white shadow-md shadow-primary/20">
         <Shield className="h-5 w-5" />
       </div>
-      <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+      <p className="text-center text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E] font-bold">
         Two-factor authentication
       </p>
       <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0F3D2E]">
@@ -44,7 +44,7 @@ export default function Setup2FAPage() {
         </Link>
         <Link
           href="/deals"
-          className="group inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-4 py-2.5 text-[13px] font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
+          className="group inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-4 py-2.5 text-[13px] font-semibold transition"
         >
           Verify &amp; enable
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />

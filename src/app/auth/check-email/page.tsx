@@ -31,7 +31,7 @@ function CheckEmailContent({ email }: { email: string | null }) {
               <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white shadow-md shadow-primary/20">
                 <Mail className="h-5 w-5" />
               </div>
-              <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+              <p className="text-center text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E] font-bold">
                 Confirm email
               </p>
               <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0F3D2E]">
