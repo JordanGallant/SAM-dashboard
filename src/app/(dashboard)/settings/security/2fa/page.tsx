@@ -115,7 +115,7 @@ function TwoFactorSetup() {
           <ArrowLeft className="h-3 w-3" />
           Security
         </Link>
-        <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+        <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E] font-bold">
           Set up
         </p>
         <h1 className="mt-1 font-heading text-2xl font-bold tracking-[-0.01em] text-[#0A0A0A]">
@@ -127,13 +127,13 @@ function TwoFactorSetup() {
       </div>
 
       {required && step !== "done" && (
-        <div className="rounded-2xl ring-1 ring-primary/30 bg-primary/5 p-5 flex gap-3">
-          <AlertTriangle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+        <div className="rounded-2xl ring-1 ring-[#0F3D2E]/10 bg-[#FAFAF7] p-5 flex gap-3">
+          <AlertTriangle className="h-4 w-4 text-[#0F3D2E] shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-heading font-bold text-primary">
+            <p className="text-sm font-heading font-bold text-[#0F3D2E]">
               2FA required for your plan
             </p>
-            <p className="mt-1 text-[12.5px] text-primary/85 leading-relaxed">
+            <p className="mt-1 text-[12.5px] text-muted-foreground leading-relaxed">
               Fund tier accounts must have 2FA enabled to access the dashboard. Complete
               setup below to continue.
             </p>

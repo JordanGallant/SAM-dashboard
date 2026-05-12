@@ -81,7 +81,7 @@ export default function SecurityPage() {
               <Shield className="h-5 w-5 text-[#0F3D2E]" />
             </div>
             <div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E] font-bold">
                 Two-factor authentication
               </p>
               <h3 className="mt-1 font-heading text-[15px] font-bold leading-tight">
@@ -100,7 +100,7 @@ export default function SecurityPage() {
               </span>
             )}
             {mfaEnrolled === false && (
-              <span className="inline-flex items-center rounded-full bg-primary/10 ring-1 ring-primary/30 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold text-primary">
+              <span className="inline-flex items-center rounded-full bg-[#0F3D2E]/5 ring-1 ring-[#0F3D2E]/15 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold text-[#0F3D2E]">
                 Not set up
               </span>
             )}
@@ -114,7 +114,7 @@ export default function SecurityPage() {
 
         <div className="mt-5 space-y-3">
           {mfaEnrolled === false && config.twoFactorRequired && (
-            <div className="rounded-xl bg-primary/5 ring-1 ring-primary/30 p-3 flex gap-2 text-sm text-primary">
+            <div className="rounded-xl bg-[#FAFAF7] ring-1 ring-[#0F3D2E]/10 p-3 flex gap-2 text-sm text-[#0F3D2E]">
               <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
               <span>
                 Your {config.label} plan requires 2FA. Set it up to keep dashboard access.
@@ -161,7 +161,7 @@ export default function SecurityPage() {
             <KeyRound className="h-5 w-5 text-[#0F3D2E]" />
           </div>
           <div>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E] font-bold">
               Password
             </p>
             <h3 className="mt-1 font-heading text-[15px] font-bold leading-tight">

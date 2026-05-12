@@ -24,7 +24,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
           <ArrowLeft className="h-3 w-3" />
           Dealroom
         </Link>
-        <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-primary">Account</p>
+        <p className="mt-2 text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E]">Account</p>
         <h1 className="mt-1 text-2xl font-bold font-heading">Settings</h1>
       </div>
       <nav className="border-b -mx-4 md:-mx-6 px-4 md:px-6">
