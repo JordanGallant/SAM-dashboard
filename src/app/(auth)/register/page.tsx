@@ -200,7 +200,7 @@ function RegisterContent() {
             className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-3 text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {inviteToken ? "Create account & join team" : "Continue to payment"}
+            {inviteToken ? "Create account & join team" : "Create account"}
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </button>
 
