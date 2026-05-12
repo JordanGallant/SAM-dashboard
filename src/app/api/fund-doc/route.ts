@@ -191,14 +191,27 @@ export async function POST(request: Request) {
     } else {
       // No fund row yet — create one. Use extracted thesis/focus/etc directly,
       // since there's nothing to preserve on a fresh row.
-      const { error } = await supabase.from("funds").insert({
-        user_id: user.id,
-        name: "(awaiting fund details)",
-        ...patch,
-      })
+      const { data: newFund, error } = await supabase
+        .from("funds")
+        .insert({
+          user_id: user.id,
+          name: "(awaiting fund details)",
+          ...patch,
+        })
+        .select("id")
+        .single()
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
+      // Seat the creator as owner so /settings/members works for them too.
+      await supabase
+        .from("fund_members")
+        .insert({ fund_id: (newFund as { id: string }).id, user_id: user.id, role: "owner" })
+        .then(({ error: memErr }) => {
+          if (memErr && memErr.code !== "23505") {
+            console.error("[fund-doc] fund_members owner insert failed:", memErr)
+          }
+        })
     }
 
     // Sync the freshly-extracted fund context up to HubSpot. Fire-and-forget —

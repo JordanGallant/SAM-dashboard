@@ -59,8 +59,36 @@ async function loadFundContext() {
     .limit(1)
     .maybeSingle()
 
-  if (!membership) return { error: "No active fund" as const }
-  return { supabase, user, fundId: (membership as { fund_id: string }).fund_id }
+  if (membership) {
+    return { supabase, user, fundId: (membership as { fund_id: string }).fund_id }
+  }
+
+  // Self-heal: if the user owns a funds row but pre-dates the fund_members
+  // backfill, insert their owner row now and proceed. This catches users
+  // whose fund was created before 006_fund_members.sql ran, or via paths
+  // that didn't yet seat the owner.
+  const { data: ownedFund } = await supabase
+    .from("funds")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (ownedFund) {
+    const ownedId = (ownedFund as { id: string }).id
+    await supabase
+      .from("fund_members")
+      .insert({ fund_id: ownedId, user_id: user.id, role: "owner" })
+      .then(({ error }) => {
+        if (error && error.code !== "23505") {
+          console.error("[members] self-heal fund_members insert failed:", error)
+        }
+      })
+    return { supabase, user, fundId: ownedId }
+  }
+
+  // No fund at all yet — distinct from "user error" so the UI can show a
+  // friendly "create your fund first" CTA instead of a red error box.
+  return { error: "NO_FUND" as const }
 }
 
 export async function listMembers(): Promise<

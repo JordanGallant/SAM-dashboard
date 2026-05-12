@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react"
 import Link from "next/link"
-import { Users, Mail, Loader2, X, ArrowRight, Crown, AlertCircle } from "lucide-react"
+import { Users, Mail, Loader2, X, ArrowRight, Crown, AlertCircle, Building2 } from "lucide-react"
 import { useTier } from "@/lib/tier-context"
 import {
   listMembers,
@@ -70,6 +70,31 @@ export default function MembersPage() {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" /> Loading members…
+      </div>
+    )
+  }
+
+  if (loadError === "NO_FUND") {
+    return (
+      <div className="rounded-2xl border border-foreground/10 bg-card p-8 max-w-2xl">
+        <Building2 className="h-8 w-8 text-primary mb-4" />
+        <h2 className="text-xl font-bold font-heading">Create your fund first</h2>
+        <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+          You need a fund profile before you can invite teammates — that profile
+          is what they&apos;ll get shared access to. The fastest way is to upload
+          your one-pager or paste your fund&apos;s website and let Sam extract it
+          for you.
+        </p>
+        <Link
+          href="/settings/fund-profile"
+          className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] text-white px-4 py-2 text-sm font-semibold hover:bg-[#0F3D2E]/90 transition"
+        >
+          Set up fund profile
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+        <p className="mt-4 text-[12px] text-muted-foreground">
+          Once your fund is created, come back here to invite up to 3 teammates.
+        </p>
       </div>
     )
   }

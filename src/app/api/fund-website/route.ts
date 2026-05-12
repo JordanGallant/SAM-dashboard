@@ -402,10 +402,23 @@ export async function POST(request: Request) {
         website: (patch.website as string | undefined) || url.toString(),
         ...patch,
       }
-      const { error } = await supabase.from("funds").insert(insertRow)
+      const { data: newFund, error } = await supabase
+        .from("funds")
+        .insert(insertRow)
+        .select("id")
+        .single()
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
+      // Seat the creator as owner so /settings/members works for them too.
+      await supabase
+        .from("fund_members")
+        .insert({ fund_id: (newFund as { id: string }).id, user_id: user.id, role: "owner" })
+        .then(({ error: memErr }) => {
+          if (memErr && memErr.code !== "23505") {
+            console.error("[fund-website] fund_members owner insert failed:", memErr)
+          }
+        })
     }
 
     // Fire-and-forget HubSpot sync — same pattern as /api/fund-doc.
