@@ -12,12 +12,42 @@ export const maxDuration = 60
 type Msg = { role: "user" | "assistant"; content: string }
 type Scope = "team" | "market" | "product" | "traction" | "finance" | "fund-fit" | "exit" | "summary"
 
-const SYSTEM_BASE = `You are SAM, an AI investment associate for a European VC fund.
-You answer questions about the user's deal pipeline with concrete, citation-backed reasoning.
-Be concise (usually under 150 words). Use short bullets when they aid scanning.
-When the user asks about a specific deal, ground every claim in the memo data we give you below.
-If data is missing, say "not in the memo" rather than speculating.
-Never invent numbers, founders, customers, or competitors.`
+const SYSTEM_BASE = `You are SAM, an AI investment associate working alongside a European VC.
+Talk to the user like a junior colleague would talk to a partner: direct,
+useful, willing to push back. Don't hedge to be polite. Don't agree to be
+agreeable.
+
+GROUNDING (non-negotiable)
+- Every factual claim must come from the memo, fund profile, or pipeline
+  context provided below.
+- If the data isn't there, say "not in the memo." Do not infer numbers,
+  names, customers, competitors, traction, dates, or relationships.
+- Cite the section you're drawing from in brackets, e.g. [team], [market],
+  [traction], [fund profile], [pipeline]. One citation per claim is enough.
+- You have no web access. If asked to look something up externally, say so
+  and offer what you can answer from the provided context instead.
+
+POSTURE TOWARD THE DEAL
+- Be critical of the founders' claims, not the user's questions. Treat the
+  deck as a pitch, not as truth. Flag unsupported assertions, weak logic,
+  and convenient framings.
+- When a strength is real, say so plainly. When a risk is real, lead with
+  it — no softener.
+- If a founder claim is plausible but not verified in the memo, label it:
+  "claimed, not verified [section]."
+
+POSTURE TOWARD THE USER
+- If the user asks a leading question ("great team, right?"), answer the
+  underlying question, not the framing. Disagree when the context supports
+  disagreement.
+- Ask back when the question is ambiguous. One question, not three.
+
+FORMAT
+- Default to under 120 words. Short bullets when they aid scanning, prose
+  otherwise.
+- No preamble. Start with the answer.
+- For deepdives the user explicitly asks for, length cap is off — but stay
+  dense, no filler.`
 
 function buildDealContext(deal: Deal): string {
   const es = deal.analysis?.executiveSummary
@@ -49,7 +79,10 @@ RISKS:
 ${risks || "  (none recorded)"}
 
 RECOMMENDED NEXT STEPS:
-${nextSteps || "  (none recorded)"}`
+${nextSteps || "  (none recorded)"}
+
+Cite the relevant domain in brackets when drawing on it, e.g. [market],
+[traction], [finance], [product], [fund-fit], [exit].`
 }
 
 function buildTeamContext(deal: Deal): string {
@@ -83,7 +116,9 @@ TEAM DYNAMICS & COMPOSITION:
 ${t.teamDynamics || "  (not recorded)"}
 
 RED FLAGS:
-${redFlags || "  (none)"}`
+${redFlags || "  (none)"}
+
+Cite as [team] or [founders] when referenced.`
 }
 
 async function getScopedDealContext(
@@ -122,9 +157,11 @@ async function getPipelineContext(supabase: Awaited<ReturnType<typeof createClie
     .order("created_at", { ascending: false })
     .limit(20)
   if (!deals || deals.length === 0) return "PIPELINE: no deals yet."
-  return `PIPELINE (${deals.length} deals):\n${deals
-    .map((d) => `  - ${d.company_name} (${d.stage}) · ${d.status}`)
-    .join("\n")}`
+  return `PIPELINE (${deals.length} deals, most recent ${Math.min(deals.length, 20)}):
+${deals.map((d) => `  - ${d.company_name} (${d.stage}) · ${d.status}`).join("\n")}
+
+Cite as [pipeline] when referencing the list. For specific deal questions,
+tell the user to open that deal — you only have summary data here.`
 }
 
 // Pilot feedback #22: Ask Sam couldn't answer fund-fit questions because the
@@ -157,7 +194,11 @@ async function getFundContext(
         .eq("id", (membership as { fund_id: string }).fund_id)
         .maybeSingle()
     : { data: null }
-  if (!row) return "FUND PROFILE: not configured yet — user has not completed setup."
+  if (!row) {
+    return `FUND PROFILE: not configured yet — user has not completed setup.
+When asked about fund-fit, tell the user the fund profile is missing and
+ask them to complete setup. Do not guess the fund's thesis.`
+  }
   const fund: FundProfile = dbToFund(row as DbFund)
   const lines = [
     `FUND PROFILE: ${fund.name}`,
@@ -169,6 +210,8 @@ async function getFundContext(
       ? `Ticket size: €${fund.ticketSizeMin?.toLocaleString() ?? "?"} – €${fund.ticketSizeMax?.toLocaleString() ?? "?"}`
       : null,
     fund.additional ? `Notes: ${fund.additional}` : null,
+    "",
+    "Use this to assess fund-fit. Cite as [fund profile] when referenced.",
   ].filter(Boolean)
   return lines.join("\n")
 }
