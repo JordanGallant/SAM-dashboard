@@ -171,11 +171,11 @@ export function FAQ() {
             </p>
 
             <a
-              href="mailto:hello@samvc.ai"
+              href="mailto:mark@green-whale.nl"
               className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/15 bg-white px-4 py-2.5 text-sm font-semibold text-[#0F3D2E] shadow-sm hover:border-[#0F3D2E]/30 hover:shadow-md transition-all"
             >
               <Mail className="h-3.5 w-3.5" />
-              hello@samvc.ai
+              mark@green-whale.nl
             </a>
           </Reveal>
 

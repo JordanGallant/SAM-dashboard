@@ -105,7 +105,7 @@ export function TrialPaywallDialog({
             Continue with Pro
           </button>
           <a
-            href="mailto:hello@samvc.ai?subject=SAM%20Trial%20-%20questions%20before%20I%20upgrade"
+            href="mailto:mark@green-whale.nl?subject=SAM%20Trial%20-%20questions%20before%20I%20upgrade"
             className="inline-flex items-center justify-center gap-2 rounded-full ring-1 ring-foreground/15 hover:ring-foreground/30 hover:bg-foreground/5 px-4 py-2.5 text-[13px] font-semibold transition-colors"
           >
             <Mail className="h-3.5 w-3.5" />

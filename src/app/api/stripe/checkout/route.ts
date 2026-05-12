@@ -25,7 +25,7 @@ export async function POST(request: Request) {
           {
             error: "Fund tier requires a walkthrough",
             contact: true,
-            mailto: "hello@samvc.ai?subject=SAM%20Fund%20-%20Walkthrough%20request",
+            mailto: "mark@green-whale.nl?subject=SAM%20Fund%20-%20Walkthrough%20request",
           },
           { status: 400 }
         )

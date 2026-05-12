@@ -52,7 +52,7 @@ export function Footer() {
               <li><Link href="/login" className="hover:text-white transition-colors">Log in</Link></li>
               <li><Link href="/register?tier=professional" className="hover:text-white transition-colors">Analyse a deck</Link></li>
               <li><a href="https://calendly.com/samvc" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Book a call</a></li>
-              <li><a href="mailto:hello@samvc.ai" className="hover:text-white transition-colors">Contact</a></li>
+              <li><a href="mailto:mark@green-whale.nl" className="hover:text-white transition-colors">Contact</a></li>
             </ul>
           </div>
         </div>
