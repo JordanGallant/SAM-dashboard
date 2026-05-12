@@ -82,6 +82,20 @@ function RegisterContent() {
       return
     }
 
+    // Supabase quirk: when a signup is attempted with an email that already
+    // exists, it silently returns a synthetic user with no identities and
+    // sends nothing — security feature so existence of an account can't be
+    // probed. UX-wise this leaves the user stuck on /check-email forever,
+    // expecting a confirmation that will never arrive. Detect it and tell
+    // them clearly to use the existing provider (almost always Google).
+    if (data.user.identities && data.user.identities.length === 0) {
+      setError(
+        "This email is already registered. If you originally signed up with Google, click 'Sign up with Google' above instead.",
+      )
+      setLoading(false)
+      return
+    }
+
     if (!data.session) {
       // For invite flow: still need email confirmation before joining the fund.
       // The token + email pass through so /auth/callback completes acceptance.

@@ -49,8 +49,14 @@ function CheckEmailContent({ email }: { email: string | null }) {
                 <p className="text-center text-[13px] text-muted-foreground">
                   Click the link in the email to verify your account. You&apos;ll then be taken through to complete checkout.
                 </p>
-                <div className="rounded-xl bg-foreground/[0.03] ring-1 ring-foreground/10 px-3 py-2.5 text-[12px] text-muted-foreground text-center">
-                  Didn&apos;t get it? Check your spam folder or try registering again.
+                <div className="rounded-xl bg-foreground/[0.03] ring-1 ring-foreground/10 px-3 py-2.5 text-[12px] text-muted-foreground text-center space-y-1">
+                  <p>Didn&apos;t get it? Check your spam folder, or try registering again.</p>
+                  <p>
+                    Already signed up with <strong>Google</strong> using this email?{" "}
+                    <Link href="/login" className="font-medium text-foreground hover:underline">
+                      Sign in with Google
+                    </Link>.
+                  </p>
                 </div>
               </div>
 
