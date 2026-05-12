@@ -68,7 +68,11 @@ function RegisterContent() {
       password,
       options: {
         data: { full_name: name, pending_tier: tierParam },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        // Pass the invite token through email confirmation so /auth/callback
+        // accepts the invite and routes to /deals (rather than /checkout-redirect).
+        emailRedirectTo: inviteToken
+          ? `${window.location.origin}/auth/callback?invite=${encodeURIComponent(inviteToken)}`
+          : `${window.location.origin}/auth/callback`,
       },
     })
 
@@ -136,7 +140,11 @@ function RegisterContent() {
       )}
 
       <div className="mt-7 space-y-4">
-        <GoogleButton label="Sign up with Google" tier={tierParam} />
+        <GoogleButton
+          label={inviteToken ? "Join with Google" : "Sign up with Google"}
+          tier={tierParam}
+          inviteToken={inviteToken}
+        />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">

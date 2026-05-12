@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { upsertHubspotContact } from "@/lib/hubspot"
+import { acceptInvite } from "@/app/actions/members"
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
   const next = searchParams.get("next")
+  const invite = searchParams.get("invite")
 
   if (code) {
     const supabase = await createClient()
@@ -19,6 +21,19 @@ export async function GET(request: Request) {
         void upsertHubspotContact(email, {
           lifecyclestage: "lead",
         }).catch(() => {})
+      }
+
+      // Invite acceptance takes priority over the normal post-auth routing.
+      // Without this, the user lands on /checkout-redirect because their
+      // profile still has pending_tier set from the signup metadata.
+      if (invite) {
+        const result = await acceptInvite(invite)
+        if ("error" in result) {
+          return NextResponse.redirect(
+            `${origin}/login?error=${encodeURIComponent(result.error)}`,
+          )
+        }
+        return NextResponse.redirect(`${origin}/deals`)
       }
 
       // If a specific next URL was provided, use it

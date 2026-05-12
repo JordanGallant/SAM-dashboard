@@ -8,19 +8,25 @@ import type { Tier } from "@/lib/types/user"
 interface GoogleButtonProps {
   label?: string
   tier?: Tier | null
+  inviteToken?: string | null
   disabled?: boolean
 }
 
-export function GoogleButton({ label = "Continue with Google", tier, disabled }: GoogleButtonProps) {
+export function GoogleButton({ label = "Continue with Google", tier, inviteToken, disabled }: GoogleButtonProps) {
   const [loading, setLoading] = useState(false)
 
   async function handleClick() {
     setLoading(true)
     const supabase = createClient()
 
-    // Pass tier through so the auth callback can route to checkout if needed
-    const nextPath = tier ? `/checkout-redirect?tier=${tier}` : "/deals"
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`
+    // Invite path takes priority: callback accepts the invite and routes to
+    // /deals (skipping checkout — invitees ride the inviter's plan). Without
+    // this the callback reads pending_tier and bounces them to /checkout.
+    const redirectTo = inviteToken
+      ? `${window.location.origin}/auth/callback?invite=${encodeURIComponent(inviteToken)}`
+      : `${window.location.origin}/auth/callback?next=${encodeURIComponent(
+          tier ? `/checkout-redirect?tier=${tier}` : "/deals",
+        )}`
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
