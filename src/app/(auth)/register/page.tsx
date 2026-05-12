@@ -3,21 +3,27 @@
 import { useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { BarChart3, Loader2, ArrowRight } from "lucide-react"
+import { BarChart3, Loader2, ArrowRight, Users } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { TIER_CONFIG } from "@/lib/tier-config"
 import type { Tier } from "@/lib/types/user"
 import { GoogleButton } from "@/components/auth/google-button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { acceptInvite } from "@/app/actions/members"
 
 function RegisterContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tierParam = (searchParams.get("tier") as Tier) || "professional"
 
+  // Invite-link signup: the email field is pre-filled from the URL and locked
+  // so the new account matches the invited address (strict match on accept).
+  const inviteToken = searchParams.get("invite")
+  const invitedEmail = searchParams.get("email") || ""
+
   const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState(invitedEmail)
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
   const [error, setError] = useState("")
@@ -51,7 +57,24 @@ function RegisterContent() {
     }
 
     if (!data.session) {
-      router.push(`/auth/check-email?email=${encodeURIComponent(email)}`)
+      // For invite flow: still need email confirmation before joining the fund.
+      // The token + email pass through so /auth/callback completes acceptance.
+      const next = inviteToken
+        ? `?email=${encodeURIComponent(email)}&invite=${encodeURIComponent(inviteToken)}`
+        : `?email=${encodeURIComponent(email)}`
+      router.push(`/auth/check-email${next}`)
+      return
+    }
+
+    // Invited users skip checkout — they piggy-back on the inviter's plan.
+    if (inviteToken) {
+      const result = await acceptInvite(inviteToken)
+      if ("error" in result) {
+        setError(result.error)
+        setLoading(false)
+        return
+      }
+      router.push("/deals")
       return
     }
 
@@ -64,19 +87,31 @@ function RegisterContent() {
         <BarChart3 className="h-5 w-5" />
       </div>
       <p className="text-center text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
-        Create account
+        {inviteToken ? "Accept team invite" : "Create account"}
       </p>
       <h1 className="mt-1 text-center font-heading text-2xl font-bold tracking-[-0.02em] text-[#0F3D2E]">
-        Get started with Sam
+        {inviteToken ? "Join your team on Sam" : "Get started with Sam"}
       </h1>
-      <div className="mt-3 flex items-center justify-center gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.04] ring-1 ring-foreground/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E]/75">
-          {tier.label}
-        </span>
-        <span className="text-[12px] font-mono tabular-nums text-muted-foreground">
-          {tier.price === 0 ? "Custom pricing" : `EUR ${tier.price}/mo`}
-        </span>
-      </div>
+      {inviteToken ? (
+        <div className="mt-3 mx-auto max-w-sm rounded-xl bg-[#B5D33C]/20 ring-1 ring-[#B5D33C]/40 px-4 py-3 text-center">
+          <p className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-[#0F3D2E] font-bold">
+            <Users className="h-3 w-3" />
+            You&apos;ve been invited
+          </p>
+          <p className="mt-1 text-[12.5px] text-[#0F3D2E]/80 leading-relaxed">
+            Create your account to join your team&apos;s shared workspace. No payment required — your seat is included in the plan.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.04] ring-1 ring-foreground/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest text-[#0F3D2E]/75">
+            {tier.label}
+          </span>
+          <span className="text-[12px] font-mono tabular-nums text-muted-foreground">
+            {tier.price === 0 ? "Custom pricing" : `EUR ${tier.price}/mo`}
+          </span>
+        </div>
+      )}
 
       <div className="mt-7 space-y-4">
         <GoogleButton label="Sign up with Google" tier={tierParam} />
@@ -102,7 +137,21 @@ function RegisterContent() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email" className="text-sm">Email</Label>
-            <Input id="email" type="email" placeholder="you@fund.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@fund.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              readOnly={!!inviteToken}
+              className={inviteToken ? "bg-foreground/[0.04] cursor-not-allowed" : undefined}
+            />
+            {inviteToken && (
+              <p className="text-[11px] text-muted-foreground">
+                Invites are locked to the address they were sent to.
+              </p>
+            )}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
@@ -121,13 +170,15 @@ function RegisterContent() {
             className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-3 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            Continue to payment
+            {inviteToken ? "Create account & join team" : "Continue to payment"}
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </button>
 
-          <p className="text-center text-[11px] text-muted-foreground">
-            Have a coupon? You can apply it on the next screen.
-          </p>
+          {!inviteToken && (
+            <p className="text-center text-[11px] text-muted-foreground">
+              Have a coupon? You can apply it on the next screen.
+            </p>
+          )}
         </form>
 
         <p className="text-center text-sm text-muted-foreground">

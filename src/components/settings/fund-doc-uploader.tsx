@@ -45,11 +45,21 @@ export function FundDocUploader({
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
-        const { data: fund } = await supabase
-          .from("funds")
-          .select("one_pager_filename, one_pager_uploaded_at, one_pager_text")
+        // Look up via fund_members so teammates see the shared fund doc.
+        const { data: membership } = await supabase
+          .from("fund_members")
+          .select("fund_id")
           .eq("user_id", user.id)
+          .limit(1)
           .maybeSingle()
+        const memberFundId = (membership as { fund_id: string } | null)?.fund_id ?? null
+        const { data: fund } = memberFundId
+          ? await supabase
+              .from("funds")
+              .select("one_pager_filename, one_pager_uploaded_at, one_pager_text")
+              .eq("id", memberFundId)
+              .maybeSingle()
+          : { data: null }
         if (cancelled) return
         if (fund?.one_pager_filename && fund.one_pager_uploaded_at) {
           const wordCount = fund.one_pager_text

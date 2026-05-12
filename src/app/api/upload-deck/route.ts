@@ -230,11 +230,17 @@ export async function POST(request: Request) {
       }
     }
 
-    const { data: fund } = await supabase
-      .from("funds")
-      .select("*")
+    // Use fund_members so teammates upload decks against the shared fund_id.
+    const { data: membership } = await supabase
+      .from("fund_members")
+      .select("fund_id")
       .eq("user_id", user.id)
+      .limit(1)
       .maybeSingle()
+    const fundId = (membership as { fund_id: string } | null)?.fund_id ?? null
+    const { data: fund } = fundId
+      ? await supabase.from("funds").select("*").eq("id", fundId).maybeSingle()
+      : { data: null }
 
     const { data: deal, error: dealErr } = await supabase
       .from("deals")

@@ -93,7 +93,38 @@ export async function updateSession(request: NextRequest) {
     const trialValid = profile?.subscription_status === "trial" && trialEnd && trialEnd > now
     const active = profile?.subscription_status === "active"
 
+    // Teammate path: a user who joined via invite has no subscription of their
+    // own — entitlement lives on the fund owner. Allow them through if the
+    // owner of any fund they belong to has an active subscription.
+    let teamEntitled = false
     if (!active && !trialValid) {
+      const { data: membership } = await supabase
+        .from("fund_members")
+        .select("fund_id, role")
+        .eq("user_id", user.id)
+        .neq("role", "owner")
+        .limit(1)
+        .maybeSingle()
+      if (membership) {
+        const { data: fund } = await supabase
+          .from("funds")
+          .select("user_id")
+          .eq("id", (membership as { fund_id: string }).fund_id)
+          .maybeSingle()
+        if (fund) {
+          const { data: ownerProfile } = await supabase
+            .from("profiles")
+            .select("subscription_status")
+            .eq("id", (fund as { user_id: string }).user_id)
+            .maybeSingle()
+          if ((ownerProfile as { subscription_status: string } | null)?.subscription_status === "active") {
+            teamEntitled = true
+          }
+        }
+      }
+    }
+
+    if (!active && !trialValid && !teamEntitled) {
       const url = request.nextUrl.clone()
       url.pathname = "/settings/billing"
       if (profile?.subscription_status === "trial" && trialEnd && trialEnd <= now) {

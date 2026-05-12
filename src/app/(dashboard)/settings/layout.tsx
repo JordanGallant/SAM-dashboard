@@ -2,10 +2,11 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ArrowLeft, Building2, CreditCard, ShieldCheck } from "lucide-react"
+import { ArrowLeft, Building2, CreditCard, ShieldCheck, Users } from "lucide-react"
 
 const tabs = [
   { href: "/settings/fund-profile", label: "Fund Profile", icon: Building2 },
+  { href: "/settings/members", label: "Members", icon: Users },
   { href: "/settings/billing", label: "Billing", icon: CreditCard },
   { href: "/settings/security", label: "Security", icon: ShieldCheck },
 ]

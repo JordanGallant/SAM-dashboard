@@ -41,15 +41,16 @@ export async function upsertFund(input: FundInput) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Not authenticated" }
 
-  // Check if user has an existing fund
-  const { data: existing } = await supabase
-    .from("funds")
-    .select("id")
+  // Lookup happens through fund_members so a teammate editing the fund
+  // profile updates the *owner's* fund row, not a phantom new fund.
+  const { data: membership } = await supabase
+    .from("fund_members")
+    .select("fund_id, role")
     .eq("user_id", user.id)
+    .limit(1)
     .maybeSingle()
 
   const payload = {
-    user_id: user.id,
     name: input.name,
     website: input.website ?? null,
     thesis: input.thesis ?? null,
@@ -64,12 +65,29 @@ export async function upsertFund(input: FundInput) {
     updated_at: new Date().toISOString(),
   }
 
-  if (existing) {
-    const { error } = await supabase.from("funds").update(payload).eq("id", existing.id)
+  if (membership) {
+    const fundId = (membership as { fund_id: string }).fund_id
+    const { error } = await supabase.from("funds").update(payload).eq("id", fundId)
     if (error) return { error: error.message }
   } else {
-    const { error } = await supabase.from("funds").insert(payload)
-    if (error) return { error: error.message }
+    // First-time setup: create the fund AND insert the owner row in
+    // fund_members so subsequent lookups go through the membership path.
+    const { data: newFund, error: insertErr } = await supabase
+      .from("funds")
+      .insert({ ...payload, user_id: user.id })
+      .select("id")
+      .single()
+    if (insertErr) return { error: insertErr.message }
+
+    const newFundId = (newFund as { id: string }).id
+    const { error: memberErr } = await supabase
+      .from("fund_members")
+      .insert({ fund_id: newFundId, user_id: user.id, role: "owner" })
+    if (memberErr && memberErr.code !== "23505") {
+      // Roll back the fund row to keep the schema invariant clean.
+      await supabase.from("funds").delete().eq("id", newFundId)
+      return { error: memberErr.message }
+    }
   }
 
   // Fire-and-forget HubSpot sync — same pattern as fund-doc / fund-website /

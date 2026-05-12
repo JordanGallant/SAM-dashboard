@@ -48,7 +48,6 @@ export async function POST(request: Request) {
       .from("deals")
       .select("id, company_name, stage, user_id")
       .eq("id", dealId)
-      .eq("user_id", user.id)
       .single()
 
     if (dealErr || !deal) {
@@ -127,11 +126,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "n8n not configured" }, { status: 500 })
     }
 
-    const { data: fund } = await supabase
-      .from("funds")
-      .select("*")
+    // Fund profile: look up via fund_members so teammates trigger analysis
+    // against the shared fund context, not their (nonexistent) own fund.
+    const { data: membership } = await supabase
+      .from("fund_members")
+      .select("fund_id")
       .eq("user_id", user.id)
+      .limit(1)
       .maybeSingle()
+    const { data: fund } = membership
+      ? await supabase
+          .from("funds")
+          .select("*")
+          .eq("id", (membership as { fund_id: string }).fund_id)
+          .maybeSingle()
+      : { data: null }
     const fundProfileForN8n = fund
       ? {
           name: fund.name,

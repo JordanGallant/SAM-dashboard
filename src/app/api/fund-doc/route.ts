@@ -92,14 +92,23 @@ export async function POST(request: Request) {
       )
     }
 
-    // Find or create the funds row, then attach the doc.
-    const { data: existing } = await supabase
-      .from("funds")
-      .select(
-        "id, name, website, thesis, stage_focus, sector_focus, geo_focus, ticket_size_min, ticket_size_max, additional, one_pager_filename"
-      )
+    // Find the shared fund row via fund_members (works for owner + teammates).
+    const { data: membership } = await supabase
+      .from("fund_members")
+      .select("fund_id")
       .eq("user_id", user.id)
+      .limit(1)
       .maybeSingle()
+    const memberFundId = (membership as { fund_id: string } | null)?.fund_id ?? null
+    const { data: existing } = memberFundId
+      ? await supabase
+          .from("funds")
+          .select(
+            "id, name, website, thesis, stage_focus, sector_focus, geo_focus, ticket_size_min, ticket_size_max, additional, one_pager_filename"
+          )
+          .eq("id", memberFundId)
+          .maybeSingle()
+      : { data: null }
 
     // If they had a previous doc, remove the old file from storage so we
     // don't leak orphaned PDFs.
@@ -268,11 +277,20 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { data: existing } = await supabase
-      .from("funds")
-      .select("id, one_pager_filename")
+    const { data: membership } = await supabase
+      .from("fund_members")
+      .select("fund_id")
       .eq("user_id", user.id)
+      .limit(1)
       .maybeSingle()
+    const memberFundId = (membership as { fund_id: string } | null)?.fund_id ?? null
+    const { data: existing } = memberFundId
+      ? await supabase
+          .from("funds")
+          .select("id, one_pager_filename")
+          .eq("id", memberFundId)
+          .maybeSingle()
+      : { data: null }
 
     if (!existing) {
       return NextResponse.json({ success: true })

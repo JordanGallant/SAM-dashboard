@@ -58,7 +58,16 @@ function readPersisted(): Partial<Persisted> {
 
 export default function SetupPage() {
   const router = useRouter()
-  const { fund, loading: fundLoading, refetch: refetchFund } = useFundProfile()
+  const { fund, isOwner, loading: fundLoading, refetch: refetchFund } = useFundProfile()
+
+  // Invitees inherit the inviter's fund profile. Skip the wizard so they don't
+  // accidentally edit the owner's data — they land straight in the dealroom.
+  useEffect(() => {
+    if (!fundLoading && fund && !isOwner) {
+      router.replace("/deals")
+    }
+  }, [fund, isOwner, fundLoading, router])
+
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")

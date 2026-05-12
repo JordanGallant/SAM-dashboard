@@ -17,7 +17,6 @@ export async function POST(request: Request) {
       .from("deals")
       .select("company_name")
       .eq("id", dealId)
-      .eq("user_id", user.id)
       .single()
 
     const { data: analysis } = await supabase

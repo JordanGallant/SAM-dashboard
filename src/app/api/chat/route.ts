@@ -114,11 +114,11 @@ async function getScopedDealContext(
   }
 }
 
-async function getPipelineContext(supabase: Awaited<ReturnType<typeof createClient>>, userId: string): Promise<string> {
+async function getPipelineContext(supabase: Awaited<ReturnType<typeof createClient>>, _userId: string): Promise<string> {
+  // No explicit user_id filter — RLS scopes deals to the caller's team.
   const { data: deals } = await supabase
     .from("deals")
     .select("id, company_name, stage, status, created_at")
-    .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(20)
   if (!deals || deals.length === 0) return "PIPELINE: no deals yet."
@@ -135,11 +135,21 @@ async function getFundContext(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string
 ): Promise<string> {
-  const { data: row } = await supabase
-    .from("funds")
-    .select("*")
+  // Look up the user's fund via fund_members so teammates get the shared
+  // fund profile instead of nothing.
+  const { data: membership } = await supabase
+    .from("fund_members")
+    .select("fund_id")
     .eq("user_id", userId)
+    .limit(1)
     .maybeSingle()
+  const { data: row } = membership
+    ? await supabase
+        .from("funds")
+        .select("*")
+        .eq("id", (membership as { fund_id: string }).fund_id)
+        .maybeSingle()
+    : { data: null }
   if (!row) return "FUND PROFILE: not configured yet — user has not completed setup."
   const fund: FundProfile = dbToFund(row as DbFund)
   const lines = [

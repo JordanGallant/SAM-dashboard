@@ -290,14 +290,24 @@ export async function POST(request: Request) {
       )
     }
 
-    // Find or create the funds row.
-    const { data: existing } = await supabase
-      .from("funds")
-      .select(
-        "id, name, website, thesis, stage_focus, sector_focus, geo_focus, ticket_size_min, ticket_size_max, additional",
-      )
+    // Find the shared fund via fund_members so teammates' scrapes update the
+    // same row.
+    const { data: membership } = await supabase
+      .from("fund_members")
+      .select("fund_id")
       .eq("user_id", user.id)
+      .limit(1)
       .maybeSingle()
+    const memberFundId = (membership as { fund_id: string } | null)?.fund_id ?? null
+    const { data: existing } = memberFundId
+      ? await supabase
+          .from("funds")
+          .select(
+            "id, name, website, thesis, stage_focus, sector_focus, geo_focus, ticket_size_min, ticket_size_max, additional",
+          )
+          .eq("id", memberFundId)
+          .maybeSingle()
+      : { data: null }
 
     // LLM-extract structured fields from the scraped text. "website" hint
     // tells the model to be skeptical of marketing fluff.
