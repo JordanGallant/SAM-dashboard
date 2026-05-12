@@ -37,6 +37,7 @@ export function Footer() {
               <li><Link href="/how-it-works" className="hover:text-white transition-colors">How it works</Link></li>
               <li><Link href="/sample" className="hover:text-white transition-colors">Sample assessment</Link></li>
               <li><Link href="/#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+              <li><Link href="/#faq" className="hover:text-white transition-colors">FAQ</Link></li>
               <li><Link href="/for-angels" className="hover:text-white transition-colors">For angels</Link></li>
               <li><Link href="/for-teams" className="hover:text-white transition-colors">For teams</Link></li>
               <li><Link href="/for-vc-funds" className="hover:text-white transition-colors">For VC funds</Link></li>
@@ -50,6 +51,8 @@ export function Footer() {
               <li><Link href="/privacy" className="hover:text-white transition-colors">GDPR &amp; privacy</Link></li>
               <li><Link href="/login" className="hover:text-white transition-colors">Log in</Link></li>
               <li><Link href="/register?tier=professional" className="hover:text-white transition-colors">Analyse a deck</Link></li>
+              <li><a href="https://calendly.com/samvc" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Book a call</a></li>
+              <li><a href="mailto:hello@samvc.ai" className="hover:text-white transition-colors">Contact</a></li>
             </ul>
           </div>
         </div>

@@ -31,6 +31,10 @@ function DealsContent() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [retryingId, setRetryingId] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<Deal | null>(null)
+  // Lets the user X-out the failed-analyses banner. Tracks the set of deal
+  // ids dismissed in this session so the banner stays gone after a successful
+  // retry (which Realtime hasn't reflected yet).
+  const [dismissedFailedIds, setDismissedFailedIds] = useState<Set<string>>(new Set())
 
   function requestDelete(e: React.MouseEvent, deal: Deal) {
     e.preventDefault()
@@ -203,32 +207,50 @@ function DealsContent() {
         <DeckUploader onCreated={() => refetch()} />
       )}
 
-      {!loading && failedDeals.length > 0 && (
-        <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50/70 px-4 py-3 ring-1 ring-red-200">
-          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-700" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-red-900">
-              {failedDeals.length === 1 ? "1 analysis failed" : `${failedDeals.length} analyses failed`}
-            </p>
-            <p className="mt-0.5 text-[12.5px] text-red-900/80 leading-snug">
-              {failedDeals.length === 1
-                ? "Click below or use the per-deal Reanalyse button to retry."
-                : "Retry all at once or use the per-deal Reanalyse buttons below."}
-            </p>
+      {(() => {
+        const visibleFailed = failedDeals.filter((d) => !dismissedFailedIds.has(d.id))
+        if (loading || visibleFailed.length === 0) return null
+        return (
+          <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50/70 px-4 py-3 ring-1 ring-red-200">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-700" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-red-900">
+                {visibleFailed.length === 1 ? "1 analysis failed" : `${visibleFailed.length} analyses failed`}
+              </p>
+              <p className="mt-0.5 text-[12.5px] text-red-900/80 leading-snug">
+                {visibleFailed.length === 1
+                  ? "Click below or use the per-deal Reanalyse button to retry."
+                  : "Retry all at once or use the per-deal Reanalyse buttons below."}
+              </p>
+            </div>
+            <button
+              onClick={retryAllFailed}
+              disabled={retryingAll}
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-red-600 hover:bg-red-700 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-widest text-white transition-colors disabled:opacity-60"
+            >
+              {retryingAll ? (
+                <><Loader2 className="h-3 w-3 animate-spin" /> Retrying…</>
+              ) : (
+                <><RefreshCw className="h-3 w-3" /> Retry all</>
+              )}
+            </button>
+            <button
+              type="button"
+              aria-label="Dismiss"
+              onClick={() => {
+                setDismissedFailedIds((prev) => {
+                  const next = new Set(prev)
+                  for (const d of visibleFailed) next.add(d.id)
+                  return next
+                })
+              }}
+              className="shrink-0 ml-1 h-7 w-7 grid place-items-center rounded-full text-red-700/60 hover:bg-red-100 hover:text-red-900 transition-colors"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           </div>
-          <button
-            onClick={retryAllFailed}
-            disabled={retryingAll}
-            className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-red-600 hover:bg-red-700 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-widest text-white transition-colors disabled:opacity-60"
-          >
-            {retryingAll ? (
-              <><Loader2 className="h-3 w-3 animate-spin" /> Retrying…</>
-            ) : (
-              <><RefreshCw className="h-3 w-3" /> Retry all</>
-            )}
-          </button>
-        </div>
-      )}
+        )
+      })()}
 
       {!loading && deals.length > 0 && (
         <>

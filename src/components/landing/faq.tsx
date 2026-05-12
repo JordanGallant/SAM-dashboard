@@ -147,7 +147,7 @@ export function FAQ() {
   const [open, setOpen] = useState<number | null>(0)
 
   return (
-    <section className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-white via-[#FAFAF7] to-white">
+    <section id="faq" className="relative py-24 md:py-28 border-t overflow-hidden bg-gradient-to-b from-white via-[#FAFAF7] to-white">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_50%_40%_at_80%_40%,rgba(0,168,107,0.08),transparent_70%)]" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_40%_30%_at_20%_70%,rgba(127,217,170,0.10),transparent_70%)]" />
 

@@ -36,7 +36,9 @@ export function AppSidebar() {
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] shadow-md shadow-primary/20 ring-1 ring-[#B5D33C]/20 group-hover:shadow-lg group-hover:shadow-primary/30 transition-all">
             <BarChart3 className="h-4 w-4 text-[#B5D33C]" />
           </div>
-          <span className="text-lg font-bold font-heading tracking-tight text-[#0F3D2E]">Sam</span>
+          <span className="text-lg font-bold font-heading tracking-tight text-[#0F3D2E]">
+            sam<span className="opacity-50">/</span>
+          </span>
         </Link>
       </SidebarHeader>
       <SidebarContent>

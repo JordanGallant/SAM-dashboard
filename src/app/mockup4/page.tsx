@@ -52,7 +52,6 @@ export default function Mockup4() {
       <main>
         <Hero />
         <TickerBar />
-        <LimeMarquee />
         <LogoBand />
         <OnePlatform />
         <FounderNarrative />
@@ -549,14 +548,14 @@ function LogoBand() {
           </h2>
           <div className="mt-9 grid grid-cols-3 gap-8 items-center">
             {partners.map((p) => (
-              <div key={p.name} className="flex items-center justify-start h-12">
+              <div key={p.name} className="flex items-center justify-center h-12">
                 <Image
                   src={p.logo}
                   alt={p.name}
                   width={180}
                   height={48}
                   unoptimized
-                  className={`max-h-10 w-auto object-contain grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition ${p.invert ? "invert" : ""}`}
+                  className={`max-h-8 w-auto object-contain grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition ${p.invert ? "invert" : ""}`}
                 />
               </div>
             ))}

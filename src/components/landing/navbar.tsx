@@ -53,6 +53,14 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <a
+            href="https://calendly.com/samvc"
+            target="_blank"
+            rel="noreferrer"
+            className="hidden md:inline-flex text-[13.5px] hover:opacity-60 transition"
+          >
+            Book a call
+          </a>
           <Link
             href="/login"
             className="hidden sm:inline-flex text-[13.5px] hover:opacity-60 transition"
@@ -99,10 +107,19 @@ export function Navbar() {
                 {l.label}
               </Link>
             ))}
+            <a
+              href="https://calendly.com/samvc"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setMobileOpen(false)}
+              className="mt-3 text-[14px] py-2.5 font-semibold"
+            >
+              Book a call
+            </a>
             <Link
               href="/login"
               onClick={() => setMobileOpen(false)}
-              className="mt-3 text-[14px] py-2.5 font-semibold"
+              className="text-[14px] py-2.5 font-semibold"
             >
               Sign in
             </Link>
