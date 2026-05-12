@@ -28,7 +28,6 @@ import {
   FileText,
   Mail,
   Sparkles,
-  PlayCircle,
 } from "lucide-react"
 
 // ---------- design tokens ----------
@@ -1155,15 +1154,6 @@ function CaseStudyTile() {
         SAM
       </div>
 
-      {/* watch story pill — bottom-left, in front */}
-      <button
-        type="button"
-        className="relative self-start inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[13px] font-semibold transition hover:scale-[1.02]"
-        style={{ color: ACCENT }}
-      >
-        <PlayCircle className="h-4 w-4" />
-        Watch story
-      </button>
     </motion.div>
   )
 }
