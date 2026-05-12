@@ -55,7 +55,8 @@ export async function upsertFund(input: FundInput) {
 
   // Lookup happens through fund_members so a teammate editing the fund
   // profile updates the *owner's* fund row, not a phantom new fund.
-  const { data: membership } = await supabase
+  // Use admin client to avoid the fund_members RLS recursion (see 008).
+  const { data: membership } = await adminClient()
     .from("fund_members")
     .select("fund_id, role")
     .eq("user_id", user.id)

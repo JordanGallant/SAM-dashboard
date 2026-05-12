@@ -128,7 +128,14 @@ export async function POST(request: Request) {
 
     // Fund profile: look up via fund_members so teammates trigger analysis
     // against the shared fund context, not their (nonexistent) own fund.
-    const { data: membership } = await supabase
+    // Admin client avoids fund_members RLS recursion (see 008).
+    const { createClient: createAdminClient } = await import("@supabase/supabase-js")
+    const admin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } },
+    )
+    const { data: membership } = await admin
       .from("fund_members")
       .select("fund_id")
       .eq("user_id", user.id)

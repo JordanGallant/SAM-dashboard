@@ -137,7 +137,14 @@ async function getFundContext(
 ): Promise<string> {
   // Look up the user's fund via fund_members so teammates get the shared
   // fund profile instead of nothing.
-  const { data: membership } = await supabase
+  // Admin client avoids fund_members RLS recursion (see 008).
+  const { createClient: createAdminClient } = await import("@supabase/supabase-js")
+  const admin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } },
+  )
+  const { data: membership } = await admin
     .from("fund_members")
     .select("fund_id")
     .eq("user_id", userId)

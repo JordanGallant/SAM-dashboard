@@ -94,7 +94,13 @@ export async function POST(request: Request) {
     }
 
     // Find the shared fund row via fund_members (works for owner + teammates).
-    const { data: membership } = await supabase
+    // Use admin client to avoid fund_members RLS recursion (see 008).
+    const admin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } },
+    )
+    const { data: membership } = await admin
       .from("fund_members")
       .select("fund_id")
       .eq("user_id", user.id)
@@ -102,7 +108,7 @@ export async function POST(request: Request) {
       .maybeSingle()
     const memberFundId = (membership as { fund_id: string } | null)?.fund_id ?? null
     const { data: existing } = memberFundId
-      ? await supabase
+      ? await admin
           .from("funds")
           .select(
             "id, name, website, thesis, stage_focus, sector_focus, geo_focus, ticket_size_min, ticket_size_max, additional, one_pager_filename"
@@ -205,13 +211,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
       // Seat the creator as owner so /settings/members works for them too.
-      // Uses the service role: the fund_members RLS requires existing membership,
-      // which is circular for the very first owner row.
-      const admin = createAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        { auth: { persistSession: false } },
-      )
+      // (Reuses the admin client created above.)
       await admin
         .from("fund_members")
         .insert({ fund_id: (newFund as { id: string }).id, user_id: user.id, role: "owner" })

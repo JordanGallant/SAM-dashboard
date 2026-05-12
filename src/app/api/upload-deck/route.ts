@@ -231,7 +231,14 @@ export async function POST(request: Request) {
     }
 
     // Use fund_members so teammates upload decks against the shared fund_id.
-    const { data: membership } = await supabase
+    // Admin client avoids the RLS recursion on fund_members (see 008).
+    const { createClient: createAdminClient } = await import("@supabase/supabase-js")
+    const admin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } },
+    )
+    const { data: membership } = await admin
       .from("fund_members")
       .select("fund_id")
       .eq("user_id", user.id)
