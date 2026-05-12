@@ -440,6 +440,31 @@ function BillingContent() {
         </section>
       )}
 
+      {/* Soft-out above the coupon entry. Users who hit the paywall and don't
+          have a code aren't trapped — they have a path to a human conversation
+          right where the decision pressure peaks. */}
+      {(isInactive || isExpiredTrial) && (
+        <div className="rounded-2xl bg-[#FAFAF7] ring-1 ring-[#0F3D2E]/10 p-4 flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <p className="text-[13px] font-semibold text-[#0F3D2E]">
+              Want to talk first?
+            </p>
+            <p className="text-[12.5px] text-muted-foreground">
+              Book a 15-min call to see SAM in your own pipeline before subscribing.
+            </p>
+          </div>
+          <a
+            href="https://calendly.com/samvc"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-4 py-2 text-[13px] font-semibold transition shrink-0"
+          >
+            Book a 15-min call
+            <ArrowRight className="h-3.5 w-3.5" />
+          </a>
+        </div>
+      )}
+
       {/* Coupon-gated trial entry. Hidden when the user already has a live
           sub — switching with a coupon goes through the customer portal,
           not a fresh checkout, so this section would just confuse. */}

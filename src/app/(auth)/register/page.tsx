@@ -224,6 +224,22 @@ function RegisterContent() {
             Sign in
           </Link>
         </p>
+
+        {/* Soft-out for cold prospects who aren't ready to drop a card.
+            Front-loads a human conversation option before the Stripe page. */}
+        {!inviteToken && (
+          <p className="mt-3 text-center text-[12px] text-muted-foreground">
+            Not ready yet?{" "}
+            <a
+              href="https://calendly.com/samvc"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-foreground hover:underline"
+            >
+              Book a 15-min call
+            </a>
+          </p>
+        )}
       </div>
     </div>
   )
