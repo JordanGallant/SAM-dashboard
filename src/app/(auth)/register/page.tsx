@@ -213,7 +213,14 @@ function RegisterContent() {
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href={`/login?tier=${tierParam}`} className="font-medium text-foreground hover:underline">
+          <Link
+            href={
+              inviteToken
+                ? `/login?invite=${encodeURIComponent(inviteToken)}&email=${encodeURIComponent(invitedEmail)}`
+                : `/login?tier=${tierParam}`
+            }
+            className="font-medium text-foreground hover:underline"
+          >
             Sign in
           </Link>
         </p>

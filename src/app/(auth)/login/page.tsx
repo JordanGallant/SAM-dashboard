@@ -1,14 +1,15 @@
 "use client"
 
-import { useState, Suspense } from "react"
+import { useEffect, useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { BarChart3, Loader2, Shield, ArrowRight, ArrowLeft } from "lucide-react"
+import { BarChart3, Loader2, Shield, ArrowRight, ArrowLeft, Users } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import type { Tier } from "@/lib/types/user"
 import { GoogleButton } from "@/components/auth/google-button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { acceptInvite } from "@/app/actions/members"
 
 type Step = "credentials" | "mfa"
 
@@ -16,6 +17,29 @@ function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tierParam = searchParams.get("tier") as Tier | null
+  const inviteToken = searchParams.get("invite")
+
+  // Already-signed-in invitee path: if a logged-in user lands here with an
+  // invite token in the URL, accept the invite immediately and redirect to
+  // /deals. Mirrors the same behaviour on /register so the invite flow
+  // works no matter which auth page the user clicks through.
+  useEffect(() => {
+    if (!inviteToken) return
+    let cancelled = false
+    ;(async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || cancelled) return
+      const result = await acceptInvite(inviteToken)
+      if (cancelled) return
+      if ("error" in result) {
+        setError(result.error)
+      } else {
+        router.push("/deals")
+      }
+    })()
+    return () => { cancelled = true }
+  }, [inviteToken, router])
 
   const [step, setStep] = useState<Step>("credentials")
   const [email, setEmail] = useState("")
@@ -85,6 +109,19 @@ function LoginContent() {
   }
 
   async function finishLogin() {
+    // Invite path beats every other post-login route. The user is here
+    // because they clicked an email invite link; once authenticated, accept
+    // the invite and drop them in /deals.
+    if (inviteToken) {
+      const result = await acceptInvite(inviteToken)
+      if ("error" in result) {
+        setError(result.error)
+        setLoading(false)
+        return
+      }
+      router.push("/deals")
+      return
+    }
     if (tierParam) {
       try {
         const res = await fetch("/api/stripe/checkout", {
@@ -180,7 +217,11 @@ function LoginContent() {
       </p>
 
       <div className="mt-7 space-y-4">
-        <GoogleButton label="Sign in with Google" tier={tierParam} />
+        <GoogleButton
+          label={inviteToken ? "Continue with Google" : "Sign in with Google"}
+          tier={tierParam}
+          inviteToken={inviteToken}
+        />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
