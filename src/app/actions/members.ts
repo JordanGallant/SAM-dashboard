@@ -218,10 +218,12 @@ export async function createInvite(
     return { error: `Seat limit reached (${effectiveCap}). Revoke a pending invite or remove a member first.` }
   }
 
-  // Generate token + insert. Unique partial index on (fund_id, lower(email))
-  // prevents duplicate pending invites for the same email.
+  // Generate token + insert via admin client. We've already validated
+  // tier + membership + seat cap above, so RLS isn't load-bearing here.
+  // Unique partial index on (fund_id, lower(email)) prevents duplicate
+  // pending invites for the same email.
   const token = randomBytes(24).toString("base64url")
-  const { data: inserted, error: insertErr } = await supabase
+  const { data: inserted, error: insertErr } = await adminClient()
     .from("fund_invitations")
     .insert({
       fund_id: fundId,
@@ -250,7 +252,7 @@ export async function createInvite(
 
   if (!sendResult.ok) {
     // Roll back the invite row so the user can retry cleanly.
-    await supabase.from("fund_invitations").delete().eq("id", (inserted as { id: string }).id)
+    await adminClient().from("fund_invitations").delete().eq("id", (inserted as { id: string }).id)
     return { error: `Couldn't send invite: ${sendResult.error}` }
   }
 
@@ -263,9 +265,10 @@ export async function revokeInvite(
 ): Promise<{ error: string } | { success: true }> {
   const ctx = await loadFundContext()
   if ("error" in ctx) return { error: String(ctx.error) }
-  const { supabase, fundId } = ctx
+  const { fundId } = ctx
 
-  const { error } = await supabase
+  // Admin client: membership already verified in loadFundContext.
+  const { error } = await adminClient()
     .from("fund_invitations")
     .update({ revoked_at: new Date().toISOString() })
     .eq("id", invitationId)
@@ -292,7 +295,8 @@ export async function removeMember(
     return { error: "Can't remove the fund owner. Transfer ownership first." }
   }
 
-  const { error } = await supabase
+  // Admin client: membership already verified in loadFundContext.
+  const { error } = await adminClient()
     .from("fund_members")
     .delete()
     .eq("fund_id", fundId)
@@ -345,9 +349,42 @@ export async function acceptInvite(
     }
   }
 
+  // One-fund-per-user invariant. If the caller is already in a fund (as
+  // owner or member), block — joining a second fund leaves the rest of the
+  // app picking an arbitrary one. Service-role read so we don't depend on
+  // RLS for a check that has to be authoritative.
+  const admin = adminClient()
+  const { data: existing } = await admin
+    .from("fund_members")
+    .select("fund_id, role")
+    .eq("user_id", user.id)
+    .limit(1)
+    .maybeSingle()
+  if (existing) {
+    const ex = existing as { fund_id: string; role: string }
+    if (ex.fund_id === inv.fund_id) {
+      // Idempotent: already a member of this exact fund — treat as success.
+      const { data: f } = await admin
+        .from("funds")
+        .select("name")
+        .eq("id", inv.fund_id)
+        .single()
+      return { joined: true, fundName: (f as { name: string } | null)?.name ?? "your fund" }
+    }
+    const { data: existingFund } = await admin
+      .from("funds")
+      .select("name")
+      .eq("id", ex.fund_id)
+      .maybeSingle()
+    const existingName = (existingFund as { name: string } | null)?.name ?? "another fund"
+    const action = ex.role === "owner" ? "delete it" : "leave it"
+    return {
+      error: `You already belong to "${existingName}". ${action === "delete it" ? "Delete" : "Leave"} that fund first before accepting this invite.`,
+    }
+  }
+
   // Insert membership + mark accepted. Use service role to bypass RLS on
   // a fund the new user isn't yet a member of (RLS read-after-write race).
-  const admin = adminClient()
   const { error: insErr } = await admin.from("fund_members").insert({
     fund_id: inv.fund_id,
     user_id: user.id,
