@@ -329,7 +329,12 @@ export async function acceptInvite(
   } = await supabase.auth.getUser()
   if (!user) return { error: "Not authenticated" }
 
-  const { data: invite } = await supabase
+  // Admin client: the invitee can't SELECT fund_invitations through RLS
+  // before they're on the fund (the policy is is_teammate(fund.user_id)).
+  // We strict-match the row's email against the authenticated user's email
+  // below, so authorization stays enforced in code.
+  const adminLookup = adminClient()
+  const { data: invite } = await adminLookup
     .from("fund_invitations")
     .select("id, fund_id, email, expires_at, accepted_at, revoked_at")
     .eq("token", token)
