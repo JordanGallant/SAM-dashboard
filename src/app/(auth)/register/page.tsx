@@ -82,6 +82,19 @@ function RegisterContent() {
       return
     }
 
+    // Supabase silently dedups when an email already exists with any provider
+    // (returns a user object with no identities and sends nothing). Without
+    // this guard the user is dumped on /check-email waiting for an email that
+    // will never arrive. Covers both signed-up-with-Google and previously-
+    // signed-up-with-password cases.
+    if (data.user.identities && data.user.identities.length === 0) {
+      setError(
+        "This email is already registered. Try signing in instead — or use 'Forgot password?' if you originally signed up with Google.",
+      )
+      setLoading(false)
+      return
+    }
+
     if (!data.session) {
       // For invite flow: still need email confirmation before joining the fund.
       // The token + email pass through so /auth/callback completes acceptance.
