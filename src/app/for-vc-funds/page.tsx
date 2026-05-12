@@ -225,6 +225,7 @@ export default function ForVCFundsPage() {
                 </h2>
                 <p className="mt-5 mx-auto max-w-xl text-[15.5px] leading-[1.55] text-white/70">
                   Custom pricing — based on team size and deal flow.
+                  Billed monthly by invoice.
                 </p>
 
                 <ul className="mt-9 grid gap-2.5 sm:grid-cols-2 max-w-2xl mx-auto text-left">

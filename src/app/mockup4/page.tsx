@@ -1498,6 +1498,14 @@ function Pricing() {
                   </span>
                 )}
               </div>
+              {t.price === "Custom" && (
+                <p
+                  className="mt-1.5 text-[11px] font-mono uppercase tracking-[0.18em]"
+                  style={{ color: SUBINK }}
+                >
+                  Billed monthly by invoice
+                </p>
+              )}
               <p
                 className="mt-4 text-[13.5px] leading-[1.5]"
                 style={{ color: t.highlighted ? "rgba(255,255,255,0.7)" : SUBINK }}

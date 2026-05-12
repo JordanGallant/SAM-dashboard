@@ -231,7 +231,7 @@ export function Pricing() {
                     )}
                   >
                     {tier.price === null
-                      ? "Based on team size and deal flow"
+                      ? "Billed monthly by invoice · based on team size"
                       : "Billed monthly · cancel anytime"}
                   </p>
 
