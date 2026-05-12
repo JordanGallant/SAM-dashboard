@@ -186,10 +186,13 @@ export async function createInvite(
   const ownerTier = ((ownerProfile as { tier: Tier } | null)?.tier ?? "starter") as Tier
   const status = (ownerProfile as { subscription_status: string } | null)?.subscription_status
 
-  // Tier gate: Pro paid only. Coupon trials (status='trial') are excluded.
-  // Fund tier is allowed too (unlimited seats, but feature is hidden in UI for now).
+  // Tier gate: Pro or Fund. Coupon trial users get full Pro features during
+  // the trial — gating them out would mean they never see team invites and
+  // never have a reason to convert. Past_due / canceled / inactive are blocked.
   if (ownerTier === "starter") return { error: "Upgrade to Pro to invite teammates" }
-  if (status !== "active") return { error: "Active paid plan required to invite teammates" }
+  if (status !== "active" && status !== "trial") {
+    return { error: "Active Pro plan required to invite teammates" }
+  }
 
   const cap = TIER_CONFIG[ownerTier].users
   const effectiveCap = cap === -1 ? 999 : cap

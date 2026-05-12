@@ -37,7 +37,7 @@ interface MembersData {
 }
 
 export default function MembersPage() {
-  const { tier, isTrialing, loading: tierLoading } = useTier()
+  const { loading: tierLoading } = useTier()
   const [data, setData] = useState<MembersData | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -111,7 +111,7 @@ export default function MembersPage() {
 
   const isPaidTeamTier =
     (data.ownerTier === "professional" || data.ownerTier === "fund") &&
-    data.ownerStatus === "active"
+    (data.ownerStatus === "active" || data.ownerStatus === "trial")
 
   if (!isPaidTeamTier) {
     return (
@@ -129,12 +129,6 @@ export default function MembersPage() {
           Upgrade to Pro
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
-        {tier === "professional" && isTrialing && (
-          <p className="mt-4 inline-flex items-center gap-1.5 text-[12px] text-muted-foreground">
-            <AlertCircle className="h-3.5 w-3.5" />
-            Coupon trials don&apos;t include team seats — they unlock after the first paid invoice.
-          </p>
-        )}
       </div>
     )
   }
