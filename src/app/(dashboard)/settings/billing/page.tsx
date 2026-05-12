@@ -422,11 +422,11 @@ function BillingContent() {
             )}
             {isTrialing && (
               <button
-                onClick={() => handleSubscribe(tier)}
-                disabled={loading !== null}
+                onClick={handleManage}
+                disabled={portalLoading}
                 className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-[#0F3D2E] to-[#00A86B] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all disabled:opacity-60"
               >
-                {loading === tier && <Loader2 className="h-4 w-4 animate-spin" />}
+                {portalLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Add payment method — keep my plan
               </button>
             )}
