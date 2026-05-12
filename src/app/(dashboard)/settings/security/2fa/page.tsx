@@ -240,7 +240,7 @@ function TwoFactorSetup() {
               <button
                 type="submit"
                 disabled={code.length !== 6 || verifying}
-                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-3 text-sm font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-3 text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {verifying && <Loader2 className="h-4 w-4 animate-spin" />}
                 Verify and enable 2FA
@@ -274,7 +274,7 @@ function TwoFactorSetup() {
                 router.push("/deals")
                 router.refresh()
               }}
-              className="group inline-flex items-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-2.5 text-sm font-semibold transition"
             >
               Go to dashboard
               <CheckCircle2 className="h-4 w-4" />

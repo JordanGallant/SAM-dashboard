@@ -310,9 +310,13 @@ export default function FundProfilePage() {
         </CardContent>
       </Card>
 
-      <Button onClick={handleSave} disabled={saving}>
+      <Button
+        onClick={handleSave}
+        disabled={saving}
+        className="bg-[#B5D33C] text-[#0F3D2E] hover:bg-[#B5D33C]/90 [a]:hover:bg-[#B5D33C]/90 rounded-full px-5 py-2.5 font-semibold"
+      >
         {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {saved && <CheckCircle2 className="mr-2 h-4 w-4 text-emerald-500" />}
+        {saved && <CheckCircle2 className="mr-2 h-4 w-4 text-[#0F3D2E]" />}
         {saved ? "Saved" : "Save Changes"}
       </Button>
     </div>

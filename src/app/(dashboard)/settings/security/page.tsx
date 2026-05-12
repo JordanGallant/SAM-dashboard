@@ -145,7 +145,7 @@ export default function SecurityPage() {
           ) : (
             <Link
               href={`/settings/security/2fa${config.twoFactorRequired ? "?required=true" : ""}`}
-              className="group inline-flex items-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-2.5 text-sm font-semibold transition"
             >
               <Shield className="h-4 w-4" />
               Enable 2FA
@@ -220,7 +220,7 @@ export default function SecurityPage() {
           <button
             type="submit"
             disabled={passwordLoading}
-            className="group inline-flex items-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            className="group inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-2.5 text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {passwordLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             Update password

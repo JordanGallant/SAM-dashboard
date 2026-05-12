@@ -424,7 +424,7 @@ function BillingContent() {
               <button
                 onClick={handleManage}
                 disabled={portalLoading}
-                className="group inline-flex items-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all disabled:opacity-60"
+                className="group inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-2.5 text-sm font-semibold transition disabled:opacity-60"
               >
                 {portalLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Add payment method — keep my plan
@@ -486,7 +486,7 @@ function BillingContent() {
             <button
               type="submit"
               disabled={couponLoading || !coupon.trim()}
-              className="group inline-flex items-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-2 text-[13.5px] font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-2 text-[13.5px] font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {couponLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               Start Pro trial
@@ -565,7 +565,7 @@ function BillingContent() {
                   <button
                     onClick={() => handleSubscribe(t)}
                     disabled={loading !== null}
-                    className="mt-5 group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0A0A0A] text-white px-4 py-2 text-[13px] font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                    className="mt-5 group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-4 py-2 text-[13px] font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {loading === t && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                     {isInactive || isExpiredTrial || !hasStripeCustomer
@@ -639,7 +639,7 @@ function FundContactDialog({
             href="https://calendly.com/samvc"
             target="_blank"
             rel="noreferrer"
-            className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#0A0A0A] text-white px-4 py-2.5 text-[13px] font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all"
+            className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-4 py-2.5 text-[13px] font-semibold transition"
           >
             <Calendar className="h-3.5 w-3.5" />
             Book a 15-min call
@@ -789,7 +789,7 @@ function SwitchDialog({
                 type="button"
                 onClick={onConfirm}
                 disabled={submitting}
-                className="group inline-flex items-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-2 text-[13px] font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:hover:translate-y-0"
+                className="group inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-2 text-[13px] font-semibold transition disabled:opacity-60"
               >
                 {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Confirm {direction.toLowerCase()}

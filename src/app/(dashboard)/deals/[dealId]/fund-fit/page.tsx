@@ -69,7 +69,7 @@ export default function FundFitPage() {
           <div className="flex flex-wrap gap-2">
             <Link
               href="/settings/fund-profile"
-              className="group inline-flex items-center gap-2 rounded-full bg-[#0A0A0A] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-2.5 text-sm font-semibold transition"
             >
               <Settings className="h-4 w-4" />
               Add fund info

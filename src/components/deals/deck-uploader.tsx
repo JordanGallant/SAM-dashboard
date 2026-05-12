@@ -91,7 +91,7 @@ export function DeckUploader({
           className={`group inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold transition-all ${
             atTrialCap
               ? "bg-muted text-muted-foreground ring-1 ring-foreground/10 hover:bg-muted/70"
-              : "bg-[#0A0A0A] text-white shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5"
+              : "bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90"
           }`}
         >
           {atTrialCap ? <Sparkles className="h-4 w-4" /> : <UploadCloud className="h-4 w-4" />}
@@ -135,7 +135,7 @@ export function DeckUploader({
           </p>
           <button
             onClick={() => setPaywallOpen(true)}
-            className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-[#0A0A0A] text-white px-5 py-2.5 text-sm font-semibold shadow-md shadow-black/15 hover:shadow-lg hover:shadow-black/25 hover:-translate-y-0.5 transition-all"
+            className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-[#0F3D2E] text-white hover:bg-[#0F3D2E]/90 px-5 py-2.5 text-sm font-semibold transition"
           >
             Continue with Pro
           </button>
