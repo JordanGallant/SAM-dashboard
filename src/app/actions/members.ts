@@ -413,6 +413,49 @@ export async function acceptInvite(
 }
 
 /**
+ * Returns any pending invite for the currently signed-in user's email.
+ * Used by the dashboard pending-invite banner so users who slipped past
+ * the auth-page invite-accept paths (e.g. browser cache, OAuth without
+ * the invite param) can still complete the join from inside the app.
+ */
+export async function getPendingInviteForCurrentUser(): Promise<
+  { error: string } | { invite: null } | { invite: { id: string; token: string; fundName: string } }
+> {
+  const supabase = await createServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user || !user.email) return { invite: null }
+
+  const admin = adminClient()
+  const { data: inv } = await admin
+    .from("fund_invitations")
+    .select("id, fund_id, token, expires_at, accepted_at, revoked_at, email")
+    .ilike("email", user.email)
+    .is("accepted_at", null)
+    .is("revoked_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (!inv) return { invite: null }
+  const row = inv as { id: string; fund_id: string; token: string }
+  const { data: fund } = await admin
+    .from("funds")
+    .select("name")
+    .eq("id", row.fund_id)
+    .single()
+  return {
+    invite: {
+      id: row.id,
+      token: row.token,
+      fundName: (fund as { name: string } | null)?.name ?? "your team",
+    },
+  }
+}
+
+/**
  * Used by /setup and onboarding flows: returns true if the current user
  * is already a member of a fund (i.e. accepted an invite — skip wizard).
  */

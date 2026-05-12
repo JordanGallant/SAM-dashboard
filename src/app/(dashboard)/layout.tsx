@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import { Topbar } from "@/components/layout/topbar"
+import { PendingInviteBanner } from "@/components/layout/pending-invite-banner"
 import { TierProvider } from "@/lib/tier-context"
 import { UploadProvider } from "@/components/upload-context"
 
@@ -18,6 +19,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {!hideSidebar && <AppSidebar />}
           <SidebarInset>
             <Topbar showSidebarTrigger={!hideSidebar} />
+            <PendingInviteBanner />
             <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
           </SidebarInset>
         </SidebarProvider>
