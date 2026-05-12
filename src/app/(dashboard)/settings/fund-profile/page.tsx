@@ -313,7 +313,7 @@ export default function FundProfilePage() {
       <Button
         onClick={handleSave}
         disabled={saving}
-        className="bg-[#B5D33C] text-[#0F3D2E] hover:bg-[#B5D33C]/90 [a]:hover:bg-[#B5D33C]/90 rounded-full px-5 py-2.5 font-semibold"
+        className="bg-[#B5D33C] text-[#0F3D2E] hover:bg-[#E0FF80] [a]:hover:bg-[#E0FF80] rounded-full px-5 py-2.5 font-semibold"
       >
         {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {saved && <CheckCircle2 className="mr-2 h-4 w-4 text-[#0F3D2E]" />}
