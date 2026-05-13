@@ -141,7 +141,8 @@ function LoginContent() {
         setLoading(false)
         return
       }
-      router.push("/deals")
+      // Full reload (not router.push) — see comment below.
+      window.location.href = "/deals"
       return
     }
     if (tierParam) {
@@ -160,8 +161,14 @@ function LoginContent() {
         // fall through to deals
       }
     }
-    router.push("/deals")
-    router.refresh()
+    // Full reload instead of router.push so the next request carries the
+    // freshly-set Supabase session cookie. With router.push the navigation
+    // happens client-side before the cookie has propagated to the next
+    // server request — middleware sees no session, redirects back, and the
+    // spinner sits forever. A hard reload reissues the GET with cookies
+    // attached and middleware lands the user on /deals on the first hop.
+    // Bug surfaced 2026-05-13 on Juriaan's account.
+    window.location.href = "/deals"
   }
 
   if (step === "mfa") {
