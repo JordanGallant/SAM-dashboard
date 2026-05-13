@@ -145,14 +145,11 @@ export async function updateSession(request: NextRequest) {
 
     // MFA enforcement.
     //
-    // Two cases to distinguish (using Supabase's Assurance Level):
-    //  - currentLevel = aal2: user has passed MFA in this session. Done.
-    //  - currentLevel = aal1, nextLevel = aal2: user has verified factors but
-    //    hasn't been challenged this session. Common with Google OAuth — the
-    //    /login page handles challenge for email/password, but /auth/callback
-    //    does not. Force these users through /auth/verify-mfa.
-    //  - nextLevel = aal1: user has no factors. Fund-tier users must enrol;
-    //    everyone else can proceed.
+    // 2FA is OPT-IN. Users who voluntarily enrol via /settings/security still
+    // get the per-session challenge (case 1 below) so a stolen session can't
+    // bypass it. No tier is forced to enrol — the fund-tier auto-redirect was
+    // a UX trap (any /settings/security/2fa visit auto-creates a TOTP factor,
+    // so users sent there mid-loop got stuck behind a QR code with no exit).
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
     const currentLevel = aal?.currentLevel
     const nextLevel = aal?.nextLevel
@@ -161,7 +158,7 @@ export async function updateSession(request: NextRequest) {
       pathname.startsWith("/settings/security") ||
       pathname === "/auth/verify-mfa"
 
-    // (1) User has verified factors but session is still aal1. Force challenge.
+    // User has verified factors but session is still aal1. Force challenge.
     if (
       nextLevel === "aal2" &&
       currentLevel !== "aal2" &&
@@ -170,18 +167,6 @@ export async function updateSession(request: NextRequest) {
       const url = request.nextUrl.clone()
       url.pathname = "/auth/verify-mfa"
       if (pathname && pathname !== "/") url.searchParams.set("next", pathname)
-      return NextResponse.redirect(url)
-    }
-
-    // (2) Fund-tier users must enrol if they don't have any factors yet.
-    if (
-      profile?.tier === "fund" &&
-      nextLevel === "aal1" &&
-      !onSecurityPath
-    ) {
-      const url = request.nextUrl.clone()
-      url.pathname = "/settings/security/2fa"
-      url.searchParams.set("required", "true")
       return NextResponse.redirect(url)
     }
 
