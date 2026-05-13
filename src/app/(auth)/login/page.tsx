@@ -10,6 +10,7 @@ import { GoogleButton } from "@/components/auth/google-button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { acceptInvite } from "@/app/actions/members"
+import { syncLeadToHubspot } from "@/app/actions/lead-sync"
 
 type Step = "credentials" | "mfa"
 
@@ -62,6 +63,13 @@ function LoginContent() {
       setLoading(false)
       return
     }
+
+    // Safety net for HubSpot capture. Email+password users whose confirm-link
+    // PKCE exchange silently failed (cross-browser click, email scanner
+    // pre-fetch, expired cookie) never make it through /auth/callback. Fire
+    // upsert here so every authenticated user is in the CRM. Idempotent on
+    // email, fire-and-forget, never blocks login.
+    void syncLeadToHubspot({ email }).catch(() => {})
 
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
     if (aal?.nextLevel === "aal2") {

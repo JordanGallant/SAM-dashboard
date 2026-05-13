@@ -19,7 +19,7 @@ function BillingContent() {
   const showSubscribe = searchParams.get("subscribe") === "true"
   const showCanceled = searchParams.get("canceled") === "true"
 
-  const { tier, config, isTrialing, trialDaysLeft } = useTier()
+  const { tier, config, limits, isTrialing, trialDaysLeft } = useTier()
   const [loading, setLoading] = useState<Tier | null>(null)
   const [portalLoading, setPortalLoading] = useState(false)
   const [portalError, setPortalError] = useState<string | null>(null)
@@ -80,7 +80,10 @@ function BillingContent() {
     })
   }, [])
 
-  const memoCap = config.dealsPerMonth // -1 = unlimited
+  // Effective monthly memo cap. Per-fund override (set via /admin/limits)
+  // beats the tier default — surfacing the override here keeps the meter
+  // honest for customers with a bumped allowance.
+  const memoCap = limits.memos // -1 = unlimited
   const memoPct = memoCap === -1 || memoCap === 0 || memosUsed === null
     ? 0
     : Math.min(100, Math.round((memosUsed / memoCap) * 100))
@@ -352,17 +355,26 @@ function BillingContent() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-foreground/10 rounded-xl overflow-hidden ring-1 ring-foreground/10">
             {[
-              ["Analyses / mo", config.dealsPerMonth === -1 ? "Custom" : String(config.dealsPerMonth)],
-              ["Docs / deal", config.docsPerDeal === -1 ? "Custom" : String(config.docsPerDeal)],
-              ["Word export", config.wordExport ? "Yes" : "No"],
-              ["Fund Fit", config.fundFit ? "Yes" : "No"],
-            ].map(([label, value]) => (
+              [
+                "Analyses / mo",
+                limits.memos === -1 ? "Custom" : String(limits.memos),
+                limits.memosOverridden,
+              ],
+              ["Docs / deal", config.docsPerDeal === -1 ? "Custom" : String(config.docsPerDeal), false],
+              ["Word export", config.wordExport ? "Yes" : "No", false],
+              ["Fund Fit", config.fundFit ? "Yes" : "No", false],
+            ].map(([label, value, overridden]) => (
               <div key={label as string} className="bg-card p-4">
                 <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                   {label}
                 </p>
                 <p className="mt-1.5 font-heading font-bold text-[15px] text-[#0F3D2E]">
                   {value}
+                  {overridden && (
+                    <span className="ml-1.5 inline-flex items-center rounded-full bg-[#B5D33C]/30 ring-1 ring-[#B5D33C]/50 px-1.5 py-0.5 align-middle text-[9px] font-mono uppercase tracking-widest text-[#0F3D2E]">
+                      Custom
+                    </span>
+                  )}
                 </p>
               </div>
             ))}
@@ -564,6 +576,11 @@ function BillingContent() {
                     </>
                   )}
                 </div>
+                {tc.price === 0 && (
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    Payment via monthly invoice
+                  </p>
+                )}
 
                 <ul className="mt-4 space-y-1.5 text-[12.5px] flex-1">
                   <FeatureRow

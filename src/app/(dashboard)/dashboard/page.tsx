@@ -15,7 +15,7 @@ import { DeckUploader } from "@/components/deals/deck-uploader"
 export default function DashboardLanding() {
   const { deals, loading, refetch } = useDeals()
   const { fund } = useFundProfile()
-  const { config, isTrialing, trialDaysLeft } = useTier()
+  const { limits, isTrialing, trialDaysLeft } = useTier()
   const trialUsage = useTrialUsage()
 
   // Phase distribution.
@@ -39,7 +39,8 @@ export default function DashboardLanding() {
     return deals.filter((d) => new Date(d.createdAt) >= start).length
   }, [deals])
 
-  const memoCap = config.dealsPerMonth
+  // Effective monthly memo cap (honours per-fund overrides set via /admin/limits).
+  const memoCap = limits.memos
   const memoPct = memoCap === -1 || memoCap === 0
     ? 0
     : Math.min(100, Math.round((memosThisMonth / memoCap) * 100))

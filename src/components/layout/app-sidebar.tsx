@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { UploadCloud, BarChart3 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { UploadCloud, BarChart3, Shield } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +18,7 @@ import {
 import { useDeals } from "@/hooks/use-deals"
 import { STAGE_BADGE_COLORS } from "@/lib/constants"
 import { TrialChip } from "@/components/billing/trial-chip"
+import { getIsAdmin } from "@/app/actions/admin-limits"
 
 const verdictDotColors: Record<string, string> = {
   "Strong Buy": "bg-emerald-500",
@@ -28,6 +30,13 @@ const verdictDotColors: Record<string, string> = {
 export function AppSidebar() {
   const pathname = usePathname()
   const { deals, loading } = useDeals()
+  // Admin link visibility is a UI nicety, not a security boundary — the
+  // /admin/limits page + actions both re-check server-side. We just hide
+  // the link for non-admins so the sidebar isn't cluttered for customers.
+  const [isAdmin, setIsAdmin] = useState(false)
+  useEffect(() => {
+    getIsAdmin().then(setIsAdmin).catch(() => setIsAdmin(false))
+  }, [])
 
   return (
     <Sidebar className="border-r border-[#0F3D2E]/10 bg-white">
@@ -129,6 +138,36 @@ export function AppSidebar() {
             )}
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isAdmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="flex items-center px-2 pt-4 pb-2">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-semibold">
+                Admin
+              </span>
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-1">
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    render={<Link href="/admin/limits" />}
+                    isActive={pathname.startsWith("/admin/limits")}
+                    className={`h-auto py-2 rounded-xl transition-colors ${
+                      pathname.startsWith("/admin/limits")
+                        ? "bg-[#0F3D2E]/5 ring-1 ring-primary/30"
+                        : "hover:bg-[#FAFAF7]"
+                    }`}
+                  >
+                    <Shield className="h-3.5 w-3.5 text-[#0F3D2E]" />
+                    <span className="text-[13px] font-medium text-[#0F3D2E]">
+                      Limit overrides
+                    </span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
     </Sidebar>
   )

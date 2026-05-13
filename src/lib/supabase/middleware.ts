@@ -47,10 +47,6 @@ export async function updateSession(request: NextRequest) {
       "/privacy",
       "/terms",
       "/sample",
-      "/mockup1",
-      "/mockup2",
-      "/mockup3",
-      "/mockup4",
     ]
     const isPublic =
       publicRoutes.some((route) => pathname === route) ||
@@ -78,7 +74,11 @@ export async function updateSession(request: NextRequest) {
       pathname.startsWith("/settings/billing/") ||
       pathname === "/setup" ||
       pathname === "/checkout-redirect" ||
-      pathname.startsWith("/checkout/")
+      pathname.startsWith("/checkout/") ||
+      // Admin pages should always be reachable for whitelisted admins
+      // regardless of subscription state — they're not customers. The
+      // server actions behind /admin re-gate on isAdminEmail anyway.
+      pathname.startsWith("/admin/")
 
     if (paymentFlowAllowed) return supabaseResponse
 

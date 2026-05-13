@@ -11,6 +11,7 @@ import { GoogleButton } from "@/components/auth/google-button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { acceptInvite } from "@/app/actions/members"
+import { syncLeadToHubspot } from "@/app/actions/lead-sync"
 
 function RegisterContent() {
   const router = useRouter()
@@ -94,6 +95,12 @@ function RegisterContent() {
       setLoading(false)
       return
     }
+
+    // Capture the lead in HubSpot the moment they sign up, BEFORE email
+    // confirmation. /auth/callback also tries to upsert, but its PKCE code
+    // exchange silently fails in cross-browser/email-scanner cases — we lost
+    // ~5 leads to that path. This is the reliable signup-time write.
+    void syncLeadToHubspot({ email, fullName: name }).catch(() => {})
 
     if (!data.session) {
       // For invite flow: still need email confirmation before joining the fund.

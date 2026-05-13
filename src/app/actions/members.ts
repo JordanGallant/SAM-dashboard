@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto"
 import { revalidatePath } from "next/cache"
 import { createClient as createServerClient } from "@/lib/supabase/server"
 import { createClient as createAdminClient } from "@supabase/supabase-js"
-import { TIER_CONFIG } from "@/lib/tier-config"
+import { effectiveLimits } from "@/lib/effective-limits"
 import { sendInviteEmail } from "@/lib/email/send-invite"
 import type { Tier } from "@/lib/types/user"
 
@@ -110,7 +110,7 @@ export async function listMembers(): Promise<
   const [{ data: fund }, { data: members }, { data: invites }] = await Promise.all([
     admin
       .from("funds")
-      .select("id, name, user_id")
+      .select("id, name, user_id, seats_override, memos_override")
       .eq("id", fundId)
       .single(),
     admin
@@ -139,8 +139,14 @@ export async function listMembers(): Promise<
   const ownerTier = ((ownerProfile as { tier: Tier } | null)?.tier ?? "starter") as Tier
   const ownerStatus =
     (ownerProfile as { subscription_status: string } | null)?.subscription_status ?? "inactive"
-  const cap = TIER_CONFIG[ownerTier]?.users ?? 1
-  const seatCap = cap === -1 ? 999 : cap
+  // Honour per-fund overrides (009_fund_overrides.sql) so a customer whose
+  // admin bumped their seat count sees the right cap here.
+  const fundLimits = effectiveLimits({
+    tier: ownerTier,
+    seatsOverride: (fund as { seats_override?: number | null }).seats_override,
+    memosOverride: (fund as { memos_override?: number | null }).memos_override,
+  })
+  const seatCap = fundLimits.seats === -1 ? 999 : fundLimits.seats
 
   // Enrich each member row with email via admin lookup (reuse the
   // admin client created above).
@@ -179,10 +185,11 @@ export async function createInvite(
   if ("error" in ctx) return { error: String(ctx.error) }
   const { supabase, user, fundId } = ctx
 
-  // Seat check: owner's tier defines the cap.
+  // Seat check: owner's tier defines the cap, unless an /admin/limits override
+  // is set on the fund.
   const { data: fund } = await supabase
     .from("funds")
-    .select("user_id, name")
+    .select("user_id, name, seats_override, memos_override")
     .eq("id", fundId)
     .single()
   if (!fund) return { error: "Fund not found" }
@@ -203,8 +210,12 @@ export async function createInvite(
     return { error: "Active Pro plan required to invite teammates" }
   }
 
-  const cap = TIER_CONFIG[ownerTier].users
-  const effectiveCap = cap === -1 ? 999 : cap
+  const limits = effectiveLimits({
+    tier: ownerTier,
+    seatsOverride: (fund as { seats_override?: number | null }).seats_override,
+    memosOverride: (fund as { memos_override?: number | null }).memos_override,
+  })
+  const effectiveCap = limits.seats === -1 ? 999 : limits.seats
 
   const [{ count: memberCount }, { count: pendingCount }] = await Promise.all([
     supabase
@@ -361,9 +372,10 @@ export async function acceptInvite(
   }
 
   // One-fund-per-user invariant. If the caller is already in a fund (as
-  // owner or member), block — joining a second fund leaves the rest of the
-  // app picking an arbitrary one. Service-role read so we don't depend on
-  // RLS for a check that has to be authoritative.
+  // owner or member), we either auto-clean (empty solo fund — common
+  // when teammates self-served before being invited) or block with a
+  // clear message that includes the inviter's fund name (so duplicate
+  // "Green Whale" vs "Green Whale" isn't confusing).
   const admin = adminClient()
   const { data: existing } = await admin
     .from("fund_members")
@@ -371,26 +383,68 @@ export async function acceptInvite(
     .eq("user_id", user.id)
     .limit(1)
     .maybeSingle()
+
+  const { data: targetFundRow } = await admin
+    .from("funds")
+    .select("name")
+    .eq("id", inv.fund_id)
+    .single()
+  const targetFundName = (targetFundRow as { name: string } | null)?.name ?? "your fund"
+
   if (existing) {
     const ex = existing as { fund_id: string; role: string }
+
     if (ex.fund_id === inv.fund_id) {
       // Idempotent: already a member of this exact fund — treat as success.
-      const { data: f } = await admin
+      return { joined: true, fundName: targetFundName }
+    }
+
+    if (ex.role === "owner") {
+      // Auto-merge path: the invitee self-served before being invited and
+      // owns an empty stub fund. Silently delete + accept — saves them
+      // the "go delete your fund first" goose chase that broke the first
+      // real teammate (mlppieterse@hotmail.com hit this on 2026-05-12).
+      // Deals are the parent of documents + analyses (both keyed only by
+      // deal_id), so a zero deal count means the fund is empty of work.
+      const { count: dealCount } = await admin
+        .from("deals")
+        .select("id", { count: "exact", head: true })
+        .eq("fund_id", ex.fund_id)
+      const isEmpty = (dealCount ?? 0) === 0
+
+      if (isEmpty) {
+        // FK cascades on funds delete clean fund_members + fund_invitations.
+        const { error: delErr } = await admin.from("funds").delete().eq("id", ex.fund_id)
+        if (delErr) {
+          return { error: `Couldn't clean up your empty fund: ${delErr.message}` }
+        }
+        // Fall through to the insert below.
+      } else {
+        const { data: existingFund } = await admin
+          .from("funds")
+          .select("name")
+          .eq("id", ex.fund_id)
+          .maybeSingle()
+        const existingName = (existingFund as { name: string } | null)?.name ?? "your existing fund"
+        return {
+          error:
+            `You're trying to join "${targetFundName}", but you already own "${existingName}" with work in it. ` +
+            `Delete your fund from Settings → Fund profile first, then click the invite link again.`,
+        }
+      }
+    } else {
+      // role === "member" of a different team. Don't silently pull them out.
+      const { data: existingFund } = await admin
         .from("funds")
         .select("name")
-        .eq("id", inv.fund_id)
-        .single()
-      return { joined: true, fundName: (f as { name: string } | null)?.name ?? "your fund" }
-    }
-    const { data: existingFund } = await admin
-      .from("funds")
-      .select("name")
-      .eq("id", ex.fund_id)
-      .maybeSingle()
-    const existingName = (existingFund as { name: string } | null)?.name ?? "another fund"
-    const action = ex.role === "owner" ? "delete it" : "leave it"
-    return {
-      error: `You already belong to "${existingName}". ${action === "delete it" ? "Delete" : "Leave"} that fund first before accepting this invite.`,
+        .eq("id", ex.fund_id)
+        .maybeSingle()
+      const existingName = (existingFund as { name: string } | null)?.name ?? "another team"
+      return {
+        error:
+          `You're already on the "${existingName}" team. Leave that team from Settings → Members ` +
+          `before joining "${targetFundName}".`,
+      }
     }
   }
 
@@ -408,13 +462,7 @@ export async function acceptInvite(
     .update({ accepted_at: new Date().toISOString() })
     .eq("id", inv.id)
 
-  const { data: fund } = await admin
-    .from("funds")
-    .select("name")
-    .eq("id", inv.fund_id)
-    .single()
-
-  return { joined: true, fundName: (fund as { name: string } | null)?.name ?? "your fund" }
+  return { joined: true, fundName: targetFundName }
 }
 
 /**
