@@ -531,6 +531,7 @@ function LogoBand() {
     { name: "Green Whale Smart Capital", logo: "/partners/green-whale.png", invert: true },
     { name: "Heliphant", logo: "/partners/heliphant.png", invert: false },
     { name: "Spotlight Invest", logo: "/partners/spotlight-invest.png", invert: false },
+    { name: "Founder", logo: "/partners/foinderogo.jpg", invert: false },
   ]
   return (
     <section className="py-20 md:py-24">
@@ -546,7 +547,7 @@ function LogoBand() {
             Review every deck with the
             <span className="font-serif italic font-normal" style={{ color: ACCENT }}> same investment discipline</span>.
           </h2>
-          <div className="mt-9 grid grid-cols-3 gap-8 items-center">
+          <div className="mt-9 grid grid-cols-2 sm:grid-cols-4 gap-8 items-center">
             {partners.map((p) => (
               <div key={p.name} className="flex items-center justify-center h-12">
                 <Image
