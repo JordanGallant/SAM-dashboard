@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { BarChart3, Loader2, Shield, ArrowRight, ArrowLeft, Users } from "lucide-react"
+import { BarChart3, Loader2, Shield, ArrowRight, ArrowLeft, Users, AlertCircle } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import type { Tier } from "@/lib/types/user"
 import { GoogleButton } from "@/components/auth/google-button"
@@ -13,6 +13,20 @@ import { acceptInvite } from "@/app/actions/members"
 import { syncLeadToHubspot } from "@/app/actions/lead-sync"
 
 type Step = "credentials" | "mfa"
+
+// Supabase returns "Invalid login credentials" verbatim for both wrong email
+// and wrong password — they don't distinguish (anti-enumeration). We want to
+// show the user a clearer message + an inline reset CTA, so we match on the
+// error string. Keep the matcher tolerant: Supabase has tweaked this string
+// across versions ("Invalid login credentials" vs "Invalid email or password").
+function isInvalidCredentials(msg: string): boolean {
+  const m = msg.toLowerCase()
+  return (
+    m.includes("invalid login credentials") ||
+    m.includes("invalid email or password") ||
+    m.includes("invalid credentials")
+  )
+}
 
 function LoginContent() {
   const router = useRouter()
@@ -242,8 +256,26 @@ function LoginContent() {
 
         <form onSubmit={handleCredentials} className="space-y-4">
           {error && (
-            <div className="rounded-xl bg-red-50 ring-1 ring-red-200 px-3 py-2 text-[13px] text-red-700">
-              {error}
+            <div className="rounded-xl bg-red-50 ring-1 ring-red-300 px-3.5 py-3 flex items-start gap-2.5">
+              <AlertCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-red-800 leading-tight">
+                  {isInvalidCredentials(error) ? "Incorrect email or password" : "Couldn't sign you in"}
+                </p>
+                <p className="mt-0.5 text-[12px] text-red-700 leading-snug">
+                  {isInvalidCredentials(error)
+                    ? "Double-check your password — or reset it if you don't remember."
+                    : error}
+                </p>
+                {isInvalidCredentials(error) && (
+                  <Link
+                    href="/reset-password"
+                    className="mt-1.5 inline-block text-[12px] font-semibold text-red-800 underline hover:no-underline"
+                  >
+                    Reset password
+                  </Link>
+                )}
+              </div>
             </div>
           )}
           <div className="space-y-1.5">
