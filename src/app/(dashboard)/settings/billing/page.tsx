@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation"
 import { ExternalLink, Loader2, Check, X, AlertTriangle, Sparkles, CreditCard, ArrowRight, ArrowDown, ArrowUp, Calendar, Mail, Building2 } from "lucide-react"
 import { useTier } from "@/lib/tier-context"
 import { TIER_CONFIG } from "@/lib/tier-config"
+import { useTrialUsage } from "@/hooks/use-trial-usage"
 import type { Tier } from "@/lib/types/user"
 import { createClient } from "@/lib/supabase/client"
 import { SectionLabel } from "@/components/dashboard/section-label"
@@ -20,6 +21,11 @@ function BillingContent() {
   const showCanceled = searchParams.get("canceled") === "true"
 
   const { tier, config, limits, isTrialing, trialDaysLeft } = useTier()
+  // Coupon trials enforce a HARD total-decks cap (TRIAL_DEAL_CAP, currently 3)
+  // server-side in /api/upload-deck — not the tier's monthly cap. We have to
+  // mirror that here or the customer sees "30 / mo" while the server blocks
+  // them at the 3rd upload. Bug surfaced 2026-05-13.
+  const trial = useTrialUsage()
   const [loading, setLoading] = useState<Tier | null>(null)
   const [portalLoading, setPortalLoading] = useState(false)
   const [portalError, setPortalError] = useState<string | null>(null)
@@ -80,15 +86,20 @@ function BillingContent() {
     })
   }, [])
 
-  // Effective monthly memo cap. Per-fund override (set via /admin/limits)
-  // beats the tier default — surfacing the override here keeps the meter
-  // honest for customers with a bumped allowance.
-  const memoCap = limits.memos // -1 = unlimited
-  const memoPct = memoCap === -1 || memoCap === 0 || memosUsed === null
+  // Effective memo cap. Three branches:
+  //   1. Coupon trial — total-decks cap (trial.cap, default 3). NOT monthly.
+  //   2. Per-fund admin override — beats the tier default for paid plans.
+  //   3. Tier default from TIER_CONFIG.
+  // Trial uses trial.used (total deals) instead of `memosUsed` (this month)
+  // because the server cap is lifetime-during-trial, not calendar-month.
+  const onCouponTrial = trial.isTrialing && !trial.loading
+  const memoCap = onCouponTrial ? trial.cap : limits.memos // -1 = unlimited
+  const effectiveMemosUsed = onCouponTrial ? trial.used : memosUsed
+  const memoPct = memoCap === -1 || memoCap === 0 || effectiveMemosUsed === null
     ? 0
-    : Math.min(100, Math.round((memosUsed / memoCap) * 100))
+    : Math.min(100, Math.round((effectiveMemosUsed / memoCap) * 100))
   const memoNearLimit = memoCap > 0 && memoPct >= 80
-  const memoAtLimit = memoCap > 0 && memosUsed !== null && memosUsed >= memoCap
+  const memoAtLimit = memoCap > 0 && effectiveMemosUsed !== null && effectiveMemosUsed >= memoCap
 
   async function handleSubscribe(targetTier: Tier) {
     // Fund tier is sales-only — surface the contact dialog instead of trying
@@ -355,15 +366,18 @@ function BillingContent() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-foreground/10 rounded-xl overflow-hidden ring-1 ring-foreground/10">
             {[
-              [
-                "Analyses / mo",
-                limits.memos === -1 ? "Custom" : String(limits.memos),
-                limits.memosOverridden,
-              ],
-              ["Docs / deal", config.docsPerDeal === -1 ? "Custom" : String(config.docsPerDeal), false],
-              ["Word export", config.wordExport ? "Yes" : "No", false],
-              ["Fund Fit", config.fundFit ? "Yes" : "No", false],
-            ].map(([label, value, overridden]) => (
+              onCouponTrial
+                ? ["Trial decks", `${trial.used} / ${trial.cap}`, false, true]
+                : [
+                    "Analyses / mo",
+                    limits.memos === -1 ? "Custom" : String(limits.memos),
+                    limits.memosOverridden,
+                    false,
+                  ],
+              ["Docs / deal", config.docsPerDeal === -1 ? "Custom" : String(config.docsPerDeal), false, false],
+              ["Word export", config.wordExport ? "Yes" : "No", false, false],
+              ["Fund Fit", config.fundFit ? "Yes" : "No", false, false],
+            ].map(([label, value, overridden, trialPill]) => (
               <div key={label as string} className="bg-card p-4">
                 <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                   {label}
@@ -375,20 +389,27 @@ function BillingContent() {
                       Custom
                     </span>
                   )}
+                  {trialPill && (
+                    <span className="ml-1.5 inline-flex items-center rounded-full bg-amber-100 ring-1 ring-amber-300 px-1.5 py-0.5 align-middle text-[9px] font-mono uppercase tracking-widest text-amber-800">
+                      Trial
+                    </span>
+                  )}
                 </p>
               </div>
             ))}
           </div>
 
-          {/* Pilot #18: monthly memo usage meter. Hides for unlimited tiers. */}
-          {memoCap !== -1 && memosUsed !== null && (
+          {/* Pilot #18: memo usage meter. Hides for unlimited tiers.
+              For coupon-trial users, this is total-decks-during-trial (not
+              calendar month) so the meter matches the server-enforced cap. */}
+          {memoCap !== -1 && effectiveMemosUsed !== null && (
             <div className="mt-5">
               <div className="flex items-baseline justify-between mb-2">
                 <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold">
-                  Memos this month
+                  {onCouponTrial ? "Trial decks used" : "Memos this month"}
                 </p>
                 <p className="font-mono tabular-nums text-[13px] font-semibold">
-                  {memosUsed} / {memoCap}
+                  {effectiveMemosUsed} / {memoCap}
                 </p>
               </div>
               <div className="h-2 rounded-full bg-foreground/10 overflow-hidden">
