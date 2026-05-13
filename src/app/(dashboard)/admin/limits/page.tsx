@@ -1,11 +1,13 @@
 "use client"
 
 import { useEffect, useState, useTransition } from "react"
-import { Shield, Loader2, Check, AlertCircle, Building2 } from "lucide-react"
+import { Shield, Loader2, Check, AlertCircle, Building2, Crown, UserX } from "lucide-react"
 import {
   listAllFundsForAdmin,
+  listFundlessUsers,
   updateFundLimits,
   type AdminFundRow,
+  type AdminFundlessUser,
 } from "@/app/actions/admin-limits"
 
 // Admin-only editor for per-fund seat + memo overrides. Gated server-side
@@ -14,6 +16,7 @@ import {
 // clean response instead of broken UI.
 export default function AdminLimitsPage() {
   const [rows, setRows] = useState<AdminFundRow[] | null>(null)
+  const [fundless, setFundless] = useState<AdminFundlessUser[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -23,13 +26,19 @@ export default function AdminLimitsPage() {
 
   async function refresh() {
     setLoading(true)
-    const res = await listAllFundsForAdmin()
-    if ("error" in res) {
-      setError(res.error)
+    const [fundsRes, usersRes] = await Promise.all([
+      listAllFundsForAdmin(),
+      listFundlessUsers(),
+    ])
+    if ("error" in fundsRes) {
+      setError(fundsRes.error)
       setRows(null)
     } else {
       setError(null)
-      setRows(res.data)
+      setRows(fundsRes.data)
+    }
+    if (!("error" in usersRes)) {
+      setFundless(usersRes.data)
     }
     setLoading(false)
   }
@@ -86,6 +95,51 @@ export default function AdminLimitsPage() {
           <FundCard key={row.fundId} row={row} onSaved={refresh} />
         ))}
       </div>
+
+      {fundless && fundless.length > 0 && (
+        <div className="pt-4">
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-heading font-bold text-lg text-[#0A0A0A] inline-flex items-center gap-2">
+              <UserX className="h-4 w-4 text-[#0F3D2E]/70" />
+              No fund yet
+              <span className="font-mono tabular-nums text-[12px] text-muted-foreground">
+                ({fundless.length})
+              </span>
+            </h2>
+            <p className="text-[11.5px] text-muted-foreground">
+              Signed up but haven&apos;t joined a fund. No overrides apply until they do.
+            </p>
+          </div>
+          <div className="mt-3 rounded-2xl bg-card ring-1 ring-foreground/10 overflow-hidden">
+            <table className="w-full text-[13px]">
+              <thead className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                <tr className="border-b border-foreground/10">
+                  <th className="text-left px-4 py-2.5 font-semibold">Email</th>
+                  <th className="text-left px-4 py-2.5 font-semibold">Provider</th>
+                  <th className="text-left px-4 py-2.5 font-semibold">Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                {fundless.map((u) => (
+                  <tr key={u.userId} className="border-b border-foreground/5 last:border-b-0">
+                    <td className="px-4 py-2.5">{u.email}</td>
+                    <td className="px-4 py-2.5 text-muted-foreground font-mono text-[12px]">
+                      {u.provider ?? "—"}
+                    </td>
+                    <td className="px-4 py-2.5 text-muted-foreground font-mono tabular-nums text-[12px]">
+                      {new Date(u.createdAt).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -189,6 +243,37 @@ function FundCard({ row, onSaved }: { row: AdminFundRow; onSaved: () => void }) 
           disabled={pending}
         />
       </div>
+
+      {row.members.length > 0 && (
+        <div className="mt-5">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground font-bold mb-2">
+            Members
+          </p>
+          <ul className="rounded-xl bg-foreground/[0.03] ring-1 ring-foreground/10 divide-y divide-foreground/5">
+            {row.members.map((m) => (
+              <li
+                key={m.email + m.joinedAt}
+                className="flex items-center justify-between gap-3 px-3 py-2 text-[12.5px]"
+              >
+                <span className="inline-flex items-center gap-2 min-w-0">
+                  {m.role === "owner" ? (
+                    <Crown className="h-3.5 w-3.5 text-[#B5D33C] shrink-0" />
+                  ) : (
+                    <span className="h-3.5 w-3.5 shrink-0" />
+                  )}
+                  <span className="truncate">{m.email}</span>
+                </span>
+                <span className="font-mono tabular-nums text-[11px] text-muted-foreground shrink-0">
+                  {new Date(m.joinedAt).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                  })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {saveError && (
         <div className="mt-3 rounded-xl bg-red-50 ring-1 ring-red-200 px-3 py-2 text-[13px] text-red-700">

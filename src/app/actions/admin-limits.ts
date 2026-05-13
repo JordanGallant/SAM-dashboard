@@ -51,6 +51,15 @@ export interface AdminFundRow {
   memberCount: number
   pendingInvites: number
   memosThisMonth: number
+  /** Email list for every member of this fund (owner + teammates). */
+  members: { email: string; role: "owner" | "member"; joinedAt: string }[]
+}
+
+export interface AdminFundlessUser {
+  userId: string
+  email: string
+  createdAt: string
+  provider: string | null
 }
 
 export async function listAllFundsForAdmin(): Promise<
@@ -91,12 +100,13 @@ export async function listAllFundsForAdmin(): Promise<
     const ownerStatus =
       (ownerProfile as { subscription_status: string } | null)?.subscription_status ?? "inactive"
 
-    // Counts: members, pending invites, memos this month.
-    const [memberRes, inviteRes, memoRes] = await Promise.all([
+    // Counts + roster: members (with emails), pending invites, memos this month.
+    const [membersRes, inviteRes, memoRes] = await Promise.all([
       admin
         .from("fund_members")
-        .select("user_id", { count: "exact", head: true })
-        .eq("fund_id", f.id),
+        .select("user_id, role, joined_at")
+        .eq("fund_id", f.id)
+        .order("joined_at", { ascending: true }),
       admin
         .from("fund_invitations")
         .select("id", { count: "exact", head: true })
@@ -110,6 +120,21 @@ export async function listAllFundsForAdmin(): Promise<
         .gte("created_at", startOfMonth.toISOString()),
     ])
 
+    const memberRows = (membersRes.data ?? []) as Array<{
+      user_id: string
+      role: "owner" | "member"
+      joined_at: string
+    }>
+    const members: AdminFundRow["members"] = []
+    for (const m of memberRows) {
+      const { data: au } = await admin.auth.admin.getUserById(m.user_id)
+      members.push({
+        email: au?.user?.email ?? "(unknown)",
+        role: m.role,
+        joinedAt: m.joined_at,
+      })
+    }
+
     rows.push({
       fundId: f.id,
       fundName: f.name,
@@ -120,9 +145,10 @@ export async function listAllFundsForAdmin(): Promise<
       tierMemos: TIER_CONFIG[ownerTier].dealsPerMonth,
       seatsOverride: f.seats_override,
       memosOverride: f.memos_override,
-      memberCount: memberRes.count ?? 0,
+      memberCount: members.length,
       pendingInvites: inviteRes.count ?? 0,
       memosThisMonth: memoRes.count ?? 0,
+      members,
     })
   }
 
@@ -157,6 +183,55 @@ function normaliseOverride(v: number | null): number | null {
   if (typeof v !== "number" || !Number.isFinite(v)) return null
   if (v <= 0) return null
   return Math.floor(v)
+}
+
+/**
+ * Users who signed up but aren't in any fund_members row yet — abandoned
+ * onboarding, bots, manually-created accounts that never ran /setup. Surfaced
+ * so the admin can see who's lingering before any team activity.
+ */
+export async function listFundlessUsers(): Promise<
+  { error: string } | { data: AdminFundlessUser[] }
+> {
+  const gate = await gateAdmin()
+  if ("error" in gate) return { error: String(gate.error) }
+
+  const admin = adminClient()
+
+  // Page through all auth users (admin.listUsers caps at perPage; default 50).
+  const allUsers: Array<{
+    id: string
+    email: string | undefined
+    created_at: string
+    app_metadata?: { provider?: string }
+  }> = []
+  let page = 1
+  while (true) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 })
+    if (error) return { error: error.message }
+    if (!data.users.length) break
+    allUsers.push(...(data.users as typeof allUsers))
+    if (data.users.length < 200) break
+    page++
+  }
+
+  // Anyone in fund_members is excluded — that includes owners and teammates,
+  // which is exactly the "has a team" definition we want here.
+  const { data: members } = await admin.from("fund_members").select("user_id")
+  const seatedIds = new Set(((members ?? []) as Array<{ user_id: string }>).map((m) => m.user_id))
+
+  const rows: AdminFundlessUser[] = []
+  for (const u of allUsers) {
+    if (seatedIds.has(u.id)) continue
+    rows.push({
+      userId: u.id,
+      email: u.email ?? "(no email)",
+      createdAt: u.created_at,
+      provider: u.app_metadata?.provider ?? null,
+    })
+  }
+  rows.sort((a, b) => (b.createdAt < a.createdAt ? -1 : 1))
+  return { data: rows }
 }
 
 // Re-export so the admin page can preview effective values inline without
