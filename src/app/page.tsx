@@ -548,8 +548,8 @@ function LogoBand() {
             Review every deck with the
             <span className="font-serif italic font-normal" style={{ color: ACCENT }}> same investment discipline</span>.
           </h2>
-          <div className="mt-9 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 items-center">
-            {partners.map((p) => (
+          <div className="mt-9 flex flex-wrap items-center justify-center sm:justify-between gap-y-6 gap-x-8">
+            {partners.slice(0, 3).map((p) => (
               <div key={p.name} className="flex items-center justify-center h-12">
                 <Image
                   src={p.logo}
@@ -561,6 +561,22 @@ function LogoBand() {
                 />
               </div>
             ))}
+            {/* Square logos clustered with a tighter internal gap so they
+                don't drift apart on the wide row. */}
+            <div className="flex items-center gap-5">
+              {partners.slice(3).map((p) => (
+                <div key={p.name} className="flex items-center justify-center h-12">
+                  <Image
+                    src={p.logo}
+                    alt={p.name}
+                    width={180}
+                    height={48}
+                    unoptimized
+                    className={`${p.tall ? "max-h-12" : "max-h-8"} w-auto object-contain grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition ${p.invert ? "invert" : ""}`}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
