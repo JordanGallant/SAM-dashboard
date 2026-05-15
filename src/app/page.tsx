@@ -548,9 +548,12 @@ function LogoBand() {
             Review every deck with the
             <span className="font-serif italic font-normal" style={{ color: ACCENT }}> same investment discipline</span>.
           </h2>
-          <div className="mt-9 flex flex-wrap items-center justify-center sm:justify-between gap-y-6 gap-x-8">
-            {partners.slice(0, 3).map((p) => (
-              <div key={p.name} className="flex items-center justify-center h-12">
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-y-6 gap-x-10">
+            {partners.slice(0, 3).map((p, i) => (
+              <div
+                key={p.name}
+                className={`flex items-center justify-center h-12 ${i === 2 ? "lg:-translate-x-3" : ""}`}
+              >
                 <Image
                   src={p.logo}
                   alt={p.name}
