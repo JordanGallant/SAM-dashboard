@@ -528,11 +528,11 @@ function LimeMarquee() {
 // ============================================================
 function LogoBand() {
   const partners = [
-    { name: "Green Whale Smart Capital", logo: "/partners/green-whale.png", invert: true },
-    { name: "Heliphant", logo: "/partners/heliphant.png", invert: false },
-    { name: "Spotlight Invest", logo: "/partners/spotlight-invest.png", invert: false },
-    { name: "Founder", logo: "/partners/foinderogo.jpg", invert: false },
-    { name: "PF Briefpapier", logo: "/partners/pf-briefpapier.png", invert: false },
+    { name: "Green Whale Smart Capital", logo: "/partners/green-whale.png", invert: true, tall: false },
+    { name: "Heliphant", logo: "/partners/heliphant.png", invert: false, tall: false },
+    { name: "Spotlight Invest", logo: "/partners/spotlight-invest.png", invert: false, tall: false },
+    { name: "Founder", logo: "/partners/foinderogo.jpg", invert: false, tall: true },
+    { name: "PF Briefpapier", logo: "/partners/pf-briefpapier.png", invert: false, tall: true },
   ]
   return (
     <section className="py-20 md:py-24">
@@ -557,7 +557,7 @@ function LogoBand() {
                   width={180}
                   height={48}
                   unoptimized
-                  className={`max-h-8 w-auto object-contain grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition ${p.invert ? "invert" : ""}`}
+                  className={`${p.tall ? "max-h-12" : "max-h-8"} w-auto object-contain grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition ${p.invert ? "invert" : ""}`}
                 />
               </div>
             ))}
