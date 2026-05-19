@@ -221,7 +221,7 @@ function Hero() {
                 className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate"
                 style={{ background: "#FFF", border: `1px solid ${RULE}`, color: SUBINK }}
               >
-                samvc.ai/deals/nexicon/summary
+                samvc.ai/deals/spm-ai/summary
               </span>
             </div>
             {/* 2:1 viewport — top-aligned so the executive summary header
@@ -316,7 +316,7 @@ function PreviewCard() {
           <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
         </div>
-        <p className="ml-3 text-[12px] font-mono text-[#0A0A0A]/45">sam · nexicon · executive summary</p>
+        <p className="ml-3 text-[12px] font-mono text-[#0A0A0A]/45">sam · spm-ai · executive summary</p>
       </div>
 
       <div className="grid lg:grid-cols-[280px_1fr] gap-0">
@@ -325,7 +325,7 @@ function PreviewCard() {
           <p className="text-[10px] font-mono uppercase tracking-widest" style={{ color: SUBINK }}>Pipeline</p>
           <ul className="mt-4 space-y-2 text-[13.5px]">
             <li className="flex items-center justify-between p-2 rounded-lg" style={{ background: SOFT }}>
-              <span className="font-semibold">Nexicon</span>
+              <span className="font-semibold">SPM AI</span>
               <span className="font-mono text-[11px]" style={{ color: ACCENT }}>84</span>
             </li>
             {[
@@ -347,7 +347,7 @@ function PreviewCard() {
           <div className="flex items-baseline justify-between gap-4 mb-5">
             <div>
               <p className="text-[10px] font-mono uppercase tracking-widest" style={{ color: SUBINK }}>
-                nexicon · seed · €1.2M raise
+                spm-ai · seed · €1.2M raise
               </p>
               <h3 className="mt-1 font-bold text-[26px] tracking-[-0.02em]">Verdict: Strong Buy</h3>
             </div>
@@ -2261,7 +2261,7 @@ function SourceAttribution() {
                 className="ml-3 flex-1 rounded-md px-3 py-1 text-[11px] font-mono truncate"
                 style={{ background: "#FFF", border: `1px solid ${RULE}`, color: SUBINK }}
               >
-                samvc.ai/deals/nexicon/team
+                samvc.ai/deals/spm-ai/team
               </span>
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -2399,7 +2399,7 @@ function AskSamSection() {
               <Sparkles className="h-3.5 w-3.5" />
             </span>
             <p className="text-[10.5px] font-mono uppercase tracking-[0.2em]" style={{ color: SUBINK }}>
-              Ask Sam · Team analysis · Nexicon
+              Ask Sam · Team analysis · SPM AI
             </p>
           </div>
           <div className="p-5 space-y-3">
