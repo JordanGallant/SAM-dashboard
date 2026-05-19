@@ -78,8 +78,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, unchanged: true })
     }
 
+    const taxRateId = process.env.STRIPE_TAX_RATE_ID
+
     const updated = await stripe.subscriptions.update(live.id, {
-      items: [{ id: item.id, price: priceId }],
+      items: [
+        {
+          id: item.id,
+          price: priceId,
+          ...(taxRateId ? { tax_rates: [taxRateId] } : {}),
+        },
+      ],
+      ...(taxRateId ? { default_tax_rates: [taxRateId] } : {}),
       proration_behavior: "create_prorations",
       metadata: {
         supabase_user_id: user.id,

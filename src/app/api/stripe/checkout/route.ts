@@ -88,29 +88,44 @@ export async function POST(request: Request) {
     const effectiveTier: Tier = viaCoupon ? "professional" : tier
     const effectivePriceId = viaCoupon ? PRICE_IDS.professional ?? priceId : priceId
 
+    // VAT: prefer a configured manual Stripe Tax Rate (txr_…) over Stripe
+    // Tax's automatic engine — Stripe Tax requires tax_behavior to be set
+    // on every Price and an active tax registration, neither of which is
+    // configured on this account. The manual rate applies a flat 21% NL
+    // VAT to every checkout. When STRIPE_TAX_RATE_ID is not set, fall back
+    // to automatic_tax (works once Stripe Tax is fully set up).
+    const taxRateId = process.env.STRIPE_TAX_RATE_ID
+    const useManualTaxRate = Boolean(taxRateId)
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       // Don't hard-code payment_method_types. Stripe Checkout falls back to
       // payment methods enabled in your Stripe dashboard, so you can toggle
       // iDEAL / SEPA Debit / etc. without a deploy.
-      line_items: [{ price: effectivePriceId, quantity: 1 }],
+      line_items: [
+        {
+          price: effectivePriceId,
+          quantity: 1,
+          ...(useManualTaxRate ? { tax_rates: [taxRateId!] } : {}),
+        },
+      ],
       success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/settings/billing?canceled=true`,
-      // Stripe Tax: VAT (and any other applicable tax) is calculated and
-      // collected automatically based on the customer's billing address.
-      // Requires Stripe Tax to be active + at least one tax registration in
-      // the Stripe dashboard.
-      automatic_tax: { enabled: true },
-      // automatic_tax needs a billing address to compute the right rate.
+      // Collect billing address regardless of tax path — useful for
+      // invoicing and receipts.
       billing_address_collection: "required",
+      // Only enable automatic_tax when no manual rate is configured.
+      // The two systems are mutually exclusive.
+      ...(useManualTaxRate ? {} : { automatic_tax: { enabled: true } }),
       ...(profile?.stripe_customer_id
         ? {
             customer: profile.stripe_customer_id,
-            // When reusing an existing Customer, Stripe needs explicit
-            // permission to write the address/name captured at checkout
-            // back to the Customer record — without this, automatic_tax
-            // throws on customers who don't already have an address.
-            customer_update: { address: "auto", name: "auto" },
+            // When reusing a Customer with automatic_tax, Stripe needs
+            // explicit permission to write the captured address back.
+            // Not needed for the manual-rate path.
+            ...(useManualTaxRate
+              ? {}
+              : { customer_update: { address: "auto" as const, name: "auto" as const } }),
           }
         : { customer_email: user.email }),
       // Coupon path: pre-attach so the user doesn't have to paste it twice.
@@ -135,6 +150,9 @@ export async function POST(request: Request) {
         ...(viaCoupon ? { coupon: couponCode } : {}),
       },
       subscription_data: {
+        // Apply manual tax rate at the subscription level too — otherwise
+        // recurring invoices after the first one won't carry the rate.
+        ...(useManualTaxRate ? { default_tax_rates: [taxRateId!] } : {}),
         ...(viaCoupon
           ? {
               trial_period_days: 14,
