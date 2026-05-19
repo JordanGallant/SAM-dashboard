@@ -36,7 +36,11 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}/deals`)
       }
 
-      // If a specific next URL was provided, use it
+      // If a specific next URL was provided, use it. For recovery sessions
+      // the destination is /reset-password/confirm — short-circuit before the
+      // profile/subscription routing below, otherwise an expired-trial user
+      // resetting their password would get bounced to /settings/billing and
+      // never see the new-password form.
       if (next) {
         return NextResponse.redirect(`${origin}${next}`)
       }

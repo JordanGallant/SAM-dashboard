@@ -40,6 +40,7 @@ export async function updateSession(request: NextRequest) {
       "/login",
       "/register",
       "/reset-password",
+      "/reset-password/confirm",
       "/how-it-works",
       "/for-angels",
       "/for-teams",

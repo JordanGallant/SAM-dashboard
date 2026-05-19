@@ -20,7 +20,7 @@ export default function ResetPasswordPage() {
 
     const supabase = createClient()
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/settings/security`,
+      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password/confirm`,
     })
 
     if (error) {
@@ -75,6 +75,9 @@ export default function ResetPasswordPage() {
       </h1>
       <p className="mt-1.5 text-center text-sm text-muted-foreground">
         Enter your email and we&apos;ll send you a reset link.
+      </p>
+      <p className="mt-2 text-center text-[11px] text-muted-foreground/80">
+        Signed up with Google? Use the <Link href="/login" className="underline underline-offset-2 hover:text-foreground">Sign in with Google</Link> button instead.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-7 space-y-4">
