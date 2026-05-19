@@ -96,8 +96,22 @@ export async function POST(request: Request) {
       line_items: [{ price: effectivePriceId, quantity: 1 }],
       success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/settings/billing?canceled=true`,
+      // Stripe Tax: VAT (and any other applicable tax) is calculated and
+      // collected automatically based on the customer's billing address.
+      // Requires Stripe Tax to be active + at least one tax registration in
+      // the Stripe dashboard.
+      automatic_tax: { enabled: true },
+      // automatic_tax needs a billing address to compute the right rate.
+      billing_address_collection: "required",
       ...(profile?.stripe_customer_id
-        ? { customer: profile.stripe_customer_id }
+        ? {
+            customer: profile.stripe_customer_id,
+            // When reusing an existing Customer, Stripe needs explicit
+            // permission to write the address/name captured at checkout
+            // back to the Customer record — without this, automatic_tax
+            // throws on customers who don't already have an address.
+            customer_update: { address: "auto", name: "auto" },
+          }
         : { customer_email: user.email }),
       // Coupon path: pre-attach so the user doesn't have to paste it twice.
       // Direct-pay path: still allow the Stripe-native promo entry on the
