@@ -64,6 +64,25 @@ export function useTrialUsage() {
         return
       }
 
+      // Mirror server-side getTrialUsage: lift the hardcoded cap when the
+      // user's fund has a memos_override set by /admin/limits.
+      const { data: mem } = await supabase
+        .from("fund_members")
+        .select("fund_id")
+        .eq("user_id", user.id)
+        .limit(1)
+      const fundId = mem?.[0]?.fund_id as string | undefined
+      let cap = TRIAL_DEAL_CAP
+      if (fundId) {
+        const { data: fund } = await supabase
+          .from("funds")
+          .select("memos_override")
+          .eq("id", fundId)
+          .maybeSingle()
+        const override = (fund as { memos_override: number | null } | null)?.memos_override
+        if (typeof override === "number" && override > 0) cap = override
+      }
+
       const { count } = await supabase
         .from("deals")
         .select("id", { count: "exact", head: true })
@@ -71,13 +90,12 @@ export function useTrialUsage() {
 
       if (cancelled) return
       const used = count ?? 0
-      const remaining = Math.max(0, TRIAL_DEAL_CAP - used)
       setState({
         isTrialing: true,
         used,
-        cap: TRIAL_DEAL_CAP,
-        remaining,
-        atLimit: used >= TRIAL_DEAL_CAP,
+        cap,
+        remaining: Math.max(0, cap - used),
+        atLimit: used >= cap,
         loading: false,
       })
     }

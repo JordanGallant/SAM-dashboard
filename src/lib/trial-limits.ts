@@ -45,6 +45,26 @@ export async function getTrialUsage(
   const isTrialing = profile?.subscription_status === "trial"
   if (!isTrialing) return EMPTY
 
+  // Honour any admin-set memos_override on the user's fund — lifts the
+  // hardcoded 3-deck cap for staff / pilot accounts without flipping them
+  // to "active" (which would bypass the trial paywall entirely).
+  const { data: mem } = await supabase
+    .from("fund_members")
+    .select("fund_id")
+    .eq("user_id", userId)
+    .limit(1)
+  const fundId = (mem as Array<{ fund_id: string }> | null)?.[0]?.fund_id
+  let cap = TRIAL_DEAL_CAP
+  if (fundId) {
+    const { data: fund } = await supabase
+      .from("funds")
+      .select("memos_override")
+      .eq("id", fundId)
+      .maybeSingle()
+    const override = (fund as { memos_override: number | null } | null)?.memos_override
+    if (typeof override === "number" && override > 0) cap = override
+  }
+
   // Count total deals ever — trial users have no pre-trial access so this
   // equals "deals during current trial". Cheap query (one row), runs on
   // every gated action.
@@ -54,12 +74,11 @@ export async function getTrialUsage(
     .eq("user_id", userId)
 
   const used = count ?? 0
-  const remaining = Math.max(0, TRIAL_DEAL_CAP - used)
   return {
     isTrialing: true,
     used,
-    cap: TRIAL_DEAL_CAP,
-    remaining,
-    atLimit: used >= TRIAL_DEAL_CAP,
+    cap,
+    remaining: Math.max(0, cap - used),
+    atLimit: used >= cap,
   }
 }
