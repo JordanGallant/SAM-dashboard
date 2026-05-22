@@ -47,6 +47,8 @@ export async function sendInviteEmail({
 
   const text = `${safeInviter} invited you to join ${safeFund} on Sam.\n\nAccept the invite: ${acceptUrl}\n\nThis link expires in 14 days. If you weren't expecting this, you can ignore the email.`
 
+  const keyPrefix = `${apiKey.slice(0, 6)}…(len ${apiKey.length})`
+
   try {
     const resend = new Resend(apiKey)
     const result = await resend.emails.send({
@@ -57,10 +59,23 @@ export async function sendInviteEmail({
       text,
     })
     if (result.error) {
+      console.error("[resend.invite] send failed", {
+        keyPrefix,
+        from: FROM,
+        to,
+        error: result.error,
+      })
       return { ok: false, error: result.error.message }
     }
+    console.log("[resend.invite] send ok", { keyPrefix, from: FROM, to, id: result.data?.id })
     return { ok: true }
   } catch (err) {
+    console.error("[resend.invite] threw", {
+      keyPrefix,
+      from: FROM,
+      to,
+      error: err instanceof Error ? { name: err.name, message: err.message } : err,
+    })
     return { ok: false, error: err instanceof Error ? err.message : "send failed" }
   }
 }
