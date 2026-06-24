@@ -229,33 +229,32 @@ function DealsContent() {
 
       {(() => {
         const visibleFailed = failedDeals.filter((d) => !dismissedFailedIds.has(d.id))
-        if (loading || visibleFailed.length === 0) return null
+        // The banner exists purely for the bulk "Retry all" affordance, so it's
+        // only worth showing for 2+ failures. A single failure is left to its
+        // inline per-deal Reanalyse button — no top-of-page warning for one deal.
+        if (loading || visibleFailed.length <= 1) return null
         return (
           <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50/70 px-4 py-3 ring-1 ring-red-200">
             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-700" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-red-900">
-                {visibleFailed.length === 1 ? "1 analysis failed" : `${visibleFailed.length} analyses failed`}
+                {`${visibleFailed.length} analyses failed`}
               </p>
               <p className="mt-0.5 text-[12.5px] text-red-900/80 leading-snug">
-                {visibleFailed.length === 1
-                  ? "Click below or use the per-deal Reanalyse button to retry."
-                  : "Retry all at once or use the per-deal Reanalyse buttons below."}
+                Retry all at once or use the per-deal Reanalyse buttons below.
               </p>
             </div>
-            {visibleFailed.length > 1 && (
-              <button
-                onClick={retryAllFailed}
-                disabled={retryingAll}
-                className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-red-600 hover:bg-red-700 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-widest text-white transition-colors disabled:opacity-60"
-              >
-                {retryingAll ? (
-                  <><Loader2 className="h-3 w-3 animate-spin" /> Retrying…</>
-                ) : (
-                  <><RefreshCw className="h-3 w-3" /> Retry all</>
-                )}
-              </button>
-            )}
+            <button
+              onClick={retryAllFailed}
+              disabled={retryingAll}
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-red-600 hover:bg-red-700 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-widest text-white transition-colors disabled:opacity-60"
+            >
+              {retryingAll ? (
+                <><Loader2 className="h-3 w-3 animate-spin" /> Retrying…</>
+              ) : (
+                <><RefreshCw className="h-3 w-3" /> Retry all</>
+              )}
+            </button>
             <button
               type="button"
               aria-label="Dismiss"
