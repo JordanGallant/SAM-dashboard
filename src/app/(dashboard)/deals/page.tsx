@@ -87,19 +87,39 @@ function DealsContent() {
 
   const [retryingAll, setRetryingAll] = useState(false)
   async function retryAllFailed() {
-    if (retryingAll || failedDeals.length === 0) return
+    // Only retry what the user can actually see (dismissed banners excluded).
+    const targets = failedDeals.filter((d) => !dismissedFailedIds.has(d.id))
+    if (retryingAll || targets.length === 0) return
     setRetryingAll(true)
     try {
-      // Fire sequentially to be polite to the n8n queue. Errors are silently ignored
-      // — the per-row status will reflect the outcome once Realtime fires.
-      for (const d of failedDeals) {
-        await fetch("/api/analysis/trigger", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ dealId: d.id }),
-        }).catch(() => {})
+      // Fire sequentially to be polite to the n8n queue. Track outcomes so we can
+      // surface failures (e.g. the trigger endpoint's 10/min rate limit) instead of
+      // silently no-op'ing.
+      let failures = 0
+      let rateLimited = false
+      for (const d of targets) {
+        try {
+          const res = await fetch("/api/analysis/trigger", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dealId: d.id }),
+          })
+          if (!res.ok) {
+            failures++
+            if (res.status === 429) rateLimited = true
+          }
+        } catch {
+          failures++
+        }
       }
       refetch()
+      if (failures > 0) {
+        window.alert(
+          rateLimited
+            ? `Couldn't retry ${failures} of ${targets.length} (rate limit reached). Wait a minute and retry the rest.`
+            : `Couldn't retry ${failures} of ${targets.length} deals. Try the per-deal Reanalyse button.`
+        )
+      }
     } finally {
       setRetryingAll(false)
     }
@@ -223,17 +243,19 @@ function DealsContent() {
                   : "Retry all at once or use the per-deal Reanalyse buttons below."}
               </p>
             </div>
-            <button
-              onClick={retryAllFailed}
-              disabled={retryingAll}
-              className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-red-600 hover:bg-red-700 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-widest text-white transition-colors disabled:opacity-60"
-            >
-              {retryingAll ? (
-                <><Loader2 className="h-3 w-3 animate-spin" /> Retrying…</>
-              ) : (
-                <><RefreshCw className="h-3 w-3" /> Retry all</>
-              )}
-            </button>
+            {visibleFailed.length > 1 && (
+              <button
+                onClick={retryAllFailed}
+                disabled={retryingAll}
+                className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-red-600 hover:bg-red-700 px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-widest text-white transition-colors disabled:opacity-60"
+              >
+                {retryingAll ? (
+                  <><Loader2 className="h-3 w-3 animate-spin" /> Retrying…</>
+                ) : (
+                  <><RefreshCw className="h-3 w-3" /> Retry all</>
+                )}
+              </button>
+            )}
             <button
               type="button"
               aria-label="Dismiss"

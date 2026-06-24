@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
+import { ANALYSIS_STALE_MS } from "@/lib/types/analysis"
 
 export async function POST(request: Request) {
   try {
@@ -56,11 +57,20 @@ export async function POST(request: Request) {
 
     // Idempotency: if an analysis is already in flight for this deal, return that one
     // instead of firing another (avoids duplicate n8n runs / wasted LLM spend).
+    //
+    // A pending/processing row older than ANALYSIS_STALE_MS is a silently-dead n8n
+    // run — the dashboard already shows these deals as "failed". Without this cutoff
+    // the guard keeps returning "already in progress" for them, so "Retry all" can
+    // never re-fire a stalled batch. Treat stale rows as not-in-flight so the retry
+    // creates a fresh analysis (the stale row is left as-is; the sweep cron / read-
+    // time detector marks it failed).
+    const staleBefore = new Date(Date.now() - ANALYSIS_STALE_MS).toISOString()
     const { data: inFlight } = await supabase
       .from("analyses")
       .select("id, status")
       .eq("deal_id", dealId)
       .in("status", ["pending", "processing"])
+      .gte("created_at", staleBefore)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle()

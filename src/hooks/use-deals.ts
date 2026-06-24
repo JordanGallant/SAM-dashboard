@@ -5,9 +5,9 @@ import useSWR from "swr"
 import { createClient } from "@/lib/supabase/client"
 import { dbToDeal, type DbDeal, type DbDocument, type DbAnalysis } from "@/lib/db-mappers"
 import type { Deal } from "@/lib/types/deal"
-import type { AnalysisStatus } from "@/lib/types/analysis"
+import { ANALYSIS_STALE_MS, type AnalysisStatus } from "@/lib/types/analysis"
 
-const STALE_MS = 60 * 60 * 1000 // 1h
+const STALE_MS = ANALYSIS_STALE_MS
 
 type DealsResult = (Deal & {
   latestAnalysisStatus?: AnalysisStatus
