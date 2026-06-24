@@ -189,6 +189,13 @@ export interface MissingInfoAnalysis {
 
 export type AnalysisStatus = "pending" | "processing" | "completed" | "failed"
 
+// An analysis stuck in pending/processing longer than this is treated as dead
+// (n8n silently died). Shared by the read-time stale detector in use-deals and
+// the trigger route's idempotency guard so the UI and API agree on what counts
+// as "still in flight" — otherwise stale deals show as failed but can't be
+// retried (the guard keeps returning "already in progress").
+export const ANALYSIS_STALE_MS = 60 * 60 * 1000 // 1h
+
 export interface DealAnalysis {
   id: string
   dealId: string
