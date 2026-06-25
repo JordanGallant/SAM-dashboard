@@ -94,6 +94,13 @@ export async function POST(request: Request) {
       break
     }
 
+    // `created` is fired when a subscription is made outside Checkout — e.g. the
+    // admin "invoiced annual" flow (collection_method: send_invoice) which never
+    // produces a checkout.session.completed event. We mirror it through the exact
+    // same logic as `updated` so profiles.tier / subscription_status are set from
+    // the subscription's metadata (supabase_user_id + tier). past_due / canceled
+    // transitions on these invoiced subs continue to arrive as `updated`.
+    case "customer.subscription.created":
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription
       const userId = subscription.metadata?.supabase_user_id
