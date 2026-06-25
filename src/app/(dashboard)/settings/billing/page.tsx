@@ -8,11 +8,30 @@ import { TIER_CONFIG } from "@/lib/tier-config"
 import { useTrialUsage } from "@/hooks/use-trial-usage"
 import type { Tier } from "@/lib/types/user"
 import { createClient } from "@/lib/supabase/client"
+import { getBillingSummary, type BillingSummary } from "@/app/actions/billing-summary"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
 const TIER_ORDER: Tier[] = ["starter", "professional", "fund"]
+
+// Prefer the real Stripe price/interval when we have it (e.g. "€1.500,00 / year"
+// for a custom annual invoiced deal); otherwise fall back to the tier-config
+// monthly default ("EUR 299 / month" / "Custom pricing").
+function formatPriceLabel(live: BillingSummary["live"], tierPrice: number): string {
+  if (live && live.priceAmount != null && live.currency && live.interval) {
+    const amount = (live.priceAmount / 100).toLocaleString("nl-NL", {
+      style: "currency",
+      currency: live.currency.toUpperCase(),
+    })
+    const cadence =
+      live.intervalCount && live.intervalCount > 1
+        ? `every ${live.intervalCount} ${live.interval}s`
+        : `/ ${live.interval}`
+    return `${amount} ${cadence}`
+  }
+  return tierPrice === 0 ? "Custom pricing" : `EUR ${tierPrice} / month`
+}
 
 function BillingContent() {
   const searchParams = useSearchParams()
@@ -46,6 +65,10 @@ function BillingContent() {
   // Pilot #18: usage count vs cap so users know when they're approaching the
   // tier limit. Counted as analyses started this calendar month.
   const [memosUsed, setMemosUsed] = useState<number | null>(null)
+  // Live subscription read from Stripe (real price/interval + invoiced/custom
+  // flags). Lets us show the true figures and hide self-serve management for
+  // bespoke invoiced plans instead of the tier-config monthly default.
+  const [summary, setSummary] = useState<BillingSummary | null>(null)
 
   // In-page confirmation modal for upgrades/downgrades. Replaces the
   // browser-native window.confirm() / alert() pair which (a) looks unprofessional,
@@ -84,6 +107,13 @@ function BillingContent() {
       setHasStripeCustomer(Boolean(data?.stripe_customer_id))
       setMemosUsed(count ?? 0)
     })
+  }, [])
+
+  // Pull the real subscription from Stripe (price, interval, invoiced/custom).
+  useEffect(() => {
+    getBillingSummary()
+      .then(setSummary)
+      .catch(() => setSummary(null))
   }, [])
 
   // Effective memo cap. Three branches:
@@ -246,6 +276,21 @@ function BillingContent() {
     subStatus === "inactive" || subStatus === "canceled" || !subStatus
   const isExpiredTrial = subStatus === "trial" && !isTrialing
 
+  // Bespoke/invoiced plan (e.g. a custom annual deal via send_invoice). For
+  // these we show the real price/interval and hide self-serve management +
+  // plan switching — changes go through sales, not the Stripe portal/checkout
+  // (which would let them cancel or start a conflicting second subscription).
+  const live = summary?.live ?? null
+  const isManaged = Boolean(live?.isCustom || live?.isInvoiced)
+  const priceLabel = formatPriceLabel(live, config.price)
+  const renewalDate = live?.currentPeriodEnd
+    ? new Date(live.currentPeriodEnd * 1000).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : null
+
   return (
     <div className="mx-auto max-w-3xl space-y-7">
       {/* Status banners */}
@@ -343,8 +388,13 @@ function BillingContent() {
                   {config.label}
                 </h3>
                 <p className="font-mono text-[13px] text-muted-foreground tabular-nums">
-                  {config.price === 0 ? "Custom pricing" : `EUR ${config.price} / month`}
+                  {priceLabel}
                 </p>
+                {isActive && isManaged && (
+                  <span className="inline-flex items-center rounded-full bg-[#0F3D2E]/5 ring-1 ring-[#0F3D2E]/15 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold text-[#0F3D2E]">
+                    {live?.isInvoiced ? "Invoiced" : "Custom"}
+                  </span>
+                )}
                 {isTrialing && (
                   <span className="inline-flex items-center rounded-full bg-[#0F3D2E]/5 ring-1 ring-[#0F3D2E]/15 px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest font-bold text-[#0F3D2E]">
                     Trial · {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} left
@@ -438,8 +488,28 @@ function BillingContent() {
             </div>
           )}
 
+          {/* Invoiced/custom plans are managed by sales, not the self-serve
+              Stripe portal — so we surface a contact route instead of the
+              "Manage subscription" button (which exposes cancel) for them. */}
+          {isActive && isManaged && (
+            <div className="mt-5 rounded-xl bg-[#FAFAF7] ring-1 ring-[#0F3D2E]/10 px-4 py-3 text-[13px] text-[#0F3D2E]">
+              <span className="font-semibold">
+                {live?.isInvoiced ? "Billed by invoice" : "Custom plan"}
+              </span>
+              {renewalDate && <> · renews {renewalDate}</>} — to change or cancel,
+              email{" "}
+              <a
+                className="underline underline-offset-2 hover:text-[#00A86B]"
+                href="mailto:mark@green-whale.nl?subject=SAM%20subscription%20change"
+              >
+                mark@green-whale.nl
+              </a>
+              .
+            </div>
+          )}
+
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            {isActive && hasStripeCustomer && (
+            {isActive && hasStripeCustomer && !isManaged && (
               <button
                 onClick={handleManage}
                 disabled={portalLoading}
@@ -559,7 +629,10 @@ function BillingContent() {
         </section>
       )}
 
-      {/* Plan picker */}
+      {/* Plan picker — hidden for active customers on a bespoke/invoiced plan,
+          who change plans via sales rather than self-serve checkout (which would
+          spin up a second, conflicting subscription). */}
+      {!(isActive && isManaged) && (
       <div>
         <SectionLabel className="mb-4">
           {isInactive || isExpiredTrial ? "Or subscribe directly" : "Switch plan"}
@@ -643,6 +716,7 @@ function BillingContent() {
           })}
         </div>
       </div>
+      )}
 
       {/* Switch confirmation dialog. Replaces window.confirm() so users see
           tier-diff context (current -> new, prorated billing note) instead of
