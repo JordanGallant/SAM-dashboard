@@ -46,6 +46,8 @@ export interface FounderRow {
   strength: string
   keyConcern: string
   linkedinUrl?: string
+  /** True when linkedinUrl came from a manual paste rather than extraction. */
+  linkedinManual?: boolean
 }
 
 export interface TeamAnalysis {

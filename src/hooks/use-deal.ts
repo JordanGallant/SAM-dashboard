@@ -7,6 +7,7 @@ import { dbToDeal, type DbDeal, type DbDocument, type DbAnalysis } from "@/lib/d
 import type { Deal } from "@/lib/types/deal"
 import type { AnalysisStatus, DealAnalysis } from "@/lib/types/analysis"
 import { recomputeCompleteness } from "@/lib/recompute-completeness"
+import { applyFounderLinks } from "@/lib/founder-links"
 
 type UseDealResult = {
   deal: Deal | null
@@ -16,17 +17,22 @@ type UseDealResult = {
 
 async function fetchDeal(dealId: string): Promise<UseDealResult> {
   const supabase = createClient()
-  const [{ data: dealRow }, { data: docRows }, { data: latestAnalysis }] = await Promise.all([
-    supabase.from("deals").select("*").eq("id", dealId).single(),
-    supabase.from("documents").select("*").eq("deal_id", dealId),
-    supabase
-      .from("analyses")
-      .select("*")
-      .eq("deal_id", dealId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ])
+  const [{ data: dealRow }, { data: docRows }, { data: latestAnalysis }, { data: linkRows }] =
+    await Promise.all([
+      supabase.from("deals").select("*").eq("id", dealId).single(),
+      supabase.from("documents").select("*").eq("deal_id", dealId),
+      supabase
+        .from("analyses")
+        .select("*")
+        .eq("deal_id", dealId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("founder_links")
+        .select("founder_key, founder_name, linkedin_url")
+        .eq("deal_id", dealId),
+    ])
 
   if (!dealRow) {
     return { deal: null, analysisStatus: null, analysisError: null }
@@ -47,8 +53,14 @@ async function fetchDeal(dealId: string): Promise<UseDealResult> {
   }
 
   const rawResult = analysisRow?.status === "completed" ? analysisRow?.result ?? undefined : undefined
+  const founderLinks = (linkRows ?? []).map((r) => ({
+    founderKey: r.founder_key as string,
+    founderName: r.founder_name as string,
+    linkedinUrl: r.linkedin_url as string,
+  }))
+
   const completedResult: DealAnalysis | undefined = rawResult
-    ? recomputeCompleteness(rawResult)
+    ? applyFounderLinks(recomputeCompleteness(rawResult), founderLinks)
     : undefined
 
   return {

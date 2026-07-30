@@ -1,12 +1,16 @@
 "use client"
 
+import { useState } from "react"
 import { useParams } from "next/navigation"
 import { useDeal } from "@/hooks/use-deal"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { setFounderLink, clearFounderLink } from "@/app/actions/founder-links"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
 import { InsightBlock, leadSplit } from "@/components/dashboard/editorial"
-import { Sparkles, AlertTriangle, Users, Handshake } from "lucide-react"
+import { Sparkles, AlertTriangle, Users, Handshake, Pencil } from "lucide-react"
 import { DomainSources, type ExternalSource } from "@/components/dashboard/domain-sources"
 import type { FounderRow } from "@/lib/types/analysis"
 
@@ -65,7 +69,8 @@ function initials(name: string) {
 
 export default function TeamPage() {
   const params = useParams()
-  const { deal } = useDeal(params.dealId as string)
+  const dealId = params.dealId as string
+  const { deal, refetch } = useDeal(dealId)
   const team = deal?.analysis?.team
 
   if (!team) return <p className="text-sm text-muted-foreground">No team analysis available.</p>
@@ -105,6 +110,8 @@ export default function TeamPage() {
                 founder={f}
                 grad={AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]}
                 companyName={deal?.companyName}
+                dealId={dealId}
+                onSaved={refetch}
               />
             ))}
           </div>
@@ -148,16 +155,108 @@ export default function TeamPage() {
   )
 }
 
+// ------------------------------------------------- manual LinkedIn editor
+// Extraction misses founder profiles often enough that every card needs a
+// paste-it-yourself path: "Add LinkedIn" when we have nothing confirmed,
+// "Edit" when we do. Saves through a server action, then refetches the deal.
+function LinkedInEditor({
+  dealId,
+  founder,
+  onSaved,
+  onCancel,
+}: {
+  dealId: string
+  founder: FounderRow
+  onSaved: () => void
+  onCancel: () => void
+}) {
+  const [value, setValue] = useState(founder.linkedinUrl ?? "")
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function save() {
+    setSaving(true)
+    setError(null)
+    const res = await setFounderLink(dealId, founder.name, value)
+    setSaving(false)
+    if (res.error) {
+      setError(res.error)
+      return
+    }
+    onSaved()
+  }
+
+  async function remove() {
+    setSaving(true)
+    setError(null)
+    const res = await clearFounderLink(dealId, founder.name)
+    setSaving(false)
+    if (res.error) {
+      setError(res.error)
+      return
+    }
+    onSaved()
+  }
+
+  return (
+    <div className="mt-4 space-y-2">
+      <Input
+        autoFocus
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") save()
+          if (e.key === "Escape") onCancel()
+        }}
+        placeholder="linkedin.com/in/username"
+        aria-label={`LinkedIn profile URL for ${founder.name}`}
+        className="h-8 text-[12.5px]"
+      />
+      {error && <p className="text-[11px] text-red-600">{error}</p>}
+      <div className="flex items-center gap-2">
+        <Button size="sm" className="h-7 text-[11px]" disabled={saving || !value.trim()} onClick={save}>
+          {saving ? "Saving…" : "Save"}
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 text-[11px]"
+          disabled={saving}
+          onClick={onCancel}
+        >
+          Cancel
+        </Button>
+        {founder.linkedinManual && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 text-[11px] text-muted-foreground hover:text-red-600 ml-auto"
+            disabled={saving}
+            onClick={remove}
+          >
+            Remove
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ---------------------------------------------------------------- founder card
 function FounderCard({
   founder: f,
   grad,
   companyName,
+  dealId,
+  onSaved,
 }: {
   founder: FounderRow
   grad: string
   companyName?: string
+  dealId: string
+  onSaved: () => void
 }) {
+  const [editing, setEditing] = useState(false)
   const links = profileLinks(f, companyName)
   return (
     <article className="group relative rounded-2xl bg-card ring-1 ring-foreground/10 hover:ring-foreground/20 transition-shadow hover:shadow-sm overflow-hidden">
@@ -248,22 +347,53 @@ function FounderCard({
 
         {/* Profile lookup link — primary footer link points at LinkedIn (or
             LinkedIn-scoped search if no confirmed URL); Google glyph in the
-            header keeps the wider-web fallback one click away. */}
-        <a
-          href={links.linkedin.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`mt-4 inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
-            links.linkedin.confirmed ? "text-[#0A66C2] hover:text-[#084c92]" : "text-[#0A66C2]/70 hover:text-[#0A66C2]"
-          }`}
-        >
-          {links.linkedin.confirmed ? (
-            <LinkedInGlyph className="h-3 w-3" />
-          ) : (
-            <GoogleGlyph className="h-3 w-3" />
-          )}
-          {links.linkedin.confirmed ? "View LinkedIn" : "Search LinkedIn"}
-        </a>
+            header keeps the wider-web fallback one click away. The paste
+            affordance sits alongside it because the extracted URL is wrong
+            or missing often enough to need a manual correction path. */}
+        {editing ? (
+          <LinkedInEditor
+            dealId={dealId}
+            founder={f}
+            onSaved={() => {
+              setEditing(false)
+              onSaved()
+            }}
+            onCancel={() => setEditing(false)}
+          />
+        ) : (
+          <div className="mt-4 flex items-center gap-3">
+            <a
+              href={links.linkedin.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
+                links.linkedin.confirmed
+                  ? "text-[#0A66C2] hover:text-[#084c92]"
+                  : "text-[#0A66C2]/70 hover:text-[#0A66C2]"
+              }`}
+            >
+              {links.linkedin.confirmed ? (
+                <LinkedInGlyph className="h-3 w-3" />
+              ) : (
+                <GoogleGlyph className="h-3 w-3" />
+              )}
+              {links.linkedin.confirmed ? "View LinkedIn" : "Search LinkedIn"}
+            </a>
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="inline-flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+              title={
+                links.linkedin.confirmed
+                  ? "Replace this LinkedIn URL"
+                  : "Paste this founder's LinkedIn URL"
+              }
+            >
+              <Pencil className="h-3 w-3" />
+              {links.linkedin.confirmed ? "Edit" : "Add LinkedIn"}
+            </button>
+          </div>
+        )}
       </div>
     </article>
   )

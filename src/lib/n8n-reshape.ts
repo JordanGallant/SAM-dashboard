@@ -9,6 +9,7 @@ import type {
   FounderRow,
   FindingItem,
 } from "./types/analysis"
+import { canonicalLinkedInUrl } from "./founder-links"
 
 type FlatN8N = Record<string, string | undefined>
 
@@ -235,13 +236,12 @@ const parseFounders = (text: string | undefined): FounderRow[] => {
     // icon link is consistent. Falls back to undefined when no URL appears at
     // all — the team page already has a Google "site:linkedin.com" search
     // fallback for that case.
-    let linkedinUrl: string | undefined
     const linkedInMatch = block.match(
-      /https?:\/\/(?:[a-z]{2,3}\.)?linkedin\.com\/in\/([A-Za-z0-9_\-%.]+)\/?/i,
+      /https?:\/\/(?:[a-z]{2,3}\.)?linkedin\.com\/in\/[A-Za-z0-9_\-%.]+\/?/i,
     )
-    if (linkedInMatch) {
-      linkedinUrl = `https://www.linkedin.com/in/${linkedInMatch[1].replace(/\/$/, "")}/`
-    }
+    const linkedinUrl = linkedInMatch
+      ? canonicalLinkedInUrl(linkedInMatch[0]) ?? undefined
+      : undefined
 
     out.push({ name, role, background, strength, keyConcern, linkedinUrl })
   }
