@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
 import { completionTuning } from "@/lib/azure-ai"
+import { applyFounderLinks } from "@/lib/founder-links"
 import { createClient } from "@/lib/supabase/server"
 import { dbToDeal, dbToFund, type DbDeal, type DbDocument, type DbAnalysis, type DbFund } from "@/lib/db-mappers"
 import type { Deal } from "@/lib/types/deal"
@@ -127,20 +128,37 @@ async function getScopedDealContext(
   dealId: string,
   scope: Scope | undefined
 ): Promise<string> {
-  const [{ data: dealRow }, { data: docRows }, { data: latestAnalysis }] = await Promise.all([
-    supabase.from("deals").select("*").eq("id", dealId).single(),
-    supabase.from("documents").select("*").eq("deal_id", dealId),
-    supabase
-      .from("analyses")
-      .select("*")
-      .eq("deal_id", dealId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ])
+  const [{ data: dealRow }, { data: docRows }, { data: latestAnalysis }, { data: linkRows }] =
+    await Promise.all([
+      supabase.from("deals").select("*").eq("id", dealId).single(),
+      supabase.from("documents").select("*").eq("deal_id", dealId),
+      supabase
+        .from("analyses")
+        .select("*")
+        .eq("deal_id", dealId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("founder_links")
+        .select("founder_key, founder_name, linkedin_url")
+        .eq("deal_id", dealId),
+    ])
   if (!dealRow) return "(deal not found)"
   const analysisRow = latestAnalysis as DbAnalysis | null
-  const result = analysisRow?.status === "completed" ? analysisRow?.result ?? undefined : undefined
+  const rawResult = analysisRow?.status === "completed" ? analysisRow?.result ?? undefined : undefined
+  // Manual LinkedIn overrides win here too, so Ask Sam doesn't cite a stale URL
+  // the team card has already had corrected out from under it.
+  const result = rawResult
+    ? applyFounderLinks(
+        rawResult,
+        (linkRows ?? []).map((r) => ({
+          founderKey: r.founder_key as string,
+          founderName: r.founder_name as string,
+          linkedinUrl: r.linkedin_url as string,
+        })),
+      )
+    : undefined
   const deal = dbToDeal(dealRow as DbDeal, (docRows ?? []) as DbDocument[], result)
   switch (scope) {
     case "team":
