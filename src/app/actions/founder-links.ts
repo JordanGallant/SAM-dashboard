@@ -5,6 +5,12 @@ import { createClient } from "@/lib/supabase/server"
 import { canonicalLinkedInUrl, founderKey } from "@/lib/founder-links"
 
 /**
+ * How long to wait for n8n to take the job before returning to the user. Only
+ * needs to cover receipt — the run itself continues without us.
+ */
+const TRIGGER_ACK_MS = 3000
+
+/**
  * Save a hand-pasted LinkedIn URL for one founder on a deal.
  *
  * Accepts anything paste-shaped (full URL, scheme-less host, bare handle) and
@@ -93,6 +99,12 @@ async function retriggerTeamFlow(
 
     const res = await fetch(webhook, {
       method: "POST",
+      // Flow 3's webhook is responseMode "lastNode", so it holds the connection
+      // open for the entire run — minutes. Blocking the save on that pinned the
+      // "Saving…" button and stopped the user doing anything else. n8n starts
+      // the execution on receipt and finishes it after we hang up (verified
+      // against a real run), so we only wait long enough to hand the job over.
+      signal: AbortSignal.timeout(TRIGGER_ACK_MS),
       headers: {
         "Content-Type": "application/json",
         ...(process.env.N8N_WEBHOOK_TOKEN
@@ -125,6 +137,12 @@ async function retriggerTeamFlow(
       await supabase.from("deals").update({ team_refresh_at: null }).eq("id", dealId)
     }
   } catch (err) {
+    // Hanging up on a run we successfully started is the expected path, not a
+    // failure — leave the refreshing state alone so the callback can clear it.
+    const handedOff =
+      err instanceof Error && (err.name === "TimeoutError" || err.name === "AbortError")
+    if (handedOff) return
+
     console.error("Team flow re-trigger failed:", err)
     await supabase.from("deals").update({ team_refresh_at: null }).eq("id", dealId)
   }
