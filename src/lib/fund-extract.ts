@@ -9,6 +9,7 @@
 // the funds row.
 
 import OpenAI from "openai"
+import { completionTuning } from "@/lib/azure-ai"
 import { DEAL_STAGES, SECTORS, GEOS } from "@/lib/constants"
 
 export interface ExtractedFundFields {
@@ -73,8 +74,7 @@ Be conservative. Do not invent fields. Empty string / null / [] are valid when t
   try {
     const completion = await client.chat.completions.create({
       model,
-      temperature: 0,
-      max_tokens: 1200,
+      ...completionTuning(model, { temperature: 0, maxTokens: 1200 }),
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },

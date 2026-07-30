@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
+import { completionTuning } from "@/lib/azure-ai"
 import { createClient } from "@/lib/supabase/server"
 import { dbToDeal, dbToFund, type DbDeal, type DbDocument, type DbAnalysis, type DbFund } from "@/lib/db-mappers"
 import type { Deal } from "@/lib/types/deal"
@@ -272,8 +273,7 @@ export async function POST(req: Request) {
   try {
     const completion = await client.chat.completions.create({
       model,
-      temperature: 0.4,
-      max_tokens: 600,
+      ...completionTuning(model, { temperature: 0.4, maxTokens: 600 }),
       messages: [
         { role: "system", content: `${SYSTEM_BASE}\n\n${fundContext}\n\n${context}` },
         ...messages.map((m) => ({ role: m.role, content: m.content })),

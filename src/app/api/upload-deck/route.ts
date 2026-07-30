@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { extractText, getDocumentProxy } from "unpdf"
 import OpenAI from "openai"
+import { completionTuning } from "@/lib/azure-ai"
 import { DEAL_STAGES } from "@/lib/constants"
 import type { DealStage } from "@/lib/types/deal"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
@@ -66,8 +67,7 @@ async function extractDealMeta(deckText: string): Promise<{ companyName: string;
   const client = new OpenAI({ baseURL: endpoint, apiKey: key })
   const completion = await client.chat.completions.create({
     model,
-    temperature: 0,
-    max_tokens: 200,
+    ...completionTuning(model, { temperature: 0, maxTokens: 200 }),
     response_format: { type: "json_object" },
     messages: [
       {
