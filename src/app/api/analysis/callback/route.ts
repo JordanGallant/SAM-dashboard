@@ -42,6 +42,60 @@ export async function POST(request: Request) {
 
     const supabase = getSupabaseAdmin()
 
+    // Team-refresh callback (Flow 3, re-run after a founder LinkedIn URL is
+    // pasted by hand). Flow 3 can't regenerate the team narrative on its own —
+    // that needs Flow 8's reformat step — so this patches the per-founder
+    // LinkedIn data it *does* produce and clears the refreshing indicator.
+    //
+    // The indicator is cleared unconditionally, including on a malformed or
+    // empty payload: a stuck spinner is worse than a missed update, and the
+    // deal keeps whatever LinkedIn data it already had.
+    if (kind === "team") {
+      const { data: existing } = await supabase
+        .from("analyses")
+        .select("id, deal_id, result")
+        .eq("id", analysisId)
+        .maybeSingle()
+      if (!existing) {
+        return NextResponse.json({ error: "analysis row not found" }, { status: 404 })
+      }
+
+      const incoming = Array.isArray(body.founders) ? body.founders : []
+      const byName = new Map<string, { url: string; quality?: string }>()
+      for (const f of incoming) {
+        const name = typeof f?.founder_name === "string" ? f.founder_name : ""
+        const url = typeof f?.linkedin_url === "string" ? f.linkedin_url : ""
+        const key = name.trim().toLowerCase().replace(/\s+/g, " ")
+        if (key && /linkedin\.com\/in\//i.test(url)) {
+          byName.set(key, { url, quality: f?.linkedin_match_quality })
+        }
+      }
+
+      const result = existing.result as DealAnalysis | null
+      if (byName.size && result?.team?.founders?.length) {
+        const patched: DealAnalysis = {
+          ...result,
+          team: {
+            ...result.team,
+            founders: result.team.founders.map((f) => {
+              const hit = byName.get(f.name.trim().toLowerCase().replace(/\s+/g, " "))
+              return hit ? { ...f, linkedinUrl: hit.url } : f
+            }),
+          },
+        }
+        await supabase.from("analyses").update({ result: patched }).eq("id", analysisId)
+      }
+
+      if (existing.deal_id) {
+        await supabase
+          .from("deals")
+          .update({ team_refresh_at: null })
+          .eq("id", existing.deal_id)
+      }
+
+      return NextResponse.json({ received: true, kind: "team", patched: byName.size })
+    }
+
     // Fund-fit callback (separate flow). Persists to fund_fit_result column AND, if the
     // main analysis row already has result, patches result.fundFit so the UI sees it
     // without waiting for a re-fetch.

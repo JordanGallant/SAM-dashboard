@@ -81,6 +81,16 @@ async function retriggerTeamFlow(
     ])
     if (!analysis?.id) return
 
+    // Stamp before firing so the UI shows "refreshing" even if the webhook call
+    // itself is slow. The team callback clears it; readers age it out if the
+    // callback never lands.
+    await supabase
+      .from("deals")
+      .update({ team_refresh_at: new Date().toISOString() })
+      .eq("id", dealId)
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.samvc.ai"
+
     await fetch(webhook, {
       method: "POST",
       headers: {
@@ -92,6 +102,10 @@ async function retriggerTeamFlow(
       body: JSON.stringify({
         job_id: analysis.id,
         deal_id: dealId,
+        // Flow 3 has no baked-in secrets; it posts back to whatever we hand it,
+        // same contract Flow 1 uses.
+        callback_url: `${appUrl}/api/analysis/callback`,
+        callback_token: process.env.ANALYSIS_CALLBACK_TOKEN,
         manual_links: (links ?? []).map((l) => ({
           founder_name: l.founder_name,
           linkedin_url: l.linkedin_url,

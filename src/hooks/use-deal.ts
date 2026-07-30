@@ -13,7 +13,13 @@ type UseDealResult = {
   deal: Deal | null
   analysisStatus: AnalysisStatus | null
   analysisError: string | null
+  teamRefreshing: boolean
 }
+
+// A team re-run takes a minute or two. If the callback never lands (n8n down,
+// flow failed) the stamp would otherwise pin the indicator on forever, so age
+// it out rather than trusting the flag alone.
+const TEAM_REFRESH_TIMEOUT_MS = 5 * 60 * 1000
 
 async function fetchDeal(dealId: string): Promise<UseDealResult> {
   const supabase = createClient()
@@ -35,7 +41,7 @@ async function fetchDeal(dealId: string): Promise<UseDealResult> {
     ])
 
   if (!dealRow) {
-    return { deal: null, analysisStatus: null, analysisError: null }
+    return { deal: null, analysisStatus: null, analysisError: null, teamRefreshing: false }
   }
 
   const analysisRow = latestAnalysis as DbAnalysis | null
@@ -63,10 +69,15 @@ async function fetchDeal(dealId: string): Promise<UseDealResult> {
     ? applyFounderLinks(recomputeCompleteness(rawResult), founderLinks)
     : undefined
 
+  const refreshStamp = (dealRow as { team_refresh_at?: string | null }).team_refresh_at
+  const teamRefreshing =
+    !!refreshStamp && Date.now() - new Date(refreshStamp).getTime() < TEAM_REFRESH_TIMEOUT_MS
+
   return {
     deal: dbToDeal(dealRow as DbDeal, (docRows ?? []) as DbDocument[], completedResult),
     analysisStatus: status,
     analysisError: derivedError,
+    teamRefreshing,
   }
 }
 
@@ -80,10 +91,15 @@ export function useDeal(dealId: string | undefined) {
     {
       // Conditional polling fallback: only while pending/processing.
       // Realtime is the primary signal; this is a corp-proxy safety net.
-      refreshInterval: (latest) =>
-        latest?.analysisStatus === "pending" || latest?.analysisStatus === "processing"
-          ? 60000
-          : 0,
+      refreshInterval: (latest) => {
+        if (latest?.analysisStatus === "pending" || latest?.analysisStatus === "processing") {
+          return 60000
+        }
+        // A team re-run finishes in a minute or two, so poll tighter than the
+        // full-analysis case — and this also ages the indicator out on its own
+        // if the callback never lands.
+        return latest?.teamRefreshing ? 15000 : 0
+      },
       // revalidateOnFocus + revalidateOnReconnect default to true — left enabled.
     }
   )
@@ -108,6 +124,21 @@ export function useDeal(dealId: string | undefined) {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "documents", filter: `deal_id=eq.${dealId}` },
+        () => mutate()
+      )
+      // Manual LinkedIn overrides: a teammate pasting a URL, or the team
+      // callback patching one, has to reach every open tab on this deal.
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "founder_links", filter: `deal_id=eq.${dealId}` },
+        () => mutate()
+      )
+      // The deal row itself carries team_refresh_at, so the refreshing
+      // indicator clears the moment the callback lands rather than on the
+      // next poll.
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "deals", filter: `id=eq.${dealId}` },
         () => mutate()
       )
       .subscribe()
@@ -140,5 +171,6 @@ export function useDeal(dealId: string | undefined) {
     refetch,
     analysisStatus: data?.analysisStatus ?? null,
     analysisError: data?.analysisError ?? null,
+    teamRefreshing: data?.teamRefreshing ?? false,
   }
 }

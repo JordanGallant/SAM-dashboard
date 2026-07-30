@@ -10,7 +10,7 @@ import { SectionHeader } from "@/components/dashboard/section-header"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
 import { InsightBlock, leadSplit } from "@/components/dashboard/editorial"
-import { Sparkles, AlertTriangle, Users, Handshake, Pencil } from "lucide-react"
+import { Sparkles, AlertTriangle, Users, Handshake, Pencil, Loader2 } from "lucide-react"
 import { DomainSources, type ExternalSource } from "@/components/dashboard/domain-sources"
 import type { FounderRow } from "@/lib/types/analysis"
 
@@ -70,7 +70,7 @@ function initials(name: string) {
 export default function TeamPage() {
   const params = useParams()
   const dealId = params.dealId as string
-  const { deal, refetch } = useDeal(dealId)
+  const { deal, refetch, teamRefreshing } = useDeal(dealId)
   const team = deal?.analysis?.team
 
   if (!team) return <p className="text-sm text-muted-foreground">No team analysis available.</p>
@@ -95,6 +95,15 @@ export default function TeamPage() {
           <span className="text-[11px] font-mono tabular-nums text-muted-foreground">
             {founders.length}
           </span>
+          {teamRefreshing && (
+            <span
+              className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-primary"
+              role="status"
+            >
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Refreshing profiles…
+            </span>
+          )}
         </div>
 
         {founders.length === 0 ? (
