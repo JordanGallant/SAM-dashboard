@@ -91,7 +91,7 @@ async function retriggerTeamFlow(
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.samvc.ai"
 
-    await fetch(webhook, {
+    const res = await fetch(webhook, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -112,8 +112,21 @@ async function retriggerTeamFlow(
         })),
       }),
     })
+
+    // fetch only rejects on network failure, so a wrong webhook path (n8n
+    // answers 404 for an unregistered path, and test URLs 404 unless the
+    // editor is listening) would otherwise fail completely silently.
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "")
+      console.error(
+        `Team flow re-trigger: n8n returned ${res.status} for ${webhook} — ${detail.slice(0, 300)}`,
+      )
+      // Nothing is coming back, so don't leave the UI claiming a refresh.
+      await supabase.from("deals").update({ team_refresh_at: null }).eq("id", dealId)
+    }
   } catch (err) {
     console.error("Team flow re-trigger failed:", err)
+    await supabase.from("deals").update({ team_refresh_at: null }).eq("id", dealId)
   }
 }
 
