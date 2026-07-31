@@ -161,8 +161,19 @@ export async function POST(request: Request) {
         // them a card off the scrape alone.
         const present = new Set(founders.map((f) => founderKey(f.name)))
         for (const [key, link] of byName) {
-          if (present.has(key) || !looksLikePerson(link.displayName)) continue
+          // byName holds two keys per link (the handle it was saved under and
+          // the scraped display name) — the person is already on the roster if
+          // EITHER matches, otherwise adding your co-founder who's also in the
+          // deck would duplicate them.
+          if (
+            present.has(key) ||
+            present.has(founderKey(link.displayName)) ||
+            !looksLikePerson(link.displayName)
+          ) {
+            continue
+          }
           present.add(key)
+          present.add(founderKey(link.displayName))
           founders.push({
             name: link.displayName,
             role: "",
