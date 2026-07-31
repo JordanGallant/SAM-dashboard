@@ -62,6 +62,12 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "analysis row not found" }, { status: 404 })
       }
 
+      // Two-stage delivery: the scrape finishes ~a minute before the narrative
+      // does, so Flow 3 posts an early partial with just the founders — names
+      // and links land on the cards in seconds. Only the final (non-partial)
+      // callback may clear the refreshing indicator; the prose is still coming.
+      const partial = body.partial === true
+
       const incoming = Array.isArray(body.founders) ? body.founders : []
       const byName = new Map<string, { url: string; displayName: string }>()
       for (const f of incoming) {
@@ -199,14 +205,14 @@ export async function POST(request: Request) {
         await supabase.from("analyses").update({ result: patched }).eq("id", analysisId)
       }
 
-      if (existing.deal_id) {
+      if (existing.deal_id && !partial) {
         await supabase
           .from("deals")
           .update({ team_refresh_at: null })
           .eq("id", existing.deal_id)
       }
 
-      return NextResponse.json({ received: true, kind: "team", patched: byName.size })
+      return NextResponse.json({ received: true, kind: "team", partial, patched: byName.size })
     }
 
     // Fund-fit callback (separate flow). Persists to fund_fit_result column AND, if the
