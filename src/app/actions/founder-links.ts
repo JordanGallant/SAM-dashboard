@@ -46,6 +46,7 @@ export async function setFounderLink(
 
   if (error) return { error: error.message }
 
+  await clearRemoval(supabase, dealId, founderKey(founderName))
   await retriggerTeamFlow(supabase, dealId)
 
   revalidatePath(`/deals/${dealId}/team`)
@@ -192,10 +193,63 @@ export async function addFounder(dealId: string, url: string) {
 
   if (error) return { error: error.message }
 
+  await clearRemoval(supabase, dealId, founderKey(placeholder))
   await retriggerTeamFlow(supabase, dealId)
 
   revalidatePath(`/deals/${dealId}/team`)
   return { url: canonical }
+}
+
+/**
+ * Hide a founder from the deal entirely — phantom entries the extractor
+ * invented, or a person added by mistake. Persisted in founder_removals so a
+ * re-analysis can't resurrect the card; any saved link for the same name is
+ * dropped so re-triggers stop scraping them.
+ */
+export async function removeFounder(dealId: string, founderName: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Not authenticated" }
+
+  const key = founderKey(founderName)
+
+  const { error } = await supabase.from("founder_removals").upsert(
+    {
+      deal_id: dealId,
+      founder_key: key,
+      founder_name: founderName,
+      removed_by: user.id,
+      removed_at: new Date().toISOString(),
+    },
+    { onConflict: "deal_id,founder_key" },
+  )
+  if (error) return { error: error.message }
+
+  await supabase
+    .from("founder_links")
+    .delete()
+    .eq("deal_id", dealId)
+    .eq("founder_key", key)
+
+  revalidatePath(`/deals/${dealId}/team`)
+  return { ok: true }
+}
+
+/**
+ * Re-adding or re-linking a name un-hides it — without this, a mistaken
+ * removal would silently swallow the very founder the user is trying to put
+ * back.
+ */
+async function clearRemoval(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  dealId: string,
+  key: string,
+) {
+  await supabase
+    .from("founder_removals")
+    .delete()
+    .eq("deal_id", dealId)
+    .eq("founder_key", key)
 }
 
 /** Drop the override and fall back to whatever the analysis extracted. */

@@ -86,12 +86,18 @@ export function linkedInHandle(url: string): string {
 export function applyFounderLinks(
   analysis: DealAnalysis,
   links: FounderLink[],
+  removedKeys: string[] = [],
 ): DealAnalysis {
-  if (!links.length || !analysis.team) return analysis
+  if ((!links.length && !removedKeys.length) || !analysis.team) return analysis
 
-  const unmatched = new Map(links.map((l) => [l.founderKey, l]))
+  const removed = new Set(removedKeys)
+  const unmatched = new Map(
+    links.filter((l) => !removed.has(l.founderKey)).map((l) => [l.founderKey, l]),
+  )
 
-  const founders = (analysis.team.founders ?? []).map((f) => {
+  const founders = (analysis.team.founders ?? [])
+    .filter((f) => !removed.has(founderKey(f.name)))
+    .map((f) => {
     const key = founderKey(f.name)
     // Match by name, or by URL — an added founder is saved under their
     // LinkedIn handle, and once the scrape has put their real name on the

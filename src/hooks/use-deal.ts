@@ -23,22 +23,28 @@ const TEAM_REFRESH_TIMEOUT_MS = 5 * 60 * 1000
 
 async function fetchDeal(dealId: string): Promise<UseDealResult> {
   const supabase = createClient()
-  const [{ data: dealRow }, { data: docRows }, { data: latestAnalysis }, { data: linkRows }] =
-    await Promise.all([
-      supabase.from("deals").select("*").eq("id", dealId).single(),
-      supabase.from("documents").select("*").eq("deal_id", dealId),
-      supabase
-        .from("analyses")
-        .select("*")
-        .eq("deal_id", dealId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      supabase
-        .from("founder_links")
-        .select("founder_key, founder_name, linkedin_url")
-        .eq("deal_id", dealId),
-    ])
+  const [
+    { data: dealRow },
+    { data: docRows },
+    { data: latestAnalysis },
+    { data: linkRows },
+    { data: removalRows },
+  ] = await Promise.all([
+    supabase.from("deals").select("*").eq("id", dealId).single(),
+    supabase.from("documents").select("*").eq("deal_id", dealId),
+    supabase
+      .from("analyses")
+      .select("*")
+      .eq("deal_id", dealId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("founder_links")
+      .select("founder_key, founder_name, linkedin_url")
+      .eq("deal_id", dealId),
+    supabase.from("founder_removals").select("founder_key").eq("deal_id", dealId),
+  ])
 
   if (!dealRow) {
     return { deal: null, analysisStatus: null, analysisError: null, teamRefreshing: false }
@@ -65,8 +71,10 @@ async function fetchDeal(dealId: string): Promise<UseDealResult> {
     linkedinUrl: r.linkedin_url as string,
   }))
 
+  const removedKeys = (removalRows ?? []).map((r) => r.founder_key as string)
+
   const completedResult: DealAnalysis | undefined = rawResult
-    ? applyFounderLinks(recomputeCompleteness(rawResult), founderLinks)
+    ? applyFounderLinks(recomputeCompleteness(rawResult), founderLinks, removedKeys)
     : undefined
 
   const refreshStamp = (dealRow as { team_refresh_at?: string | null }).team_refresh_at
@@ -131,6 +139,11 @@ export function useDeal(dealId: string | undefined) {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "founder_links", filter: `deal_id=eq.${dealId}` },
+        () => mutate()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "founder_removals", filter: `deal_id=eq.${dealId}` },
         () => mutate()
       )
       // The deal row itself carries team_refresh_at, so the refreshing

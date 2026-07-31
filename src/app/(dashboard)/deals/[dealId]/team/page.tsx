@@ -5,12 +5,12 @@ import { useParams } from "next/navigation"
 import { useDeal } from "@/hooks/use-deal"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { setFounderLink, clearFounderLink, addFounder } from "@/app/actions/founder-links"
+import { setFounderLink, clearFounderLink, addFounder, removeFounder } from "@/app/actions/founder-links"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
 import { InsightBlock, leadSplit } from "@/components/dashboard/editorial"
-import { Sparkles, AlertTriangle, Users, Handshake, Pencil, Loader2, UserPlus } from "lucide-react"
+import { Sparkles, AlertTriangle, Users, Handshake, Pencil, Loader2, UserPlus, Trash2 } from "lucide-react"
 import { DomainSources, type ExternalSource } from "@/components/dashboard/domain-sources"
 import type { FounderRow } from "@/lib/types/analysis"
 
@@ -348,7 +348,22 @@ function FounderCard({
   onSaved: () => void
 }) {
   const [editing, setEditing] = useState(false)
+  const [confirmingRemove, setConfirmingRemove] = useState(false)
+  const [removing, setRemoving] = useState(false)
+  const [removeError, setRemoveError] = useState<string | null>(null)
   const links = profileLinks(f, companyName)
+
+  async function doRemove() {
+    setRemoving(true)
+    setRemoveError(null)
+    const res = await removeFounder(dealId, f.name)
+    setRemoving(false)
+    if (res.error) {
+      setRemoveError(res.error)
+      return
+    }
+    onSaved()
+  }
   return (
     <article className="group relative rounded-2xl bg-card ring-1 ring-foreground/10 hover:ring-foreground/20 transition-shadow hover:shadow-sm overflow-hidden">
       <div className="p-5">
@@ -492,8 +507,43 @@ function FounderCard({
               <Pencil className="h-3 w-3" />
               {links.linkedin.confirmed ? "Edit" : "Add LinkedIn"}
             </button>
+            {/* Remove hides the founder for good (survives re-analysis) — a
+                two-step inline confirm, since there's no undo UI beyond
+                re-adding them by URL. */}
+            {confirmingRemove ? (
+              <span className="ml-auto inline-flex items-center gap-2 text-[11px]">
+                <span className="text-muted-foreground">Remove {f.name.split(/\s+/)[0]}?</span>
+                <button
+                  type="button"
+                  disabled={removing}
+                  onClick={doRemove}
+                  className="font-mono uppercase tracking-wider text-red-600 hover:text-red-700 disabled:opacity-50"
+                >
+                  {removing ? "Removing…" : "Remove"}
+                </button>
+                <button
+                  type="button"
+                  disabled={removing}
+                  onClick={() => setConfirmingRemove(false)}
+                  className="font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                >
+                  Cancel
+                </button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmingRemove(true)}
+                className="ml-auto inline-flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-muted-foreground/60 hover:text-red-600 transition-colors"
+                title="Remove this founder from the deal"
+              >
+                <Trash2 className="h-3 w-3" />
+                Remove
+              </button>
+            )}
           </div>
         )}
+        {removeError && <p className="mt-2 text-[11px] text-red-600">{removeError}</p>}
       </div>
     </article>
   )

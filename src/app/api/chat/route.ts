@@ -128,8 +128,13 @@ async function getScopedDealContext(
   dealId: string,
   scope: Scope | undefined
 ): Promise<string> {
-  const [{ data: dealRow }, { data: docRows }, { data: latestAnalysis }, { data: linkRows }] =
-    await Promise.all([
+  const [
+    { data: dealRow },
+    { data: docRows },
+    { data: latestAnalysis },
+    { data: linkRows },
+    { data: removalRows },
+  ] = await Promise.all([
       supabase.from("deals").select("*").eq("id", dealId).single(),
       supabase.from("documents").select("*").eq("deal_id", dealId),
       supabase
@@ -143,6 +148,7 @@ async function getScopedDealContext(
         .from("founder_links")
         .select("founder_key, founder_name, linkedin_url")
         .eq("deal_id", dealId),
+      supabase.from("founder_removals").select("founder_key").eq("deal_id", dealId),
     ])
   if (!dealRow) return "(deal not found)"
   const analysisRow = latestAnalysis as DbAnalysis | null
@@ -157,6 +163,7 @@ async function getScopedDealContext(
           founderName: r.founder_name as string,
           linkedinUrl: r.linkedin_url as string,
         })),
+        (removalRows ?? []).map((r) => r.founder_key as string),
       )
     : undefined
   const deal = dbToDeal(dealRow as DbDeal, (docRows ?? []) as DbDocument[], result)
