@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import type { DealAnalysis } from "@/lib/types/analysis"
 import { reshapeFlatToDealAnalysis } from "@/lib/n8n-reshape"
+import { parseTeamReport } from "@/lib/team-report"
+import { founderKey, looksLikePerson } from "@/lib/founder-links"
 
 function getSupabaseAdmin() {
   return createClient(
@@ -61,26 +63,96 @@ export async function POST(request: Request) {
       }
 
       const incoming = Array.isArray(body.founders) ? body.founders : []
-      const byName = new Map<string, { url: string; quality?: string }>()
+      const byName = new Map<string, { url: string; displayName: string }>()
       for (const f of incoming) {
-        const name = typeof f?.founder_name === "string" ? f.founder_name : ""
         const url = typeof f?.linkedin_url === "string" ? f.linkedin_url : ""
-        const key = name.trim().toLowerCase().replace(/\s+/g, " ")
-        if (key && /linkedin\.com\/in\//i.test(url)) {
-          byName.set(key, { url, quality: f?.linkedin_match_quality })
+        if (!/linkedin\.com\/in\//i.test(url)) continue
+        const displayName = typeof f?.founder_name === "string" ? f.founder_name : ""
+        // source_name is the name the portal knows the row by. The flow renames
+        // founder_name off the scraped profile when the roster entry wasn't a
+        // person, so keying on that alone would miss the row we came from.
+        const sourceName = typeof f?.source_name === "string" ? f.source_name : ""
+        for (const key of [founderKey(sourceName), founderKey(displayName)]) {
+          if (key) byName.set(key, { url, displayName })
         }
       }
 
       const result = existing.result as DealAnalysis | null
-      if (byName.size && result?.team?.founders?.length) {
+
+      // The regenerated narrative. Flow 3 re-runs the whole team analysis with
+      // the scraped profile in hand, so this is where "no LinkedIn profile
+      // found" turns into the real background — without it we'd only relabel
+      // the link and leave the prose contradicting it.
+      const report = parseTeamReport(
+        typeof body.team_result === "string" ? body.team_result : undefined,
+      )
+
+      if (result?.team?.founders?.length) {
+        // Match on a normalised name: the stored roster often has the deck's
+        // shouty "KIM VAN LAVIEREN" while the report writes "Kim van
+        // Lavieren", and mismatching here would attach one founder's history
+        // to another.
+        const fresh = new Map(report?.founders.map((f) => [founderKey(f.name), f]) ?? [])
+
+        const founders = result.team.founders.map((f) => {
+          const k = founderKey(f.name)
+          const r = fresh.get(k)
+          const link = byName.get(k)
+          fresh.delete(k)
+          return {
+            ...f,
+            // Keep the existing display name so the roster doesn't reshuffle.
+            ...(r
+              ? {
+                  role: r.role || f.role,
+                  background: r.background || f.background,
+                  strength: r.strength || f.strength,
+                  keyConcern: r.keyConcern || f.keyConcern,
+                  ...(r.linkedinUrl ? { linkedinUrl: r.linkedinUrl } : {}),
+                }
+              : {}),
+            ...(link
+              ? {
+                  linkedinUrl: link.url,
+                  // The roster entry was a heading, not a person ("ADDITIONAL
+                  // FOUNDERS / EXECUTIVE TEAM"); the scrape knows who the
+                  // pasted URL actually belongs to, so adopt that name.
+                  ...(!looksLikePerson(f.name) && looksLikePerson(link.displayName)
+                    ? { name: link.displayName }
+                    : {}),
+                }
+              : {}),
+          }
+        })
+
+        // Keep the saved override pointing at whatever we just renamed the
+        // founder to, or the next run would fail to match it all over again.
+        const renames = result.team.founders
+          .map((f) => ({ from: f.name, to: byName.get(founderKey(f.name))?.displayName }))
+          .filter(
+            (r): r is { from: string; to: string } =>
+              !!r.to && !looksLikePerson(r.from) && looksLikePerson(r.to),
+          )
+        for (const r of renames) {
+          await supabase
+            .from("founder_links")
+            .update({ founder_key: founderKey(r.to), founder_name: r.to })
+            .eq("deal_id", existing.deal_id)
+            .eq("founder_key", founderKey(r.from))
+        }
+
+        // A founder the report found but the roster never had (the scrape can
+        // surface a co-founder the deck buried) — append rather than drop.
+        for (const leftover of fresh.values()) founders.push(leftover)
+
         const patched: DealAnalysis = {
           ...result,
           team: {
             ...result.team,
-            founders: result.team.founders.map((f) => {
-              const hit = byName.get(f.name.trim().toLowerCase().replace(/\s+/g, " "))
-              return hit ? { ...f, linkedinUrl: hit.url } : f
-            }),
+            founders,
+            ...(report?.score !== undefined ? { score: report.score } : {}),
+            ...(report?.founderMarketFit ? { founderMarketFit: report.founderMarketFit } : {}),
+            ...(report?.teamDynamics ? { teamDynamics: report.teamDynamics } : {}),
           },
         }
         await supabase.from("analyses").update({ result: patched }).eq("id", analysisId)

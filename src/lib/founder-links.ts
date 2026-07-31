@@ -26,6 +26,24 @@ export function founderKey(name: string): string {
 }
 
 /**
+ * Is this a person's name, or a section heading the analysis parser mistook for
+ * one? Reports get chopped into "founders" like "ADDITIONAL FOUNDERS /
+ * EXECUTIVE TEAM" or "LinkedIn: Not Available", and a URL pasted onto one of
+ * those still has to work — we just take the real name off the scraped profile
+ * instead of trusting the roster.
+ */
+export function looksLikePerson(name: string | undefined): boolean {
+  const n = (name ?? "").trim()
+  if (!n) return false
+  if (/[:/|]|\d/.test(n)) return false
+  if (/\b(TEAM|FOUNDERS|EXECUTIVE|ADDITIONAL|UNKNOWN|AVAILABLE|OVERVIEW|PROFILES)\b/i.test(n)) {
+    return false
+  }
+  const words = n.split(/\s+/)
+  return words.length >= 2 && words.length <= 4
+}
+
+/**
  * Normalise anything a user might paste into a canonical profile URL:
  * full URLs with locale subdomains and tracking params, scheme-less hosts,
  * or a bare handle. Returns null when it isn't a LinkedIn profile at all.
