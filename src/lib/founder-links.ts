@@ -93,9 +93,17 @@ export function applyFounderLinks(
 
   const founders = (analysis.team.founders ?? []).map((f) => {
     const key = founderKey(f.name)
-    const override = unmatched.get(key)
+    // Match by name, or by URL — an added founder is saved under their
+    // LinkedIn handle, and once the scrape has put their real name on the
+    // roster the names no longer line up while the URLs still do. Without the
+    // URL check the leftover handle row would render a phantom second card.
+    let override = unmatched.get(key)
+    if (!override && f.linkedinUrl) {
+      const h = linkedInHandle(f.linkedinUrl)
+      override = [...unmatched.values()].find((l) => linkedInHandle(l.linkedinUrl) === h)
+    }
     if (!override) return f
-    unmatched.delete(key)
+    unmatched.delete(override.founderKey)
     return { ...f, linkedinUrl: override.linkedinUrl, linkedinManual: true }
   })
 

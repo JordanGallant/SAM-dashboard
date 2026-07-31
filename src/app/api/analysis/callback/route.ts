@@ -133,28 +133,41 @@ export async function POST(request: Request) {
 
         // Keep the saved override pointing at whatever we just renamed the
         // founder to, or the next run would fail to match it all over again.
-        // Covers both a mis-parsed roster entry and a hand-added founder still
-        // keyed by its LinkedIn handle.
-        const rosterNames = result.team.founders.map((f) => f.name)
-        const linkNames = (
-          await supabase
-            .from("founder_links")
-            .select("founder_name")
-            .eq("deal_id", existing.deal_id)
-        ).data?.map((r) => r.founder_name as string) ?? []
+        // Repoint founder_links rows still keyed by a handle or heading to the
+        // person's real name. Name lookup covers the tagged founders; URL
+        // lookup covers rows the tagger missed but the regenerated report
+        // still identified (it carries each founder's LinkedIn line).
+        const handle = (u: string | undefined) =>
+          (u ?? "").match(/linkedin\.com\/in\/([A-Za-z0-9_\-%.]+)/i)?.[1]?.toLowerCase() ?? ""
+        const nameByHandle = new Map<string, string>()
+        for (const { url, displayName } of byName.values()) {
+          if (handle(url) && looksLikePerson(displayName)) nameByHandle.set(handle(url), displayName)
+        }
+        for (const f of [...founders, ...(report?.founders ?? [])]) {
+          if (handle(f.linkedinUrl) && looksLikePerson(f.name)) {
+            nameByHandle.set(handle(f.linkedinUrl), f.name)
+          }
+        }
 
-        const renames = [...new Set([...rosterNames, ...linkNames])]
-          .map((from) => ({ from, to: byName.get(founderKey(from))?.displayName }))
-          .filter(
-            (r): r is { from: string; to: string } =>
-              !!r.to && !looksLikePerson(r.from) && looksLikePerson(r.to),
-          )
-        for (const r of renames) {
+        const linkRows =
+          (
+            await supabase
+              .from("founder_links")
+              .select("founder_key, founder_name, linkedin_url")
+              .eq("deal_id", existing.deal_id)
+          ).data ?? []
+
+        for (const row of linkRows) {
+          if (looksLikePerson(row.founder_name as string)) continue
+          const to =
+            byName.get(founderKey(row.founder_name as string))?.displayName ??
+            nameByHandle.get(handle(row.linkedin_url as string))
+          if (!to || !looksLikePerson(to)) continue
           await supabase
             .from("founder_links")
-            .update({ founder_key: founderKey(r.to), founder_name: r.to })
+            .update({ founder_key: founderKey(to), founder_name: to })
             .eq("deal_id", existing.deal_id)
-            .eq("founder_key", founderKey(r.from))
+            .eq("founder_key", row.founder_key as string)
         }
 
         // A founder the report found but the roster never had — either the
