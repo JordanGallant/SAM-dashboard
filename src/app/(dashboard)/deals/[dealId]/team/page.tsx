@@ -5,12 +5,12 @@ import { useParams } from "next/navigation"
 import { useDeal } from "@/hooks/use-deal"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { setFounderLink, clearFounderLink } from "@/app/actions/founder-links"
+import { setFounderLink, clearFounderLink, addFounder } from "@/app/actions/founder-links"
 import { SectionHeader } from "@/components/dashboard/section-header"
 import { SectionLabel } from "@/components/dashboard/section-label"
 import { RedFlagsList } from "@/components/dashboard/red-flags-list"
 import { InsightBlock, leadSplit } from "@/components/dashboard/editorial"
-import { Sparkles, AlertTriangle, Users, Handshake, Pencil, Loader2 } from "lucide-react"
+import { Sparkles, AlertTriangle, Users, Handshake, Pencil, Loader2, UserPlus } from "lucide-react"
 import { DomainSources, type ExternalSource } from "@/components/dashboard/domain-sources"
 import type { FounderRow } from "@/lib/types/analysis"
 
@@ -125,6 +125,12 @@ export default function TeamPage() {
             ))}
           </div>
         )}
+
+        {/* Decks routinely omit people, and the extractor misses others
+            entirely — so correcting a founder isn't enough, you have to be able
+            to add one. Shown even with an empty roster, which is exactly when
+            the deck was unreadable. */}
+        <AddFounder dealId={dealId} onSaved={refetch} />
       </section>
 
       {/* Insights — combined Founder-Market Fit + Team Dynamics */}
@@ -160,6 +166,82 @@ export default function TeamPage() {
           }))}
         generatedAt={deal?.analysis?.createdAt}
       />
+    </div>
+  )
+}
+
+// ------------------------------------------------------------ add a founder
+// Only a URL is asked for: if the deck never named this person, the user can't
+// reliably either. The scrape supplies the real name, so until it lands the
+// card is labelled with the LinkedIn handle.
+function AddFounder({ dealId, onSaved }: { dealId: string; onSaved: () => void }) {
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function save() {
+    setSaving(true)
+    setError(null)
+    const res = await addFounder(dealId, value)
+    setSaving(false)
+    if (res.error) {
+      setError(res.error)
+      return
+    }
+    setValue("")
+    setOpen(false)
+    onSaved()
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-dashed border-foreground/20 px-3 py-2 text-[12px] text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+      >
+        <UserPlus className="h-3.5 w-3.5" />
+        Add a founder we missed
+      </button>
+    )
+  }
+
+  return (
+    <div className="mt-4 max-w-md space-y-2 rounded-xl border border-foreground/15 bg-card p-3">
+      <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+        Add founder
+      </p>
+      <Input
+        autoFocus
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") save()
+          if (e.key === "Escape") setOpen(false)
+        }}
+        placeholder="linkedin.com/in/username"
+        aria-label="LinkedIn profile URL of the founder to add"
+        className="h-8 text-[12.5px]"
+      />
+      {error && <p className="text-[11px] text-red-600">{error}</p>}
+      <p className="text-[11px] text-muted-foreground">
+        We&apos;ll pull their name and background from the profile.
+      </p>
+      <div className="flex items-center gap-2">
+        <Button size="sm" className="h-7 text-[11px]" disabled={saving || !value.trim()} onClick={save}>
+          {saving ? "Adding…" : "Add founder"}
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 text-[11px]"
+          disabled={saving}
+          onClick={() => setOpen(false)}
+        >
+          Cancel
+        </Button>
+      </div>
     </div>
   )
 }
@@ -314,6 +396,15 @@ function FounderCard({
             )}
           </div>
         </div>
+
+        {/* Just added and the scrape hasn't come back yet — say so, rather than
+            rendering a card that looks like the analysis found nothing. */}
+        {f.addedByUser && !f.background && (
+          <p className="mt-4 inline-flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            Fetching profile…
+          </p>
+        )}
 
         {/* Background prose */}
         {f.background && (

@@ -127,8 +127,18 @@ export async function POST(request: Request) {
 
         // Keep the saved override pointing at whatever we just renamed the
         // founder to, or the next run would fail to match it all over again.
-        const renames = result.team.founders
-          .map((f) => ({ from: f.name, to: byName.get(founderKey(f.name))?.displayName }))
+        // Covers both a mis-parsed roster entry and a hand-added founder still
+        // keyed by its LinkedIn handle.
+        const rosterNames = result.team.founders.map((f) => f.name)
+        const linkNames = (
+          await supabase
+            .from("founder_links")
+            .select("founder_name")
+            .eq("deal_id", existing.deal_id)
+        ).data?.map((r) => r.founder_name as string) ?? []
+
+        const renames = [...new Set([...rosterNames, ...linkNames])]
+          .map((from) => ({ from, to: byName.get(founderKey(from))?.displayName }))
           .filter(
             (r): r is { from: string; to: string } =>
               !!r.to && !looksLikePerson(r.from) && looksLikePerson(r.to),
@@ -141,9 +151,29 @@ export async function POST(request: Request) {
             .eq("founder_key", founderKey(r.from))
         }
 
-        // A founder the report found but the roster never had (the scrape can
-        // surface a co-founder the deck buried) — append rather than drop.
+        // A founder the report found but the roster never had — either the
+        // scrape surfaced a co-founder the deck buried, or the user added one
+        // by hand. Append rather than drop.
         for (const leftover of fresh.values()) founders.push(leftover)
+
+        // A hand-added founder exists only as a founder_links row until now, so
+        // it isn't in the roster and the report may not name them either. Give
+        // them a card off the scrape alone.
+        const present = new Set(founders.map((f) => founderKey(f.name)))
+        for (const [key, link] of byName) {
+          if (present.has(key) || !looksLikePerson(link.displayName)) continue
+          present.add(key)
+          founders.push({
+            name: link.displayName,
+            role: "",
+            background: "",
+            strength: "",
+            keyConcern: "",
+            linkedinUrl: link.url,
+            linkedinManual: true,
+            addedByUser: true,
+          })
+        }
 
         const patched: DealAnalysis = {
           ...result,

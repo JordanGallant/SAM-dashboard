@@ -69,26 +69,48 @@ export function canonicalLinkedInUrl(input: string): string | null {
   return `https://www.linkedin.com/in/${match[2].replace(/\/$/, "")}/`
 }
 
+/** "https://www.linkedin.com/in/sanderkamphuis/" -> "sanderkamphuis" */
+export function linkedInHandle(url: string): string {
+  return url.match(/linkedin\.com\/in\/([A-Za-z0-9_\-%.]+)/i)?.[1] ?? ""
+}
+
 /**
  * Overlay stored overrides onto an analysis result. Returns a new object —
  * callers hand this straight to SWR/React, which needs a changed identity.
+ *
+ * A link that matches no founder is one the user added by hand, for someone
+ * the analysis missed entirely. Those become founder rows in their own right so
+ * the card appears the moment it's saved, with the details filled in once the
+ * scrape comes back.
  */
 export function applyFounderLinks(
   analysis: DealAnalysis,
   links: FounderLink[],
 ): DealAnalysis {
-  if (!links.length || !analysis.team?.founders?.length) return analysis
+  if (!links.length || !analysis.team) return analysis
 
-  const byKey = new Map(links.map((l) => [l.founderKey, l.linkedinUrl]))
+  const unmatched = new Map(links.map((l) => [l.founderKey, l]))
 
-  return {
-    ...analysis,
-    team: {
-      ...analysis.team,
-      founders: analysis.team.founders.map((f) => {
-        const override = byKey.get(founderKey(f.name))
-        return override ? { ...f, linkedinUrl: override, linkedinManual: true } : f
-      }),
-    },
+  const founders = (analysis.team.founders ?? []).map((f) => {
+    const key = founderKey(f.name)
+    const override = unmatched.get(key)
+    if (!override) return f
+    unmatched.delete(key)
+    return { ...f, linkedinUrl: override.linkedinUrl, linkedinManual: true }
+  })
+
+  for (const added of unmatched.values()) {
+    founders.push({
+      name: added.founderName,
+      role: "",
+      background: "",
+      strength: "",
+      keyConcern: "",
+      linkedinUrl: added.linkedinUrl,
+      linkedinManual: true,
+      addedByUser: true,
+    })
   }
+
+  return { ...analysis, team: { ...analysis.team, founders } }
 }

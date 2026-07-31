@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
-import { canonicalLinkedInUrl, founderKey } from "@/lib/founder-links"
+import { canonicalLinkedInUrl, founderKey, linkedInHandle } from "@/lib/founder-links"
 
 /**
  * How long to wait for n8n to take the job before returning to the user. Only
@@ -146,6 +146,56 @@ async function retriggerTeamFlow(
     console.error("Team flow re-trigger failed:", err)
     await supabase.from("deals").update({ team_refresh_at: null }).eq("id", dealId)
   }
+}
+
+/**
+ * Add a founder the analysis missed entirely.
+ *
+ * Only a URL is asked for: the deck didn't name this person, so neither can the
+ * user reliably. We store the LinkedIn handle as a placeholder name so a card
+ * appears immediately, and the scrape replaces it with the real one — the same
+ * path that already repoints a mis-parsed roster entry.
+ */
+export async function addFounder(dealId: string, url: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Not authenticated" }
+
+  const canonical = canonicalLinkedInUrl(url)
+  if (!canonical) {
+    return { error: "That doesn't look like a LinkedIn profile URL." }
+  }
+
+  const { data: existing } = await supabase
+    .from("founder_links")
+    .select("founder_name")
+    .eq("deal_id", dealId)
+    .eq("linkedin_url", canonical)
+    .maybeSingle()
+  if (existing) {
+    return { error: "That profile is already on this deal." }
+  }
+
+  const placeholder = linkedInHandle(canonical) || canonical
+
+  const { error } = await supabase.from("founder_links").upsert(
+    {
+      deal_id: dealId,
+      founder_key: founderKey(placeholder),
+      founder_name: placeholder,
+      linkedin_url: canonical,
+      updated_by: user.id,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "deal_id,founder_key" },
+  )
+
+  if (error) return { error: error.message }
+
+  await retriggerTeamFlow(supabase, dealId)
+
+  revalidatePath(`/deals/${dealId}/team`)
+  return { url: canonical }
 }
 
 /** Drop the override and fall back to whatever the analysis extracted. */

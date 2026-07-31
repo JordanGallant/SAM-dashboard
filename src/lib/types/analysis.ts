@@ -48,6 +48,8 @@ export interface FounderRow {
   linkedinUrl?: string
   /** True when linkedinUrl came from a manual paste rather than extraction. */
   linkedinManual?: boolean
+  /** True for a founder the user added by hand because the analysis missed them. */
+  addedByUser?: boolean
 }
 
 export interface TeamAnalysis {
