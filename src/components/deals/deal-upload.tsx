@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, FileText, Loader2, Trash2, UploadCloud } from "lucide-react"
 import { registerDocument, deleteDocument } from "@/app/actions/documents"
 import { createClient } from "@/lib/supabase/client"
+import { uploadToStorage, removeFromStorage } from "@/lib/storage-client"
 import { friendlyError, type FriendlyError } from "@/lib/errors"
 import { cn } from "@/lib/utils"
 import type { DealDocument, DocType } from "@/lib/types/deal"
@@ -70,11 +71,7 @@ export function DealUpload({
 
       const storagePath = `${user.id}/${dealId}/${Date.now()}_${safeName(file.name)}`
 
-      const { error: uploadError } = await supabase.storage
-        .from("pitch-decks")
-        .upload(storagePath, file, { contentType: file.type, upsert: false })
-
-      if (uploadError) throw new Error(uploadError.message)
+      await uploadToStorage(storagePath, file)
 
       const result = await registerDocument({
         dealId,
@@ -85,7 +82,7 @@ export function DealUpload({
       })
 
       if (result.error) {
-        await supabase.storage.from("pitch-decks").remove([storagePath])
+        await removeFromStorage(storagePath)
         throw new Error(result.error)
       }
 

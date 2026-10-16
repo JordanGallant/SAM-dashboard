@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { uploadFile, removeFiles } from "@/lib/storage"
 import type { DocType } from "@/lib/types/deal"
 
-// Insert documents row after the browser already uploaded the file directly to Supabase Storage.
+// Insert documents row after the browser already uploaded the file directly to Azure Blob storage.
 // This path avoids the Vercel server-action 4.5MB body cap (real pitch decks are 10-50 MB).
 export async function registerDocument(args: {
   dealId: string
@@ -41,7 +42,7 @@ export async function registerDocument(args: {
   })
 
   if (dbError) {
-    await supabase.storage.from("pitch-decks").remove([args.storagePath])
+    await removeFiles([args.storagePath]).catch(() => {})
     return { error: dbError.message }
   }
 
@@ -76,11 +77,11 @@ export async function uploadDocument(dealId: string, formData: FormData) {
   const safeFilename = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_")
   const storagePath = `${user.id}/${dealId}/${Date.now()}_${safeFilename}`
 
-  const { error: uploadError } = await supabase.storage
-    .from("pitch-decks")
-    .upload(storagePath, file, { contentType: file.type })
-
-  if (uploadError) return { error: uploadError.message }
+  try {
+    await uploadFile(storagePath, file, file.type)
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Upload failed" }
+  }
 
   // Insert documents row
   const { error: dbError } = await supabase.from("documents").insert({
@@ -93,7 +94,7 @@ export async function uploadDocument(dealId: string, formData: FormData) {
 
   if (dbError) {
     // Clean up orphaned file
-    await supabase.storage.from("pitch-decks").remove([storagePath])
+    await removeFiles([storagePath]).catch(() => {})
     return { error: dbError.message }
   }
 
@@ -113,7 +114,7 @@ export async function deleteDocument(documentId: string, dealId: string) {
     .single()
 
   if (doc?.storage_path) {
-    await supabase.storage.from("pitch-decks").remove([doc.storage_path])
+    await removeFiles([doc.storage_path]).catch(() => {})
   }
 
   const { error } = await supabase.from("documents").delete().eq("id", documentId)

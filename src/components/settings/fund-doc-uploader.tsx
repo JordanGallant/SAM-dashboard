@@ -1,6 +1,6 @@
 "use client"
 
-// Mirrors deal-upload.tsx: client uploads PDF directly to Supabase Storage
+// Mirrors deal-upload.tsx: client uploads PDF directly to Azure Blob storage
 // (skips Vercel's serverless body-size limit), then POSTs the storage path
 // to /api/fund-doc which extracts the text and persists it onto the funds
 // row. The doc text becomes authoritative fund context for Flow 10.
@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from "react"
 import { UploadCloud, FileText, AlertCircle, Loader2, X, Sparkles } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { uploadToStorage, removeFromStorage } from "@/lib/storage-client"
 import { friendlyError, type FriendlyError } from "@/lib/errors"
 
 const ACCEPTED_MIME = "application/pdf"
@@ -111,10 +112,7 @@ export function FundDocUploader({
       const filename = `${Date.now()}_${safeName(file.name)}`
       const storagePath = `${user.id}/fund-docs/${filename}`
 
-      const { error: upErr } = await supabase.storage
-        .from("pitch-decks")
-        .upload(storagePath, file, { contentType: file.type, upsert: false })
-      if (upErr) throw new Error(upErr.message)
+      await uploadToStorage(storagePath, file)
 
       const res = await fetch("/api/fund-doc", {
         method: "POST",
@@ -127,7 +125,7 @@ export function FundDocUploader({
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        await supabase.storage.from("pitch-decks").remove([storagePath]).catch(() => {})
+        await removeFromStorage(storagePath)
         throw new Error(data.error || "Could not process the document")
       }
 

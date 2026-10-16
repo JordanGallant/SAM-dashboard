@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { CheckCircle2, FileText, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
 import { useUpload } from "@/components/upload-context"
 import { createClient } from "@/lib/supabase/client"
+import { uploadToStorage } from "@/lib/storage-client"
 
 const STEPS = [
   "Uploading file",
@@ -45,13 +46,10 @@ export default function UploadingPage() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) throw new Error("Not signed in")
 
-        // 1. Upload PDF directly to Supabase Storage. The browser's session cookie
-        //    authenticates against bucket RLS — the file body never touches Vercel.
+        // 1. Upload PDF directly to Azure Blob via a signed URL from /api/storage
+        //    — the file body never touches Vercel.
         const storagePath = `${user.id}/uploads/${crypto.randomUUID()}/${safeName(file.name)}`
-        const { error: upErr } = await supabase.storage
-          .from("pitch-decks")
-          .upload(storagePath, file, { contentType: "application/pdf", upsert: false })
-        if (upErr) throw new Error(upErr.message || "Upload failed")
+        await uploadToStorage(storagePath, file, "application/pdf")
 
         // 2. Tell the API where to find it; server does extract + deal + n8n trigger.
         setStepIndex(1)

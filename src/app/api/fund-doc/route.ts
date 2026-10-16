@@ -1,5 +1,5 @@
 // Fund 1-pager processing endpoint. Mirrors /api/upload-deck's pattern:
-// the client uploads the PDF directly to Supabase Storage (so we don't hit
+// the client uploads the PDF directly to Azure Blob storage (so we don't hit
 // Vercel's serverless body-size limit), then POSTs the storage path here.
 // We pull the file back, extract text via unpdf, and persist it onto the
 // user's funds row. The text feeds Flow 10's prompt as authoritative fund
@@ -11,6 +11,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { extractText, getDocumentProxy } from "unpdf"
+import { downloadFile, removeFiles } from "@/lib/storage"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 import { upsertHubspotContact } from "@/lib/hubspot"
 import { extractFundFields, isEmptyStr, isEmptyArr, isEmptyNum } from "@/lib/fund-extract"
@@ -58,19 +59,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    // Download the PDF from Supabase Storage (skips Vercel body-size limit).
-    const { data: blob, error: dlErr } = await supabase.storage
-      .from("pitch-decks")
-      .download(storagePath)
-
-    if (dlErr || !blob) {
+    // Download the PDF from Azure Blob storage (skips Vercel body-size limit).
+    let buffer: Buffer
+    try {
+      buffer = await downloadFile(storagePath)
+    } catch (err) {
       return NextResponse.json(
-        { error: dlErr?.message || "Could not read uploaded file" },
+        { error: err instanceof Error ? err.message : "Could not read uploaded file" },
         { status: 400 }
       )
     }
-
-    const buffer = Buffer.from(await blob.arrayBuffer())
 
     let pdfText: string
     try {
@@ -122,10 +120,7 @@ export async function POST(request: Request) {
     if (existing?.one_pager_filename) {
       const previousPath = `${user.id}/fund-docs/${existing.one_pager_filename}`
       if (previousPath !== storagePath) {
-        await supabase.storage
-          .from("pitch-decks")
-          .remove([previousPath])
-          .catch(() => {})
+        await removeFiles([previousPath]).catch(() => {})
       }
     }
 
@@ -319,10 +314,7 @@ export async function DELETE(request: Request) {
 
     if (existing.one_pager_filename) {
       const path = `${user.id}/fund-docs/${existing.one_pager_filename}`
-      await supabase.storage
-        .from("pitch-decks")
-        .remove([path])
-        .catch(() => {})
+      await removeFiles([path]).catch(() => {})
     }
 
     const { error } = await supabase

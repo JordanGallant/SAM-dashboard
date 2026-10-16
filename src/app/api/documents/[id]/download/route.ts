@@ -4,6 +4,7 @@
 
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { createSignedUrl } from "@/lib/storage"
 
 export const runtime = "nodejs"
 
@@ -25,13 +26,12 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   if (!doc) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
-  const { data: signed, error: sErr } = await supabase.storage
-    .from("pitch-decks")
-    .createSignedUrl(doc.storage_path, 60 * 5)
-
-  if (sErr || !signed?.signedUrl) {
-    return NextResponse.json({ error: sErr?.message ?? "Sign failed" }, { status: 500 })
+  let signedUrl: string
+  try {
+    signedUrl = createSignedUrl(doc.storage_path, 60 * 5)
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Sign failed" }, { status: 500 })
   }
 
-  return NextResponse.redirect(signed.signedUrl, { status: 302 })
+  return NextResponse.redirect(signedUrl, { status: 302 })
 }
