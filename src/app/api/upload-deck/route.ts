@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { extractText, getDocumentProxy } from "unpdf"
+import { createSignedUrl, downloadFile, removeFiles } from "@/lib/storage"
 import OpenAI from "openai"
 import { completionTuning } from "@/lib/azure-ai"
 import { DEAL_STAGES } from "@/lib/constants"
@@ -169,20 +170,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    // Pull the PDF down from Supabase Storage. The body never came through our function,
+    // Pull the PDF down from Azure Blob storage. The body never came through our function,
     // so we don't hit Vercel's serverless body size limit.
-    const { data: blob, error: dlErr } = await supabase.storage
-      .from("pitch-decks")
-      .download(storagePath)
-
-    if (dlErr || !blob) {
+    let buffer: Buffer
+    try {
+      buffer = await downloadFile(storagePath)
+    } catch (err) {
       return NextResponse.json(
-        { error: dlErr?.message || "Could not read uploaded file" },
+        { error: err instanceof Error ? err.message : "Could not read uploaded file" },
         { status: 400 }
       )
     }
-
-    const buffer = Buffer.from(await blob.arrayBuffer())
 
     let deckText: string
     try {
@@ -266,7 +264,7 @@ export async function POST(request: Request) {
 
     if (dealErr || !deal) {
       // Clean up the orphaned upload — no deal row to attach it to.
-      await supabase.storage.from("pitch-decks").remove([storagePath]).catch(() => {})
+      await removeFiles([storagePath]).catch(() => {})
       return NextResponse.json(
         { error: dealErr?.message || "Failed to create deal" },
         { status: 500 }
@@ -309,11 +307,7 @@ export async function POST(request: Request) {
         .single()
 
       if (analysis) {
-        const { data: signed } = await supabase.storage
-          .from("pitch-decks")
-          .createSignedUrl(storagePath, 60 * 60)
-
-        const signedUrl = signed?.signedUrl
+        const signedUrl = createSignedUrl(storagePath, 60 * 60)
         if (signedUrl) {
           try {
             const fundProfileForN8n = fund

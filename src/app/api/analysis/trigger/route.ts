@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { createSignedUrl } from "@/lib/storage"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 import { ANALYSIS_STALE_MS } from "@/lib/types/analysis"
 
@@ -92,23 +93,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No documents to analyze" }, { status: 400 })
     }
 
-    const signedDocs = await Promise.all(
-      documents.map(async (doc) => {
-        const { data: signed, error: signErr } = await supabase.storage
-          .from("pitch-decks")
-          .createSignedUrl(doc.storage_path, 60 * 60)
-
-        if (signErr || !signed?.signedUrl) {
-          throw new Error(`Failed to sign URL for ${doc.filename}`)
-        }
-
-        return {
-          type: doc.doc_type,
-          filename: doc.filename,
-          url: signed.signedUrl,
-        }
-      })
-    )
+    const signedDocs = documents.map((doc) => ({
+      type: doc.doc_type,
+      filename: doc.filename,
+      url: createSignedUrl(doc.storage_path, 60 * 60),
+    }))
 
     const { data: analysis, error: analysisErr } = await supabase
       .from("analyses")
